@@ -17,7 +17,6 @@ var client *mongo.Client
 func ObserveMessages(session *discordgo.Session, errorCh chan<- error) {
 	log.Info().Msgf("adding message handler")
 	session.AddHandler(messageCreate)
-	session.AddHandler(MessageSend)
 
 	var err error
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
@@ -30,11 +29,6 @@ func ObserveMessages(session *discordgo.Session, errorCh chan<- error) {
 func CloseConnection() {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	defer client.Disconnect(ctx)
-}
-
-func MessageSend(s *discordgo.Session, m *discordgo.MessageSend) {
-	log.Info().Msgf("the message %v was send", *m)
-	log.Info().Msgf("%s", m.Content)
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
