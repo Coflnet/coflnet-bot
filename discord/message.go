@@ -31,6 +31,11 @@ func CloseConnection() {
 	defer client.Disconnect(ctx)
 }
 
+func MessageSend(s *discordgo.Session, m *discordgo.MessageSend) {
+	log.Info().Msgf("the message %v was send", *m)
+	log.Info().Msgf("%s", m.Content)
+}
+
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	log.Info().Msgf("storing a message")
 
