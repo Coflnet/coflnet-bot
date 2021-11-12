@@ -19,22 +19,13 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal().Err(err).Msg("Error loading .env file")
+		log.Warn().Err(err).Msg("Error loading .env file")
 	}
 
 	session = getSession()
 	session.Identify.Intents = discordgo.IntentsGuildMessages
 
 	errorCh := make(chan error)
-
-	// go kafka.StartConsumer(errorCh)
-	// go kafka.StartProducer(errorCh)
-	// go server.Start(errorCh)
-
-	// checkAllUsers := os.Getenv("CHECK_ALL_USERS") == "true"
-	// if checkAllUsers {
-	// 	go kafka.CheckAllUsers()
-	// }
 
 	go discord.ObserveMessages(session, errorCh)
 	err = session.Open()

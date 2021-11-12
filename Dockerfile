@@ -16,4 +16,4 @@ FROM alpine:3.14
 
 COPY --from=builder /app/coflnet-bot /usr/local/bin/coflnet-bot
 
-CMD feedback
+CMD coflnet-bot
