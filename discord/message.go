@@ -34,17 +34,23 @@ func CloseConnection() {
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	log.Info().Msgf("storing a message")
 
+	channel, err := s.Channel(m.ChannelID)
+	if err != nil {
+		log.Error().Err(err).Msgf("can not get channel for message %s and channel id %s", m.Content, m.ChannelID)
+	}
+
 	msg := DiscordMessage{
 		Content:   m.Content,
 		Author:    m.Author.Username,
 		Timestamp: time.Now(),
+		Channel:   channel.Name,
 	}
 
 	database := client.Database("discord")
 	messageCollection := database.Collection("messages")
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	_, err := messageCollection.InsertOne(ctx, msg)
+	_, err = messageCollection.InsertOne(ctx, msg)
 
 	if err != nil {
 		log.Error().Err(err).Msgf("error when inserting message")
@@ -55,5 +61,6 @@ type DiscordMessage struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty"`
 	Content   string             `bson:"content,omitempty"`
 	Author    string             `bson:"author,omitempty"`
+	Channel   string             `bson:"channel"`
 	Timestamp time.Time          `bson:"timestamp,omitempty"`
 }
