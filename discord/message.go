@@ -17,12 +17,13 @@ var client *mongo.Client
 func ObserveMessages(session *discordgo.Session, errorCh chan<- error) {
 	log.Info().Msgf("adding message handler")
 	session.AddHandler(messageCreate)
+	session.AddHandler(MessageSend)
 
 	var err error
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	client, err = mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGO_HOST")))
 	if err != nil {
-		panic(err)
+		errorCh <- err
 	}
 }
 
