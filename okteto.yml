@@ -1,0 +1,12 @@
+name: discord-role-updater
+autocreate: true
+image: okteto/golang:1
+command: bash
+securityContext:
+  capabilities:
+    add:
+    - SYS_PTRACE
+sync:
+- .:/usr/src/app
+persistentVolume: 
+  enabled: false
