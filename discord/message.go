@@ -39,11 +39,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		log.Error().Err(err).Msgf("can not get channel for message %s and channel id %s", m.Content, m.ChannelID)
 	}
 
+	var attachmentUrls []string
+	for _, attachemnt := range m.Attachments {
+		attachmentUrls = append(attachmentUrls, attachemnt.ProxyURL)
+	}
 	msg := DiscordMessage{
-		Content:   m.Content,
-		Author:    m.Author.Username,
-		Timestamp: time.Now(),
-		Channel:   channel.Name,
+		Content:     m.Content,
+		Author:      m.Author.Username,
+		Timestamp:   time.Now(),
+		Channel:     channel.Name,
+		Attachments: attachmentUrls,
 	}
 
 	database := client.Database("discord")
@@ -58,9 +63,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 type DiscordMessage struct {
-	ID        primitive.ObjectID `bson:"_id,omitempty"`
-	Content   string             `bson:"content,omitempty"`
-	Author    string             `bson:"author,omitempty"`
-	Channel   string             `bson:"channel"`
-	Timestamp time.Time          `bson:"timestamp,omitempty"`
+	ID          primitive.ObjectID `bson:"_id,omitempty"`
+	Content     string             `bson:"content,omitempty"`
+	Author      string             `bson:"author,omitempty"`
+	Channel     string             `bson:"channel"`
+	Attachments []string           `bson:"attachments"`
+	Timestamp   time.Time          `bson:"timestamp,omitempty"`
 }
