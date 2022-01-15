@@ -3,6 +3,7 @@ module github.com/Coflnet/coflnet-bot
 go 1.16
 
 require (
+	github.com/andersfylling/disgord v0.29.0
 	github.com/andybalholm/brotli v1.0.3 // indirect
 	github.com/arsmn/fiber-swagger/v2 v2.17.0 // indirect
 	github.com/bwmarrin/discordgo v0.23.2 // indirect
@@ -16,6 +17,7 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/prometheus/client_golang v1.11.0 // indirect
 	github.com/rs/zerolog v1.25.0
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
 	github.com/swaggo/swag v1.7.1 // indirect

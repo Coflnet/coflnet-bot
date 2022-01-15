@@ -4,23 +4,21 @@ import (
 	"os"
 
 	"github.com/Coflnet/coflnet-bot/discord"
+	"github.com/Coflnet/coflnet-bot/metrics"
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
 var session *discordgo.Session
 
 func main() {
-
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	// defer database.RedisClose()
-
 	err := godotenv.Load()
 	if err != nil {
 		log.Warn().Err(err).Msg("Error loading .env file")
 	}
+
+	metrics.Init()
 
 	session = getSession()
 	session.Identify.Intents = discordgo.IntentsGuildMessages

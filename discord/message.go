@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Coflnet/coflnet-bot/metrics"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -60,6 +61,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if err != nil {
 		log.Error().Err(err).Msgf("error when inserting message")
 	}
+
+	metrics.MessageProcessed()
 }
 
 type DiscordMessage struct {
