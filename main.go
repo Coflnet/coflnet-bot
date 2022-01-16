@@ -18,7 +18,7 @@ func main() {
 		log.Warn().Err(err).Msg("Error loading .env file")
 	}
 
-	metrics.Init()
+	go metrics.Init()
 
 	session = getSession()
 	session.Identify.Intents = discordgo.IntentsGuildMessages
