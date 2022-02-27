@@ -13,6 +13,11 @@ var (
 		Name: "discord_coflnet_bot_messages_processed",
 		Help: "Count of processed messages",
 	})
+
+	errorsOccured = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "discord_coflnet_bot_errors_occured",
+		Help: "Count of errors occured",
+	})
 )
 
 func Init() {
@@ -22,4 +27,8 @@ func Init() {
 
 func MessageProcessed() {
 	messagesProcessed.Inc()
+}
+
+func ErrorOccured() {
+	errorsOccured.Inc()
 }
