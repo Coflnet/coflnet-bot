@@ -32,14 +32,13 @@ func CloseConnection() {
 	defer client.Disconnect(ctx)
 }
 
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) error {
+func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	log.Info().Msgf("storing a message")
 
 	channel, err := s.Channel(m.ChannelID)
 	if err != nil {
 		metrics.ErrorOccured()
 		log.Error().Err(err).Msgf("can not get channel for message %s and channel id %s", m.Content, m.ChannelID)
-		return err
 	}
 
 	var attachmentUrls []string
@@ -63,11 +62,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	if err != nil {
 		log.Error().Err(err).Msgf("error when inserting message")
 		metrics.ErrorOccured()
-		return err
 	}
 
 	metrics.MessageProcessed()
-	return nil
 }
 
 type DiscordMessage struct {
