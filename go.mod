@@ -6,7 +6,7 @@ require (
 	github.com/andersfylling/disgord v0.29.0
 	github.com/andybalholm/brotli v1.0.3 // indirect
 	github.com/arsmn/fiber-swagger/v2 v2.17.0 // indirect
-	github.com/bwmarrin/discordgo v0.23.2 // indirect
+	github.com/bwmarrin/discordgo v0.24.0 // indirect
 	github.com/confluentinc/confluent-kafka-go v1.7.0
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/go-openapi/jsonreference v0.19.6 // indirect

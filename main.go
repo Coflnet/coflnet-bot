@@ -16,13 +16,15 @@ func main() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Warn().Err(err).Msg("Error loading .env file")
+	} else {
+		log.Info().Msg("loaded .env file")
 	}
 
+	log.Info().Msg("starting metrics server")
 	go metrics.Init()
 
 	session = getSession()
-	session.Identify.Intents = discordgo.IntentsGuildMessages
-
+	session.Identify.Intents = discordgo.IntentsAllWithoutPrivileged
 	errorCh := make(chan error)
 
 	go discord.ObserveMessages(session, errorCh)
@@ -30,6 +32,8 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msgf("discord open failed")
 	}
+
+	log.Info().Msg("discord started")
 
 	err = <-errorCh
 	discord.CloseConnection()

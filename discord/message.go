@@ -8,7 +8,6 @@ import (
 	"github.com/Coflnet/coflnet-bot/metrics"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -33,31 +32,13 @@ func CloseConnection() {
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	log.Info().Msgf("storing a message")
-
-	channel, err := s.Channel(m.ChannelID)
-	if err != nil {
-		metrics.ErrorOccured()
-		log.Error().Err(err).Msgf("can not get channel for message %s and channel id %s", m.Content, m.ChannelID)
-	}
-
-	var attachmentUrls []string
-	for _, attachemnt := range m.Attachments {
-		attachmentUrls = append(attachmentUrls, attachemnt.ProxyURL)
-	}
-	msg := DiscordMessage{
-		Content:     m.Content,
-		Author:      m.Author.Username,
-		Timestamp:   time.Now(),
-		Channel:     channel.Name,
-		Attachments: attachmentUrls,
-	}
+	log.Info().Msgf("received message: %s", m.Content)
 
 	database := client.Database("discord")
 	messageCollection := database.Collection("messages")
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	_, err = messageCollection.InsertOne(ctx, msg)
+	_, err := messageCollection.InsertOne(ctx, m.Message)
 
 	if err != nil {
 		log.Error().Err(err).Msgf("error when inserting message")
@@ -65,13 +46,4 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	metrics.MessageProcessed()
-}
-
-type DiscordMessage struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	Content     string             `bson:"content,omitempty"`
-	Author      string             `bson:"author,omitempty"`
-	Channel     string             `bson:"channel"`
-	Attachments []string           `bson:"attachments"`
-	Timestamp   time.Time          `bson:"timestamp,omitempty"`
 }
