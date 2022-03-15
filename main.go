@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/Coflnet/coflnet-bot/api"
+	"github.com/Coflnet/coflnet-bot/mongo"
 	"os"
 
 	"github.com/Coflnet/coflnet-bot/discord"
@@ -23,6 +25,19 @@ func main() {
 	log.Info().Msg("starting metrics server")
 	go metrics.Init()
 
+	err = mongo.Init()
+	if err != nil {
+		log.Error().Err(err).Msg("error connecting to database")
+	}
+	defer mongo.CloseConnection()
+
+	go func() {
+		err := api.Start()
+		if err != nil {
+			log.Fatal().Err(err).Msg("fatal error from api server")
+		}
+	}()
+
 	session = getSession()
 	session.Identify.Intents = discordgo.IntentsAllWithoutPrivileged
 	errorCh := make(chan error)
@@ -36,7 +51,6 @@ func main() {
 	log.Info().Msg("discord started")
 
 	err = <-errorCh
-	discord.CloseConnection()
 	log.Fatal().Err(err).Msgf("quit program due to error")
 
 }

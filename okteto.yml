@@ -8,5 +8,7 @@ securityContext:
     - SYS_PTRACE
 sync:
 - .:/usr/src/app
+forward:
+- 3000:3000
 persistentVolume: 
   enabled: false
