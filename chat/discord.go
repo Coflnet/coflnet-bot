@@ -62,9 +62,20 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 
-	content := fmt.Sprintf("%s%s: %s", message.Prefix, message.Name, message.Message)
+	content := fmt.Sprintf("%s: %s", message.Name, message.Message)
 
-	_, err := session.ChannelMessageSend(coflChatId, content)
+	_, err := session.ChannelMessageSendComplex(coflChatId, &discordgo.MessageSend{
+		Content: content,
+		Embeds: []*discordgo.MessageEmbed{
+			{
+				Title: message.Name,
+				Author: &discordgo.MessageEmbedAuthor{
+					Name: message.Name,
+				},
+				Type: "rich",
+			},
+		},
+	})
 
 	if err != nil {
 		log.Error().Err(err).Msgf("error sending message to discord chat")
