@@ -2,16 +2,18 @@ package mongo
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
 	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
-	client            *mongo.Client
-	database          *mongo.Database
-	messageCollection *mongo.Collection
+	client             *mongo.Client
+	database           *mongo.Database
+	messageCollection  *mongo.Collection
+	coflChatCollection *mongo.Collection
 )
 
 func Init() error {
@@ -25,6 +27,7 @@ func Init() error {
 
 	database = client.Database("discord")
 	messageCollection = database.Collection("messages")
+	coflChatCollection = database.Collection("cofl_chat")
 
 	return nil
 }

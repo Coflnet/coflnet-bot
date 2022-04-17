@@ -3,11 +3,12 @@ package mongo
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"time"
 )
 
 func InsertMessage(message *discordgo.Message) error {
@@ -16,6 +17,7 @@ func InsertMessage(message *discordgo.Message) error {
 
 	return err
 }
+
 func CountMessagesOfPlayer(name string) (int32, error) {
 	matchStage := bson.D{{"$match", bson.D{{"author", name}}}}
 	countStage := bson.D{{"$count", "author"}}
