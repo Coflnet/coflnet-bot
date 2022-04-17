@@ -65,12 +65,17 @@ func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 	content := fmt.Sprintf("%s: %s", message.Name, message.Message)
 
 	_, err := session.ChannelMessageSendComplex(coflChatId, &discordgo.MessageSend{
-		Content: content,
 		Embeds: []*discordgo.MessageEmbed{
 			{
-				Title: message.Name,
+				Title: content,
 				Author: &discordgo.MessageEmbedAuthor{
 					Name: message.Name,
+				},
+				Fields: []*discordgo.MessageEmbedField{
+					{
+						Name:  "Prefix",
+						Value: message.Prefix,
+					},
 				},
 				Type: "rich",
 			},
