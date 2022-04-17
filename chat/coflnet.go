@@ -75,7 +75,6 @@ func sendMessageToChatApi(msg *discordgo.MessageCreate) error {
 		Timeout: 10 * time.Second,
 	}
 
-	log.Warn().Msgf("not sending request, for test purpose")
 	log.Info().Msgf("message: %s, name: %s, uuid: %s, clientName: %s, prefix: %s", payload.Message, payload.Name, payload.UUID, payload.ClientName, payload.Prefix)
 
 	response, err := client.Do(requet)
@@ -85,7 +84,6 @@ func sendMessageToChatApi(msg *discordgo.MessageCreate) error {
 
 	log.Info().Msgf("response code %s", response.Status)
 
-	// TODO delete old message it will be replaced with the new embed one
 	session.ChannelMessageDelete(msg.ChannelID, msg.Message.ID)
 
 	return nil
