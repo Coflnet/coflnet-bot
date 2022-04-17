@@ -84,12 +84,15 @@ func sendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	// }
 
 	// log.Info().Msgf("response code %s", response.Status)
+
+	// TODOrg delete old message it will be replaced with the new embed one
+
 	return nil
 }
 
 func GetUuidForPlayer(name string) string {
 	apiBaseUrl := os.Getenv("COFL_API_BASE_URL")
-	p := fmt.Sprintf("/api/search/player/%s", name)
+	p := fmt.Sprintf("/search/player/%s", name)
 
 	u, err := url.Parse(apiBaseUrl)
 	if err != nil {
