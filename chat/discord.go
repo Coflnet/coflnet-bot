@@ -82,13 +82,10 @@ func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 					Name:    message.Name,
 					IconURL: iconUrl,
 				},
-				Fields: []*discordgo.MessageEmbedField{
-					{
-						Name:  "client",
-						Value: message.ClientName,
-					},
+				Footer: &discordgo.MessageEmbedFooter{
+					IconURL: "https://avatars.githubusercontent.com/u/42452044?s=280&v=4",
+					Text:    message.ClientName,
 				},
-				Type: "rich",
 			},
 		},
 	})
