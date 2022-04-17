@@ -53,7 +53,7 @@ func sendMessageToChatApi(msg *discordgo.MessageCreate) error {
 		Name:       msg.Author.Username,
 		UUID:       uuid,
 		ClientName: "coflnet-discord",
-		Prefix:     "d",
+		Prefix:     "cofl-dc",
 	}
 
 	body, err := json.Marshal(payload)
@@ -71,21 +71,22 @@ func sendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	requet.Header.Set("Content-Type", "application/json")
 	requet.Header.Set("Authorization", apiKey)
 
-	_ = &http.Client{
+	client := &http.Client{
 		Timeout: 10 * time.Second,
 	}
 
 	log.Warn().Msgf("not sending request, for test purpose")
 	log.Info().Msgf("message: %s, name: %s, uuid: %s, clientName: %s, prefix: %s", payload.Message, payload.Name, payload.UUID, payload.ClientName, payload.Prefix)
 
-	// response, err := client.Do(requet)
-	// if err != nil {
-	// 	log.Error().Err(err).Msgf("error sending request, status: %s")
-	// }
+	response, err := client.Do(requet)
+	if err != nil {
+		log.Error().Err(err).Msgf("error sending request, status: %s")
+	}
 
-	// log.Info().Msgf("response code %s", response.Status)
+	log.Info().Msgf("response code %s", response.Status)
 
-	// TODOrg delete old message it will be replaced with the new embed one
+	// TODO delete old message it will be replaced with the new embed one
+	session.ChannelMessageDelete(msg.ChannelID, msg.Message.ID)
 
 	return nil
 }
