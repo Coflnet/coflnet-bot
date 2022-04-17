@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/Coflnet/coflnet-bot/metrics"
@@ -61,9 +62,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 
-	log.Info().Msgf("sending message: %s", message.Message)
+	content := fmt.Sprintf("%s%s: %s", message.Prefix, message.Name, message.Message)
 
-	_, err := session.ChannelMessageSend(coflChatId, message.Message)
+	_, err := session.ChannelMessageSend(coflChatId, content)
 
 	if err != nil {
 		log.Error().Err(err).Msgf("error sending message to discord chat")
