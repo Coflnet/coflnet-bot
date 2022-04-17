@@ -88,7 +88,7 @@ func sendMessageToChatApi(msg *discordgo.MessageCreate) error {
 }
 
 func GetUuidForPlayer(name string) string {
-	apiBaseUrl := os.Getenv("API_BASE_URL")
+	apiBaseUrl := os.Getenv("COFL_API_BASE_URL")
 	p := fmt.Sprintf("/api/search/player/%s", name)
 
 	u, err := url.Parse(apiBaseUrl)

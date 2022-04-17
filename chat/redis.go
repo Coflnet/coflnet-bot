@@ -94,6 +94,5 @@ func processMessage(msg *redis.Message) error {
 		return err
 	}
 
-	log.Info().Msgf("message %s processed", message.Message)
 	return nil
 }
