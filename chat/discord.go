@@ -1,7 +1,6 @@
 package chat
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/Coflnet/coflnet-bot/metrics"
@@ -62,19 +61,17 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 
-	content := fmt.Sprintf("%s: %s", message.Name, message.Message)
-
 	_, err := session.ChannelMessageSendComplex(coflChatId, &discordgo.MessageSend{
 		Embeds: []*discordgo.MessageEmbed{
 			{
-				Title: content,
+				Title: message.Message,
 				Author: &discordgo.MessageEmbedAuthor{
 					Name: message.Name,
 				},
 				Fields: []*discordgo.MessageEmbedField{
 					{
-						Name:  "Prefix",
-						Value: message.Prefix,
+						Name:  "client",
+						Value: message.ClientName,
 					},
 				},
 				Type: "rich",
