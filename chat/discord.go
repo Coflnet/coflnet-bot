@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/Coflnet/coflnet-bot/metrics"
@@ -47,7 +48,7 @@ func ObserveMessages() {
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	log.Info().Msgf("received message: %s", m.Content)
+	log.Info().Msgf("received discord message: %s", m.Content)
 
 	err := mongo.InsertMessage(m.Message)
 
@@ -56,17 +57,30 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		metrics.ErrorOccured()
 	}
 
+	err = sendMessageToChatApi(m)
+	if err != nil {
+		log.Error().Err(err).Msgf("error when sending message to chat api")
+		metrics.ErrorOccured()
+	}
+
 	metrics.MessageProcessed()
 }
 
 func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
+
+	if message.UUID == "" {
+		return fmt.Errorf("no icon url is set")
+	}
+
+	iconUrl := fmt.Sprintf("https://crafatar.com/avatars/%s", message.UUID)
 
 	_, err := session.ChannelMessageSendComplex(coflChatId, &discordgo.MessageSend{
 		Embeds: []*discordgo.MessageEmbed{
 			{
 				Title: message.Message,
 				Author: &discordgo.MessageEmbedAuthor{
-					Name: message.Name,
+					Name:    message.Name,
+					IconURL: iconUrl,
 				},
 				Fields: []*discordgo.MessageEmbedField{
 					{
@@ -84,5 +98,21 @@ func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 		return err
 	}
 
+	return nil
+}
+
+func sendMessageToChatApi(msg *discordgo.MessageCreate) error {
+
+	if msg.ChannelID != coflChatId {
+		log.Info().Msgf("message not in cofl chat, skipping")
+		return nil
+	}
+
+	if msg.Author.ID == "888725077191974913" {
+		log.Info().Msgf("message from cofl bot, skipping")
+		return nil
+	}
+
+	log.Info().Msgf("sending message to chat api")
 	return nil
 }

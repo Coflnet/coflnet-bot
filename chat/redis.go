@@ -62,7 +62,7 @@ func StartConsume() error {
 			return err
 		}
 
-		log.Info().Msgf("received chat message: %s", msg.Payload)
+		log.Info().Msgf("received redis message: %s", msg.Payload)
 		processMessage(msg)
 	}
 }
