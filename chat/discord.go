@@ -97,3 +97,11 @@ func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 
 	return nil
 }
+
+func sendInvalidUUIDMessageToDiscord(message *discordgo.Message) {
+	session.ChannelMessageSendReply(message.ChannelID, "no uuid found for player "+message.Author.Username, &discordgo.MessageReference{
+		MessageID: message.ID,
+		ChannelID: message.ChannelID,
+		GuildID:   message.GuildID,
+	})
+}

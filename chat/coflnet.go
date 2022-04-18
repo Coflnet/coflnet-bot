@@ -42,11 +42,15 @@ func sendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	u.Path = path.Join(u.Path, p)
 
 	uuid := GetUuidForPlayer(msg.Author.Username)
-	if uuid != "" {
-		log.Info().Msgf("found uuid for player %s", msg.Author.Username)
-	} else {
-		log.Info().Msgf("no uuid found for player %s", msg.Author.Username)
+	if uuid == "" {
+		log.Warn().Msgf("no uuid found for player %s", msg.Author.Username)
+
+		sendInvalidUUIDMessageToDiscord(msg.Message)
+
+		return nil
 	}
+
+	log.Info().Msgf("found uuid for player %s", msg.Author.Username)
 
 	payload := &ChatApiPayload{
 		Message:    msg.Content,
