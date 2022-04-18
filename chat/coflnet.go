@@ -52,7 +52,7 @@ func sendMessageToChatApi(msg *discordgo.MessageCreate) error {
 		Message:    msg.Content,
 		Name:       msg.Author.Username,
 		UUID:       uuid,
-		ClientName: "coflnet-discord",
+		ClientName: "cofl-discord",
 		Prefix:     "cofl-dc",
 	}
 
