@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/bson"
 	m "go.mongodb.org/mongo-driver/mongo"
 )
@@ -60,10 +61,12 @@ func SearchByDiscordTag(discordTag string) (*User, error) {
 func InsertUser(user *User) error {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	_, err := userCollection.InsertOne(ctx, user)
+	result, err := userCollection.InsertOne(ctx, user)
 	if err != nil {
 		return err
 	}
+
+	log.Info().Msgf("inserted user %v", result.InsertedID)
 
 	return nil
 }
@@ -71,10 +74,12 @@ func InsertUser(user *User) error {
 func UpdateUser(user *User) error {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	_, err := userCollection.ReplaceOne(ctx, bson.D{{"user_id", user.UserId}}, user)
+	result, err := userCollection.ReplaceOne(ctx, bson.D{{"user_id", user.UserId}}, user)
 	if err != nil {
 		return err
 	}
+
+	log.Info().Msgf("modified %v user (%d)", result.ModifiedCount, user.UserId)
 
 	return nil
 }

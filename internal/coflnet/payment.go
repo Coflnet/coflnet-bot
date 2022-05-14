@@ -16,8 +16,6 @@ const PREMIUM_PRODUCT_SLUG = "premium"
 func PaymentUserById(userId int) (time.Time, error) {
 	url := fmt.Sprintf("%s/User/%d/owns/%s/until", os.Getenv("PAYMENT_URL"), userId, PREMIUM_PRODUCT_SLUG)
 
-	log.Info().Msgf("calling payment api %s", url)
-
 	response, err := http.DefaultClient.Get(url)
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting user from payment, userId: %d", userId)

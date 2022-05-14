@@ -23,8 +23,6 @@ type McConnectGetUserResponse struct {
 func UserMcConnect(userId int) (*mongo.User, error) {
 	url := fmt.Sprintf("%s/Connect/user/%d", os.Getenv("MC_CONNECT_URL"), userId)
 
-	log.Info().Msgf("calling mc connect path %s", url)
-
 	response, err := http.DefaultClient.Get(url)
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting user from mc connect, userId: %d", userId)

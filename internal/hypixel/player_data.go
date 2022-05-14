@@ -20,8 +20,6 @@ func PlayerData(uuid string) (*PlayerDataResponse, error) {
 		return nil, err
 	}
 
-	log.Info().Msgf("calling hypixel at url: %s", u.String())
-
 	request := http.Request{
 		Method: "GET",
 		URL:    u,
