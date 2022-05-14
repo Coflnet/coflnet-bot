@@ -75,7 +75,7 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 		Name:       msg.Author.Username,
 		UUID:       user.MinecraftUuids[0],
 		ClientName: "cofl-discord",
-		Prefix:     "cofl-dc",
+		Prefix:     "[cofl-dc] ",
 	}
 
 	body, err := json.Marshal(payload)
