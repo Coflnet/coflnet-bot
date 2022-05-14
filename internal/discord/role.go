@@ -9,7 +9,7 @@ import (
 
 func SetFlipperRoleForUser(user *mongo.User) error {
 
-	if len(user.DiscordNames) == 0 {
+	if user.DiscordNames == nil || len(user.DiscordNames) == 0 {
 		log.Info().Msgf("user %d has no discord names, skip flipper role check", user.UserId)
 		return nil
 	}
