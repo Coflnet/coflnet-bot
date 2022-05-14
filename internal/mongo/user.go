@@ -20,7 +20,7 @@ type User struct {
 func SearchByUserId(userId int) (*User, error) {
 
 	filter := bson.D{{"user_id", userId}}
-	ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	res := userCollection.FindOne(ctx, filter)
 
@@ -41,7 +41,7 @@ func SearchByDiscordTag(discordTag string) (*User, error) {
 	filter := bson.D{{"discord_names",
 		bson.D{{"$elemMatch", bson.D{{"$eq", discordTag}}}},
 	}}
-	ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	res := userCollection.FindOne(ctx, filter)
 
@@ -59,7 +59,7 @@ func SearchByDiscordTag(discordTag string) (*User, error) {
 }
 
 func InsertUser(user *User) error {
-	ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	result, err := userCollection.InsertOne(ctx, user)
 	if err != nil {
@@ -72,7 +72,7 @@ func InsertUser(user *User) error {
 }
 
 func UpdateUser(user *User) error {
-	ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	result, err := userCollection.ReplaceOne(ctx, bson.D{{"user_id", user.UserId}}, user)
 	if err != nil {
@@ -98,7 +98,7 @@ func SaveUser(user *User) error {
 }
 
 func DeleteUser(user *User) error {
-	ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	_, err := userCollection.DeleteOne(ctx, bson.D{{"user_id", user.UserId}})
 	if err != nil {
