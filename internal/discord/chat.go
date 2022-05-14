@@ -109,8 +109,6 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 
 	log.Info().Msgf("response code %s", response.Status)
 
-	session.ChannelMessageDelete(msg.ChannelID, msg.Message.ID)
-
 	return nil
 }
 
