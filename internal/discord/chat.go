@@ -22,11 +22,17 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 		return nil
 	}
 
+	// coflnet bot
 	if msg.Author.ID == "888725077191974913" {
 		return nil
 	}
 
 	if msg.Author.Bot {
+		return nil
+	}
+
+	// webhook
+	if msg.Author.ID == "975127829916286986" {
 		return nil
 	}
 
