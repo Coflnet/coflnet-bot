@@ -18,7 +18,7 @@ type TransactionMessage struct {
 	ProductSlug  string    `json:"ProductSlug"`
 	ProductId    int64     `json:"ProductId"`
 	OwnedSeconds int64     `json:"OwnedSeconds"`
-	Amount       int64     `json:"Amount"`
+	Amount       float64   `json:"Amount"`
 	Timestamp    time.Time `json:"Timestamp"`
 }
 
