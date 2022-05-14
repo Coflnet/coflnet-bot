@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
@@ -89,9 +88,6 @@ func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 		Username:  message.Name,
 		AvatarUrl: iconUrl,
 	}
-
-	log.Info().Msgf("sending message %s to discord webhook in 3 seconds", message.Message)
-	time.Sleep(time.Second * 3)
 
 	body, err := json.Marshal(data)
 	if err != nil {

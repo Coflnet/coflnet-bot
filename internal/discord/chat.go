@@ -36,9 +36,6 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 		return nil
 	}
 
-	log.Info().Msgf("sending message to chat api in 3 seconds: %s", msg.Content)
-	time.Sleep(time.Second * 3)
-
 	log.Info().Msgf("sending message to chat api")
 
 	apiKey := os.Getenv("COFL_CHAT_API_KEY")
