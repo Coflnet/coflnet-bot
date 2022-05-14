@@ -26,6 +26,13 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 		return nil
 	}
 
+	if msg.Author.Bot {
+		return nil
+	}
+
+	log.Info().Msgf("sending message to chat api: %s", msg.Content)
+	time.Sleep(time.Second * 30)
+
 	log.Info().Msgf("sending message to chat api")
 
 	apiKey := os.Getenv("COFL_CHAT_API_KEY")

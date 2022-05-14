@@ -1,7 +1,10 @@
 package discord
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
@@ -66,6 +69,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	metrics.MessageProcessed()
 }
 
+type WebhookRequest struct {
+	Content   string `json:"content"`
+	Username  string `json:"username"`
+	AvatarUrl string `json:"avatar_url"`
+}
+
 func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 
 	if message.UUID == "" {
@@ -73,22 +82,21 @@ func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 	}
 
 	iconUrl := fmt.Sprintf("https://crafatar.com/avatars/%s", message.UUID)
+	url := os.Getenv("CHAT_WEBHOOK")
+	data := &WebhookRequest{
+		Content:   message.Message,
+		Username:  message.Name,
+		AvatarUrl: iconUrl,
+	}
 
-	_, err := session.ChannelMessageSendComplex(coflChatId, &discordgo.MessageSend{
-		Embeds: []*discordgo.MessageEmbed{
-			{
-				Title: message.Message,
-				Author: &discordgo.MessageEmbedAuthor{
-					Name:    message.Name,
-					IconURL: iconUrl,
-				},
-				Footer: &discordgo.MessageEmbedFooter{
-					IconURL: "https://avatars.githubusercontent.com/u/42452044?s=280&v=4",
-					Text:    message.ClientName,
-				},
-			},
-		},
-	})
+	log.Info().Msgf("sending message %s to discord webhook in 30 seconds", message.Message)
+
+	body, err := json.Marshal(data)
+	if err != nil {
+		log.Error().Err(err).Msgf("can not marshal webhook request")
+	}
+
+	_, err = http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
 
 	if err != nil {
 		log.Error().Err(err).Msgf("error sending message to discord chat")
