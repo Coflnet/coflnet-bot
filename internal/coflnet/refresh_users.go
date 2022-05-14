@@ -23,7 +23,10 @@ func refreshUsers() {
 		} else {
 			errorCounter = 0
 		}
-		log.Info().Msgf("refreshed user %d, errorCounter: %d", id, errorCounter)
+
+		if id%100 == 0 {
+			log.Info().Msgf("refreshed %d users", id)
+		}
 
 		id++
 		time.Sleep(time.Second * 20)

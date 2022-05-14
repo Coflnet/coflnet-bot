@@ -19,12 +19,10 @@ import (
 func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 
 	if msg.ChannelID != coflChatId {
-		log.Info().Msgf("message not in cofl chat, skipping")
 		return nil
 	}
 
 	if msg.Author.ID == "888725077191974913" {
-		log.Info().Msgf("message from cofl bot, skipping")
 		return nil
 	}
 
