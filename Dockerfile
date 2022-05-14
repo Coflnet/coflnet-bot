@@ -1,19 +1,18 @@
-FROM golang:1.16.6-alpine3.14 as builder
+FROM golang:1.18.2-bullseye as builder
 
 WORKDIR /app
 
-COPY go.mod .
-COPY go.sum .
+COPY go.mod go.sum ./
 
 RUN go mod download
 
 COPY . .
 
-RUN go build .
+RUN go build cmd/coflnet-bot/main.go
 
 
-FROM alpine:3.14
+FROM alpine:3.15
 
-COPY --from=builder /app/coflnet-bot /usr/local/bin/coflnet-bot
+COPY --from=builder /app/main /usr/local/bin/coflnet-bot
 
 CMD coflnet-bot
