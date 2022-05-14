@@ -90,8 +90,8 @@ func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 		AvatarUrl: iconUrl,
 	}
 
-	log.Info().Msgf("sending message %s to discord webhook in 30 seconds", message.Message)
-	time.Sleep(time.Second * 30)
+	log.Info().Msgf("sending message %s to discord webhook in 3 seconds", message.Message)
+	time.Sleep(time.Second * 3)
 
 	body, err := json.Marshal(data)
 	if err != nil {
