@@ -78,7 +78,7 @@ func processMessage(msg *redis.Message) error {
 		return err
 	}
 
-	if message.ClientName == "coflnet-discord" {
+	if message.ClientName == "cofl-discord" {
 		return nil
 	}
 
