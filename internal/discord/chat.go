@@ -40,7 +40,9 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 
 	u.Path = path.Join(u.Path, p)
 
-	user, err := mongo.SearchByDiscordTag(msg.Author.Username)
+	username := fmt.Sprintf("%s#%s", msg.Author.Username, msg.Author.Discriminator)
+	log.Info().Msgf("searching username %s", username)
+	user, err := mongo.SearchByDiscordTag(username)
 	if err != nil {
 		log.Error().Err(err).Msgf("error when searching user %s in db", msg.Author.Username)
 		return err
