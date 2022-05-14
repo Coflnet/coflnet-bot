@@ -42,17 +42,17 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 
 	username := fmt.Sprintf("%s#%s", msg.Author.Username, msg.Author.Discriminator)
 	log.Info().Msgf("searching username %s", username)
+
 	user, err := mongo.SearchByDiscordTag(username)
 	if err != nil {
-		log.Error().Err(err).Msgf("error when searching user %s in db", msg.Author.Username)
+		log.Error().Err(err).Msgf("error when searching user %s in db", username)
 		return err
 	}
 
 	if user == nil {
-		log.Warn().Msgf("user %s not found in db", msg.Author.Username)
+		log.Warn().Msgf("user %s not found in db", username)
 
-		// TODO notify user
-		// sendInvalidUUIDMessageToDiscord(msg.Message)
+		sendInvalidUUIDMessageToDiscord(msg.Message)
 
 		return nil
 	}
