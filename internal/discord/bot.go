@@ -1,11 +1,11 @@
-package chat
+package discord
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/Coflnet/coflnet-bot/metrics"
-	"github.com/Coflnet/coflnet-bot/mongo"
+	"github.com/Coflnet/coflnet-bot/internal/metrics"
+	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
 )
@@ -57,7 +57,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		metrics.ErrorOccured()
 	}
 
-	err = sendMessageToChatApi(m)
+	err = SendMessageToChatApi(m)
 	if err != nil {
 		log.Error().Err(err).Msgf("error when sending message to chat api")
 		metrics.ErrorOccured()

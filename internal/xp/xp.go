@@ -1,7 +1,7 @@
 package xp
 
 import (
-	"github.com/Coflnet/coflnet-bot/mongo"
+	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/rs/zerolog/log"
 )
 

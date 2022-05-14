@@ -14,6 +14,7 @@ var (
 	database           *mongo.Database
 	messageCollection  *mongo.Collection
 	coflChatCollection *mongo.Collection
+	userCollection     *mongo.Collection
 )
 
 func Init() error {
@@ -28,6 +29,7 @@ func Init() error {
 	database = client.Database("discord")
 	messageCollection = database.Collection("messages")
 	coflChatCollection = database.Collection("cofl_chat")
+	userCollection = database.Collection("users")
 
 	return nil
 }

@@ -1,6 +1,7 @@
 name: discord-role-updater
+namespace: dev
 autocreate: true
-image: okteto/golang:1
+image: golang:1.18.2-bullseye
 command: bash
 securityContext:
   capabilities:
@@ -9,6 +10,6 @@ securityContext:
 sync:
 - .:/usr/src/app
 forward:
-- 3000:3000
+- 8080:8080
 persistentVolume: 
   enabled: false

@@ -1,4 +1,4 @@
-package chat
+package discord
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Coflnet/coflnet-bot/mongo"
+	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog/log"
 )

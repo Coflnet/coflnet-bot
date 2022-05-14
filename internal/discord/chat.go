@@ -1,4 +1,4 @@
-package chat
+package discord
 
 import (
 	"bytes"
@@ -11,11 +11,12 @@ import (
 	"path"
 	"time"
 
+	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
 )
 
-func sendMessageToChatApi(msg *discordgo.MessageCreate) error {
+func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 
 	if msg.ChannelID != coflChatId {
 		log.Info().Msgf("message not in cofl chat, skipping")
@@ -41,21 +42,28 @@ func sendMessageToChatApi(msg *discordgo.MessageCreate) error {
 
 	u.Path = path.Join(u.Path, p)
 
-	uuid := GetUuidForPlayer(msg.Author.Username)
-	if uuid == "" {
-		log.Warn().Msgf("no uuid found for player %s", msg.Author.Username)
+	user, err := mongo.SearchByDiscordTag(msg.Author.Username)
+	if err != nil {
+		log.Error().Err(err).Msgf("error when searching user %s in db", msg.Author.Username)
+		return err
+	}
 
-		sendInvalidUUIDMessageToDiscord(msg.Message)
+	if user == nil {
+		log.Warn().Msgf("user %s not found in db", msg.Author.Username)
+
+		// TODO notify user
+		// sendInvalidUUIDMessageToDiscord(msg.Message)
 
 		return nil
 	}
 
 	log.Info().Msgf("found uuid for player %s", msg.Author.Username)
 
+	// TODO user minecraft uuids at 0 is potentially wrong
 	payload := &ChatApiPayload{
 		Message:    msg.Content,
 		Name:       msg.Author.Username,
-		UUID:       uuid,
+		UUID:       user.MinecraftUuids[0],
 		ClientName: "cofl-discord",
 		Prefix:     "cofl-dc",
 	}
@@ -93,7 +101,10 @@ func sendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	return nil
 }
 
-func GetUuidForPlayer(name string) string {
+func GetUuidForPlayerDeprecated(name string) string {
+
+	log.Warn().Msg("this method should not be used to get the uuid of a player")
+
 	apiBaseUrl := os.Getenv("COFL_API_BASE_URL")
 	p := fmt.Sprintf("/search/player/%s", name)
 
