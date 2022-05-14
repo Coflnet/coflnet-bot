@@ -36,8 +36,7 @@ func main() {
 	go startRedisChatConsume()
 
 	// start kakfak transaction consume
-	log.Warn().Msgf("starting kafka was disabled")
-	// go startKafkaTransactionConsume()
+	go startKafkaTransactionConsume()
 
 	// open discord session and wait for messages
 	discord.InitDiscord()

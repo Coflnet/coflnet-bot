@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"strconv"
 	"time"
 
+	"github.com/Coflnet/coflnet-bot/internal/coflnet"
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/kafka-go"
 )
@@ -63,6 +65,18 @@ func ProcessTransactionMessage(message *kafka.Message) error {
 	}
 
 	log.Info().Msgf("got a %s message from user %d", t.ProductSlug, t.UserId)
+	id, err := strconv.Atoi(t.UserId)
+	if err != nil {
+		log.Error().Err(err).Msgf("could not parse userId from kafka %s", t.UserId)
+		return err
+	}
 
-	return nil
+	user, err := coflnet.UserById(id)
+
+	if err != nil {
+		log.Error().Err(err).Msgf("loading user with id failed %d, cannot update role", t.UserId)
+		return err
+	}
+
+	return SetFlipperRoleForUser(user)
 }
