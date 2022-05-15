@@ -128,3 +128,34 @@ func SetFlipperRoleForUser(user *User) error {
 	log.Info().Msgf("set has_flipper_role %t for user %d, %d documents affected", user.HasFlipperRole, user.UserId, r.ModifiedCount)
 	return nil
 }
+
+func GetUsersWithFlipperRole() (<-chan *User, error) {
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	userChan := make(chan *User)
+
+	filter := bson.D{{"has_flipper_role", true}}
+
+	cursor, err := userCollection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	go func() {
+
+		for cursor.Next(ctx) {
+			var users []*User
+			err = cursor.Decode(&users)
+			if err != nil {
+				continue
+			}
+
+			for _, u := range users {
+				userChan <- u
+			}
+		}
+
+		close(userChan)
+	}()
+
+	return userChan, nil
+}
