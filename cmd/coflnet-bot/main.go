@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/Coflnet/coflnet-bot/internal/api"
 	"github.com/Coflnet/coflnet-bot/internal/discord"
+	"github.com/Coflnet/coflnet-bot/internal/kafka"
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/Coflnet/coflnet-bot/internal/usecase"
@@ -36,7 +37,20 @@ func main() {
 	go startRedisChatConsume()
 
 	// start kakfak transaction consume
-	go startKafkaTransactionConsume()
+	go func() {
+		err := kafka.StartTransactionConsume()
+		if err != nil {
+			log.Fatal().Err(err).Msgf("error consuming messages from kafka")
+		}
+	}()
+
+	// start kafka verification consume
+	go func() {
+		err := kafka.StartVerificationConsume()
+		if err != nil {
+			log.Fatal().Err(err).Msgf("error consuming messages from kafka")
+		}
+	}()
 
 	// open discord session and wait for messages
 	discord.InitDiscord()
@@ -55,12 +69,5 @@ func startRedisChatConsume() {
 	err := discord.StartConsume()
 	if err != nil {
 		log.Fatal().Err(err).Msgf("error consuming messages from chat")
-	}
-}
-
-func startKafkaTransactionConsume() {
-	err := discord.StartTransactionConsume()
-	if err != nil {
-		log.Fatal().Err(err).Msgf("error consuming messages from kafka")
 	}
 }

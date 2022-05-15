@@ -1,13 +1,15 @@
-package discord
+package kafka
 
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"strconv"
 	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/coflnet"
+	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/kafka-go"
 )
@@ -37,7 +39,7 @@ func StartTransactionConsume() error {
 		m, err := r.FetchMessage(ctx)
 
 		if err != nil {
-			log.Error().Err(err).Msgf("error occured when fetching from kafka")
+			log.Error().Err(err).Msgf("error occured when fetching from kafka, transaction topic")
 			return err
 		}
 
@@ -52,6 +54,37 @@ func StartTransactionConsume() error {
 			log.Error().Err(err).Msg("failed to commit messages:")
 		}
 
+	}
+}
+
+func StartVerificationConsume() error {
+	r := kafka.NewReader(kafka.ReaderConfig{
+		Brokers:  []string{os.Getenv("KAFKA_HOST")},
+		GroupID:  "verification-discord-consumer",
+		Topic:    os.Getenv("TOPIC_VERIFICATION"),
+		MinBytes: 10e3,
+		MaxBytes: 10e6,
+	})
+
+	ctx := context.Background()
+	for {
+		m, err := r.FetchMessage(ctx)
+
+		if err != nil {
+			log.Error().Err(err).Msgf("error occured when fetching from kafka, verification topic")
+			return err
+		}
+
+		log.Info().Msgf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
+		err = ProcessVerificationMessage(&m)
+		if err != nil {
+			log.Error().Err(err).Msgf("error processing kafka verification message")
+			continue
+		}
+
+		if err := r.CommitMessages(ctx, m); err != nil {
+			log.Error().Err(err).Msg("failed to commit messages:")
+		}
 	}
 }
 
@@ -78,5 +111,14 @@ func ProcessTransactionMessage(message *kafka.Message) error {
 		return err
 	}
 
-	return SetFlipperRoleForUser(user)
+	return discord.SetFlipperRoleForUser(user)
+}
+
+func ProcessVerificationMessage(message *kafka.Message) error {
+	content := message.Value
+
+	log.Info().Msgf("got a verification message, dont really know what to do with it")
+	fmt.Println(content)
+
+	return nil
 }
