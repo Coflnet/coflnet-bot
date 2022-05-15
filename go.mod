@@ -26,6 +26,7 @@ require (
 	github.com/swaggo/swag v1.7.1 // indirect
 	github.com/ugorji/go v1.2.7 // indirect
 	github.com/valyala/fasthttp v1.30.0 // indirect
+	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	go.mongodb.org/mongo-driver v1.7.4
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
 	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150 // indirect

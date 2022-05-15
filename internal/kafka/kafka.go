@@ -12,6 +12,7 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/kafka-go"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 type TransactionMessage struct {
@@ -22,6 +23,10 @@ type TransactionMessage struct {
 	OwnedSeconds int64     `json:"OwnedSeconds"`
 	Amount       float64   `json:"Amount"`
 	Timestamp    time.Time `json:"Timestamp"`
+}
+
+type VerificationMessage struct {
+	UserId int64 `msgpack:"alias:UserId"`
 }
 
 func StartTransactionConsume() error {
@@ -120,5 +125,13 @@ func ProcessVerificationMessage(message *kafka.Message) error {
 	log.Info().Msgf("got a verification message, dont really know what to do with it")
 	fmt.Println(content)
 
+	var msg VerificationMessage
+	err := msgpack.Unmarshal(content, &msg)
+	if err != nil {
+		log.Error().Err(err).Msgf("could not deserialize verification message")
+		return err
+	}
+
+	log.Info().Msgf("deserialized verification message with userId %d", msg.UserId)
 	return nil
 }
