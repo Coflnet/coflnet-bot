@@ -148,6 +148,11 @@ func GetUuidForPlayerDeprecated(name string) string {
 	var results []PlayerSearchResult
 	err = json.Unmarshal(body, &results)
 
+	if err != nil {
+		log.Error().Err(err).Msgf("error unmarshaling response body")
+		return ""
+	}
+
 	for _, result := range results {
 		if result.Name == name {
 			return result.UUID

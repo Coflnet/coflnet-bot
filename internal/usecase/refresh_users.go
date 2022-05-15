@@ -1,8 +1,10 @@
-package coflnet
+package usecase
 
 import (
 	"time"
 
+	"github.com/Coflnet/coflnet-bot/internal/coflnet"
+	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/rs/zerolog/log"
 )
 
@@ -34,6 +36,12 @@ func refreshUsers() {
 }
 
 func refreshUser(id int) error {
-	_, err := LoadUserById(id)
-	return err
+	u, err := coflnet.LoadUserById(id)
+	if err != nil {
+		return err
+	}
+
+	discord.SetFlipperRoleForUser(u)
+
+	return nil
 }

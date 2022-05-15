@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/Coflnet/coflnet-bot/internal/api"
-	"github.com/Coflnet/coflnet-bot/internal/coflnet"
 	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
+	"github.com/Coflnet/coflnet-bot/internal/usecase"
 
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
@@ -42,7 +42,7 @@ func main() {
 	discord.InitDiscord()
 
 	// start the refresh of the user table
-	go coflnet.StartRefresh()
+	go usecase.StartRefresh()
 
 	// start api
 	err = api.Start()

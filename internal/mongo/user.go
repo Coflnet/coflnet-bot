@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/bson"
 	m "go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type User struct {
@@ -15,6 +16,7 @@ type User struct {
 	DiscordNames   []string  `json:"discordNames" bson:"discord_names"`
 	MinecraftUuids []string  `json:"minecraftUuids" bson:"minecraft_uuids"`
 	LastRefresh    time.Time `json:"lastRefresh" bson:"last_refresh"`
+	HasFlipperRole bool      `json:"hasFlipperRole" bson:"has_flipper_role"`
 }
 
 func SearchByUserId(userId int) (*User, error) {
@@ -61,12 +63,10 @@ func SearchByDiscordTag(discordTag string) (*User, error) {
 func InsertUser(user *User) error {
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 
-	result, err := userCollection.InsertOne(ctx, user)
+	_, err := userCollection.InsertOne(ctx, user)
 	if err != nil {
 		return err
 	}
-
-	log.Info().Msgf("inserted user %v", result.InsertedID)
 
 	return nil
 }
@@ -108,6 +108,23 @@ func DeleteUser(user *User) error {
 	return nil
 }
 
-func (u *User) IsPremium() bool {
+func (u *User) HasPremium() bool {
 	return u.PremiumUntil.After(time.Now())
+}
+
+func SetFlipperRoleForUser(user *User) error {
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+
+	filter := bson.D{{"user_id", user.UserId}}
+	update := bson.D{{"$set", bson.D{{"has_flipper_role", user.HasFlipperRole}}}}
+
+	r, err := userCollection.UpdateOne(ctx, filter, update, &options.UpdateOptions{})
+
+	if err != nil {
+		log.Error().Err(err).Msgf("there was an error when setting has_flipper_role for user %d", user.UserId)
+		return err
+	}
+
+	log.Info().Msgf("set has_flipper_role %t for user %d, %d documents affected", user.HasFlipperRole, user.UserId, r.ModifiedCount)
+	return nil
 }

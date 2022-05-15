@@ -18,8 +18,8 @@ func UserById(id int) (*mongo.User, error) {
 	}
 
 	if user != nil {
-		log.Info().Msgf("found user %d in db, last refresh: %v", id, user.LastRefresh)
 		if user.LastRefresh.After(time.Now().Add(-time.Hour * 24)) {
+			log.Info().Msgf("found user %d in db, last refresh: %v", id, user.LastRefresh)
 			return user, nil
 		}
 	}
@@ -29,8 +29,6 @@ func UserById(id int) (*mongo.User, error) {
 
 // loads the user from different api's
 func LoadUserById(id int) (*mongo.User, error) {
-
-	log.Info().Msgf("loading user with id %d from api's", id)
 
 	user := &mongo.User{
 		UserId: id,

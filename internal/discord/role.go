@@ -1,8 +1,6 @@
 package discord
 
 import (
-	"time"
-
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/rs/zerolog/log"
 )
@@ -20,14 +18,18 @@ func SetFlipperRoleForUser(user *mongo.User) error {
 		return nil
 	}
 
-	if user.PremiumUntil.Before(time.Now()) {
+	if user.HasPremium() {
 
 		log.Info().Msgf("remove role from user %s if he has the flipper role")
+		user.HasFlipperRole = false
+		mongo.SetFlipperRoleForUser(user)
 
 		return nil
 	}
 
 	log.Info().Msgf("set role for user %s", user.UserId)
+	user.HasFlipperRole = true
+	mongo.SetFlipperRoleForUser(user)
 
 	return nil
 }
