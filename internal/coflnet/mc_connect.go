@@ -3,11 +3,11 @@ package coflnet
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Coflnet/coflnet-bot/internal/model"
 	"io/ioutil"
 	"net/http"
 	"os"
 
-	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/rs/zerolog/log"
 )
 
@@ -20,7 +20,7 @@ type McConnectGetUserResponse struct {
 	} `json:"accounts"`
 }
 
-func UserMcConnect(userId int) (*mongo.User, error) {
+func UserMcConnect(userId int) (*model.User, error) {
 	url := fmt.Sprintf("%s/Connect/user/%d", os.Getenv("MC_CONNECT_URL"), userId)
 
 	response, err := http.DefaultClient.Get(url)
@@ -29,7 +29,9 @@ func UserMcConnect(userId int) (*mongo.User, error) {
 		return nil, err
 	}
 
-	defer response.Body.Close()
+	defer func() {
+		_ = response.Body.Close()
+	}()
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Error().Err(err).Msgf("error reading response body")
@@ -44,12 +46,12 @@ func UserMcConnect(userId int) (*mongo.User, error) {
 	}
 
 	// if the user has no accounts, then the user probably doesn't exist
-	// so return a error, to indicate that
+	// so return an error, to indicate that
 	if len(result.Accounts) == 0 {
 		return nil, fmt.Errorf("user not found")
 	}
 
-	uuids := []string{}
+	var uuids []string
 	for _, u := range result.Accounts {
 
 		// only add the verified ones
@@ -60,7 +62,7 @@ func UserMcConnect(userId int) (*mongo.User, error) {
 		uuids = append(uuids, u.AccountUUID)
 	}
 
-	user := mongo.User{
+	user := model.User{
 		UserId:         userId,
 		MinecraftUuids: uuids,
 	}

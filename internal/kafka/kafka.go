@@ -44,7 +44,7 @@ func StartTransactionConsume() error {
 		m, err := r.FetchMessage(ctx)
 
 		if err != nil {
-			log.Error().Err(err).Msgf("error occured when fetching from kafka, transaction topic")
+			log.Error().Err(err).Msgf("error occurred when fetching from kafka, transaction topic")
 			return err
 		}
 

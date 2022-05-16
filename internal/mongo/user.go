@@ -4,33 +4,29 @@ import (
 	"context"
 	"time"
 
+	"github.com/Coflnet/coflnet-bot/internal/model"
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/bson"
 	m "go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type User struct {
-	UserId         int       `json:"userId" bson:"user_id"`
-	PremiumUntil   time.Time `json:"premiumUntil" bson:"premium_until"`
-	DiscordNames   []string  `json:"discordNames" bson:"discord_names"`
-	MinecraftUuids []string  `json:"minecraftUuids" bson:"minecraft_uuids"`
-	LastRefresh    time.Time `json:"lastRefresh" bson:"last_refresh"`
-	HasFlipperRole bool      `json:"hasFlipperRole" bson:"has_flipper_role"`
+type UserNotFoundError struct {
+	UserId int
 }
 
-func SearchByUserId(userId int) (*User, error) {
+func SearchByUserId(userId int) (*model.User, error) {
 
 	filter := bson.D{{"user_id", userId}}
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 
 	res := userCollection.FindOne(ctx, filter)
 
-	var user User
+	var user model.User
 	err := res.Decode(&user)
 	if err != nil {
 		if err == m.ErrNoDocuments {
-			return nil, nil
+			return nil, &model.UserNotFoundError{UserId: userId}
 		}
 
 		return nil, err
@@ -39,7 +35,7 @@ func SearchByUserId(userId int) (*User, error) {
 	return &user, nil
 }
 
-func SearchByDiscordTag(discordTag string) (*User, error) {
+func SearchByDiscordTag(discordTag string) (*model.User, error) {
 	filter := bson.D{{"discord_names",
 		bson.D{{"$elemMatch", bson.D{{"$eq", discordTag}}}},
 	}}
@@ -47,11 +43,11 @@ func SearchByDiscordTag(discordTag string) (*User, error) {
 
 	res := userCollection.FindOne(ctx, filter)
 
-	var user User
+	var user model.User
 	err := res.Decode(&user)
 	if err != nil {
 		if err == m.ErrNoDocuments {
-			return nil, nil
+			return nil, &model.UserNotFoundError{}
 		}
 
 		return nil, err
@@ -60,7 +56,7 @@ func SearchByDiscordTag(discordTag string) (*User, error) {
 	return &user, nil
 }
 
-func InsertUser(user *User) error {
+func InsertUser(user *model.User) error {
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 
 	_, err := userCollection.InsertOne(ctx, user)
@@ -71,7 +67,7 @@ func InsertUser(user *User) error {
 	return nil
 }
 
-func UpdateUser(user *User) error {
+func UpdateUser(user *model.User) error {
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 
 	result, err := userCollection.ReplaceOne(ctx, bson.D{{"user_id", user.UserId}}, user)
@@ -84,7 +80,7 @@ func UpdateUser(user *User) error {
 	return nil
 }
 
-func SaveUser(user *User) error {
+func SaveUser(user *model.User) error {
 	oldUser, err := SearchByUserId(user.UserId)
 	if err != nil {
 		return err
@@ -97,22 +93,7 @@ func SaveUser(user *User) error {
 	return UpdateUser(user)
 }
 
-func DeleteUser(user *User) error {
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-
-	_, err := userCollection.DeleteOne(ctx, bson.D{{"user_id", user.UserId}})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (u *User) HasPremium() bool {
-	return u.PremiumUntil.After(time.Now())
-}
-
-func SetFlipperRoleForUser(user *User) error {
+func SetFlipperRoleForUser(user *model.User) error {
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 
 	filter := bson.D{{"user_id", user.UserId}}
@@ -129,9 +110,9 @@ func SetFlipperRoleForUser(user *User) error {
 	return nil
 }
 
-func GetUsersWithFlipperRole() (<-chan *User, error) {
+func GetUsersWithFlipperRole() (<-chan *model.User, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	userChan := make(chan *User)
+	userChan := make(chan *model.User)
 
 	filter := bson.D{{"has_flipper_role", true}}
 
@@ -143,7 +124,7 @@ func GetUsersWithFlipperRole() (<-chan *User, error) {
 	go func() {
 
 		for cursor.Next(ctx) {
-			var users []*User
+			var users []*model.User
 			err = cursor.Decode(&users)
 			if err != nil {
 				continue

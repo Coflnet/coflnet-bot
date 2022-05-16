@@ -50,20 +50,20 @@ func ObserveMessages() {
 	session.AddHandler(messageCreate)
 }
 
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+func messageCreate(_ *discordgo.Session, m *discordgo.MessageCreate) {
 	log.Info().Msgf("received discord message: %s", m.Content)
 
 	err := mongo.InsertMessage(m.Message)
 
 	if err != nil {
 		log.Error().Err(err).Msgf("error when inserting message")
-		metrics.ErrorOccured()
+		metrics.ErrorOccurred()
 	}
 
 	err = SendMessageToChatApi(m)
 	if err != nil {
 		log.Error().Err(err).Msgf("error when sending message to chat api")
-		metrics.ErrorOccured()
+		metrics.ErrorOccurred()
 	}
 
 	metrics.MessageProcessed()
@@ -105,9 +105,13 @@ func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 }
 
 func sendInvalidUUIDMessageToDiscord(message *discordgo.Message) {
-	session.ChannelMessageSendReply(message.ChannelID, " minecraft account not found / validated "+message.Author.Username, &discordgo.MessageReference{
+	_, err := session.ChannelMessageSendReply(message.ChannelID, " minecraft account not found / validated "+message.Author.Username, &discordgo.MessageReference{
 		MessageID: message.ID,
 		ChannelID: message.ChannelID,
 		GuildID:   message.GuildID,
 	})
+
+	if err != nil {
+		log.Error().Err(err).Msgf("there was an error when sending the message to discord")
+	}
 }

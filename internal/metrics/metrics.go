@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"github.com/rs/zerolog/log"
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -27,14 +28,18 @@ var (
 
 func Init() {
 	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(":2112", nil)
+	err := http.ListenAndServe(":2112", nil)
+	if err != nil {
+		log.Fatal().Err(err).Msgf("error starting metrics server")
+		return
+	}
 }
 
 func MessageProcessed() {
 	messagesProcessed.Inc()
 }
 
-func ErrorOccured() {
+func ErrorOccurred() {
 	errorsOccured.Inc()
 }
 

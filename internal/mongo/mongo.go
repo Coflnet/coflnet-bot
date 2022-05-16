@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"github.com/rs/zerolog/log"
 	"os"
 	"time"
 
@@ -36,5 +37,8 @@ func Init() error {
 
 func CloseConnection() {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	defer client.Disconnect(ctx)
+	err := client.Disconnect(ctx)
+	if err != nil {
+		log.Error().Err(err).Msgf("error closing mongo connection")
+	}
 }

@@ -1,6 +1,7 @@
 package coflnet
 
 import (
+	"github.com/Coflnet/coflnet-bot/internal/model"
 	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/hypixel"
@@ -9,8 +10,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// loads a user, potentially cached
-func UserById(id int) (*mongo.User, error) {
+// UserById loads a user, potentially cached
+func UserById(id int) (*model.User, error) {
 
 	user, err := mongo.SearchByUserId(id)
 	if err != nil {
@@ -27,10 +28,10 @@ func UserById(id int) (*mongo.User, error) {
 	return LoadUserById(id)
 }
 
-// loads the user from different api's
-func LoadUserById(id int) (*mongo.User, error) {
+// LoadUserById loads the user from different api's
+func LoadUserById(id int) (*model.User, error) {
 
-	user := &mongo.User{
+	user := &model.User{
 		UserId: id,
 	}
 
@@ -44,7 +45,7 @@ func LoadUserById(id int) (*mongo.User, error) {
 		return nil, err
 	}
 
-	discordNames := []string{}
+	var discordNames []string
 	for _, uuid := range mcUser.MinecraftUuids {
 		player, err := hypixel.PlayerData(uuid)
 		if err != nil {
@@ -53,7 +54,7 @@ func LoadUserById(id int) (*mongo.User, error) {
 		discordNames = append(discordNames, player.Player.SocialMedia.Links.Discord)
 	}
 
-	user = &mongo.User{
+	user = &model.User{
 		UserId:         id,
 		MinecraftUuids: mcUser.MinecraftUuids,
 		DiscordNames:   discordNames,

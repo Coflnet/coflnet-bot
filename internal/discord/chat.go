@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -84,14 +83,14 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 		return err
 	}
 
-	requet, err := http.NewRequest("POST", u.String(), bytes.NewBuffer(body))
+	request, err := http.NewRequest("POST", u.String(), bytes.NewBuffer(body))
 	if err != nil {
 		log.Error().Err(err).Msgf("error creating request")
 		return err
 	}
 
-	requet.Header.Set("Content-Type", "application/json")
-	requet.Header.Set("Authorization", apiKey)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", apiKey)
 
 	client := &http.Client{
 		Timeout: 10 * time.Second,
@@ -99,7 +98,7 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 
 	log.Info().Msgf("message: %s, name: %s, uuid: %s, clientName: %s, prefix: %s", payload.Message, payload.Name, payload.UUID, payload.ClientName, payload.Prefix)
 
-	response, err := client.Do(requet)
+	response, err := client.Do(request)
 	if err != nil {
 		log.Error().Err(err).Msgf("error sending request, status: %s")
 	}
@@ -107,59 +106,6 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	log.Info().Msgf("response code %s", response.Status)
 
 	return nil
-}
-
-func GetUuidForPlayerDeprecated(name string) string {
-
-	log.Warn().Msg("this method should not be used to get the uuid of a player")
-
-	apiBaseUrl := os.Getenv("COFL_API_BASE_URL")
-	p := fmt.Sprintf("/search/player/%s", name)
-
-	u, err := url.Parse(apiBaseUrl)
-	if err != nil {
-		log.Error().Err(err).Msgf("error parsing base url")
-		return ""
-	}
-
-	u.Path = path.Join(u.Path, p)
-
-	log.Info().Msgf("getting uuid for player %s, request: %s", name, u.String())
-
-	response, err := http.Get(u.String())
-	if err != nil {
-		log.Error().Err(err).Msgf("error getting uuid for player %s", name)
-		return ""
-	}
-
-	if response.StatusCode != 200 {
-		log.Error().Msgf("error getting uuid for player %s, status: %s", name, response.Status)
-		return ""
-	}
-
-	defer response.Body.Close()
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Error().Err(err).Msgf("error reading response body")
-		return ""
-	}
-
-	var results []PlayerSearchResult
-	err = json.Unmarshal(body, &results)
-
-	if err != nil {
-		log.Error().Err(err).Msgf("error unmarshaling response body")
-		return ""
-	}
-
-	for _, result := range results {
-		if result.Name == name {
-			return result.UUID
-		}
-	}
-
-	return ""
 }
 
 type PlayerSearchResult struct {

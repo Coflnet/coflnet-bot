@@ -3,6 +3,7 @@ package hypixel
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -34,7 +35,9 @@ func PlayerData(uuid string) (*PlayerDataResponse, error) {
 		log.Error().Err(err).Msgf("error getting player data")
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -46,13 +49,14 @@ func PlayerData(uuid string) (*PlayerDataResponse, error) {
 	err = json.Unmarshal(bytes, &data)
 	if err != nil {
 		log.Error().Err(err).Msgf("error unmarshalling response")
-		metrics.ErrorOccured()
+		metrics.ErrorOccurred()
 		return nil, err
 	}
 
 	return &data, nil
 }
 
+//goland:noinspection ALL
 type PlayerDataResponse struct {
 	Success bool `json:"success"`
 	Player  struct {

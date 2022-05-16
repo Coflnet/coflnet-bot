@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/Coflnet/coflnet-bot/internal/model"
 	"net/http"
 	"strconv"
 
@@ -30,7 +31,15 @@ func getUserById(c *gin.Context) {
 
 	user, err := coflnet.UserById(userId)
 	if err != nil {
-		log.Error().Err(err).Msgf("internal error occured when searching user with id %d", userId)
+
+		if nf, ok := err.(*model.UserNotFoundError); ok {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"error": nf.Error(),
+			})
+			return
+		}
+
+		log.Error().Err(err).Msgf("internal error occurred when searching user with id %d", userId)
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -51,7 +60,15 @@ func GetUserByDiscordTag(c *gin.Context) {
 
 	user, err := mongo.SearchByDiscordTag(tag)
 	if err != nil {
-		log.Error().Err(err).Msgf("internal error occured when searching user with tag %s", tag)
+
+		if nf, ok := err.(*model.UserNotFoundError); ok {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"error": nf.Error(),
+			})
+			return
+		}
+
+		log.Error().Err(err).Msgf("internal error occurred when searching user with tag %s", tag)
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}

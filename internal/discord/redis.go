@@ -54,16 +54,22 @@ func StartConsume() error {
 
 	log.Info().Msgf("start redis chat consume..")
 	pubsub := rdb.Subscribe(ctx, redisChannel)
-	defer pubsub.Close()
+	defer func() {
+		_ = pubsub.Close()
+	}()
 
 	for {
 		msg, err := pubsub.ReceiveMessage(ctx)
 		if err != nil {
-			return err
+			log.Error().Err(err).Msgf("error receiving message from redis pubsub")
+			continue
 		}
 
 		log.Info().Msgf("received redis message: %s", msg.Payload)
-		processMessage(msg)
+		err = processMessage(msg)
+		if err != nil {
+			log.Error().Err(err).Msgf("error processing redis message")
+		}
 	}
 }
 

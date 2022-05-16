@@ -10,6 +10,7 @@ type Player struct {
 	Xp   int32  `json:"xp"`
 }
 
+//goland:noinspection GoNameStartsWithPackageName
 func XpOfPlayer(playerName string) (*Player, error) {
 
 	messagesOfPlayer, err := mongo.CountMessagesOfPlayer(playerName)

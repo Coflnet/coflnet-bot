@@ -57,9 +57,7 @@ func refreshUser(id int) error {
 		return err
 	}
 
-	discord.SetFlipperRoleForUser(u)
-
-	return nil
+	return discord.SetFlipperRoleForUser(u)
 }
 
 func CheckIfUsersStillShouldHaveFlipperRole() {
@@ -74,7 +72,7 @@ func CheckIfUsersStillShouldHaveFlipperRole() {
 		err = discord.SetFlipperRoleForUser(user)
 
 		if err != nil {
-			log.Error().Err(err).Msgf("there was an error when updating flipper role for user %d", user.UserId)
+			log.Error().Err(err).Msgf("there was an error when updating flipper role for user %d", user)
 		}
 
 		time.Sleep(time.Second * 5)

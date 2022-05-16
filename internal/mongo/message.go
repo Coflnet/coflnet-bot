@@ -35,7 +35,12 @@ func CountMessagesOfPlayer(name string) (int32, error) {
 		return 0, err
 	}
 
-	defer cursor.Close(ctx)
+	defer func() {
+		err := cursor.Close(ctx)
+		if err != nil {
+			log.Error().Err(err).Msgf("error when closing cursor")
+		}
+	}()
 
 	var res []bson.M
 
