@@ -109,6 +109,7 @@ func DeleteUser(user *User) error {
 }
 
 func (u *User) HasPremium() bool {
+	log.Info().Msgf("user %d has premium until %v, result is: %t", u.UserId, u.PremiumUntil, u.PremiumUntil.After(time.Now()))
 	return u.PremiumUntil.After(time.Now())
 }
 
