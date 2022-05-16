@@ -34,7 +34,7 @@ func SetFlipperRoleForUser(user *mongo.User) error {
 		return nil
 	}
 
-	if user.HasPremium() {
+	if !user.HasPremium() {
 		log.Info().Msgf("remove role from user %s if he has the flipper role")
 		user.HasFlipperRole = false
 
