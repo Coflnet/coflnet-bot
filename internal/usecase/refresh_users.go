@@ -47,9 +47,7 @@ func refreshUsers() {
 
 		id++
 
-		if id%10 == 0 {
-			time.Sleep(time.Second * 15)
-		}
+		time.Sleep(time.Second * 20)
 	}
 }
 

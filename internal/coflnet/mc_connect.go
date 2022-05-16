@@ -43,6 +43,12 @@ func UserMcConnect(userId int) (*mongo.User, error) {
 		return nil, err
 	}
 
+	// if the user has no accounts, then the user probably doesn't exist
+	// so return a error, to indicate that
+	if len(result.Accounts) == 0 {
+		return nil, fmt.Errorf("user not found")
+	}
+
 	uuids := []string{}
 	for _, u := range result.Accounts {
 
