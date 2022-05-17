@@ -13,6 +13,8 @@ func StartRefresh() {
 	go func() {
 		for {
 			refreshUsers()
+
+			time.Sleep(time.Hour)
 		}
 	}()
 
@@ -28,26 +30,36 @@ func StartRefresh() {
 }
 
 func refreshUsers() {
-	id := 1
-	errorCounter := 0
+	id := 0
 
-	// refresh users, when 100 errors in a row happen return
-	for errorCounter < 100 {
-
-		err := refreshUser(id)
-		if err != nil {
-			errorCounter++
-		} else {
-			errorCounter = 0
-		}
-
-		if id%100 == 0 {
-			log.Info().Msgf("refreshed %d users", id)
-		}
-
-		id++
+	for {
 
 		time.Sleep(time.Second * 20)
+
+		users, err := coflnet.GetUsersFromId(id)
+		if err != nil {
+			log.Error().Err(err).Msg("error getting users")
+			return
+		}
+
+		if len(users) == 0 {
+			return
+		}
+
+		maxId := id
+		for _, user := range users {
+
+			err := refreshUser(user.UserId)
+			if err != nil {
+				log.Error().Err(err).Msgf("error loading user %d", user.UserId)
+				continue
+			}
+
+			if id > maxId {
+				maxId = id
+			}
+		}
+
 	}
 }
 

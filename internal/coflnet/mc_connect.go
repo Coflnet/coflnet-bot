@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/rs/zerolog/log"
 )
@@ -68,4 +69,59 @@ func UserMcConnect(userId int) (*model.User, error) {
 	}
 
 	return &user, nil
+}
+
+func GetUsersFromId(startId int) ([]*model.User, error) {
+	url := fmt.Sprintf("%s/Connect/users?offset=%d", os.Getenv("MC_CONNECT_URL"), startId)
+
+	response, err := http.DefaultClient.Get(url)
+
+	if err != nil {
+		log.Error().Err(err).Msgf("there was an error when getting users from mc connect, url: %s", url)
+		return nil, err
+	}
+
+	defer func() {
+		_ = response.Body.Close()
+	}()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Error().Err(err).Msgf("error reading response body")
+		return nil, err
+	}
+
+	var result []*McConnectGetUserResponse
+	err = json.Unmarshal(body, &result)
+
+	var users []*model.User
+
+	for _, u := range result {
+
+		var uuids []string
+		for _, u := range u.Accounts {
+
+			// only add the verified ones
+			if !u.Verified {
+				continue
+			}
+
+			uuids = append(uuids, u.AccountUUID)
+		}
+
+		i, err := strconv.Atoi(u.ExternalID)
+		if err != nil {
+			log.Error().Err(err).Msgf("error converting external id to int")
+			continue
+		}
+
+		user := model.User{
+			UserId:         i,
+			MinecraftUuids: uuids,
+		}
+
+		users = append(users, &user)
+	}
+
+	return users, nil
 }
