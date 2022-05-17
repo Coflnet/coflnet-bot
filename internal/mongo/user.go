@@ -81,13 +81,14 @@ func UpdateUser(user *model.User) error {
 }
 
 func SaveUser(user *model.User) error {
-	oldUser, err := SearchByUserId(user.UserId)
+	_, err := SearchByUserId(user.UserId)
 	if err != nil {
-		return err
-	}
 
-	if oldUser == nil {
-		return InsertUser(user)
+		if _, ok := err.(*model.UserNotFoundError); !ok {
+			return InsertUser(user)
+		}
+
+		return err
 	}
 
 	return UpdateUser(user)

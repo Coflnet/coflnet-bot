@@ -31,14 +31,13 @@ func getUserById(c *gin.Context) {
 
 	user, err := coflnet.UserById(userId)
 	if err != nil {
-
 		if nf, ok := err.(*model.UserNotFoundError); ok {
+			log.Warn().Msgf("user with id %d not found", userId)
 			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 				"error": nf.Error(),
 			})
 			return
 		}
-
 		log.Error().Err(err).Msgf("internal error occurred when searching user with id %d", userId)
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
