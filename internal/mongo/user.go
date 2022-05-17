@@ -88,7 +88,7 @@ func SaveUser(user *model.User) error {
 	_, err := SearchByUserId(user.UserId)
 	if err != nil {
 
-		if _, ok := err.(*model.UserNotFoundError); !ok {
+		if _, ok := err.(*model.UserNotFoundError); ok {
 
 			log.Info().Msgf("user does not exist %d", user.UserId)
 			return InsertUser(user)
