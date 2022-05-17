@@ -45,7 +45,7 @@ func refreshUsers() {
 
 		for _, user := range users {
 
-			err := refreshUser(offset)
+			err := refreshUser(user.UserId)
 			if err != nil {
 				log.Error().Err(err).Msgf("error loading user %d", user.UserId)
 				continue
@@ -61,6 +61,7 @@ func refreshUser(id int) error {
 
 	// wait to not get into api limit
 	defer time.Sleep(time.Second * 20)
+	log.Info().Msgf("loading user with id %d", id)
 
 	u, err := coflnet.LoadUserById(id)
 	if err != nil {
