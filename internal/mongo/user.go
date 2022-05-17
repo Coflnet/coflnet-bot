@@ -61,6 +61,7 @@ func InsertUser(user *model.User) error {
 
 	_, err := userCollection.InsertOne(ctx, user)
 	if err != nil {
+		log.Error().Err(err).Msgf("error when inserting user %s", user.UserId)
 		return err
 	}
 
@@ -81,16 +82,22 @@ func UpdateUser(user *model.User) error {
 }
 
 func SaveUser(user *model.User) error {
+
+	log.Info().Msgf("saving user %d", user.UserId)
+
 	_, err := SearchByUserId(user.UserId)
 	if err != nil {
 
 		if _, ok := err.(*model.UserNotFoundError); !ok {
+
+			log.Info().Msgf("user does not exist %d", user.UserId)
 			return InsertUser(user)
 		}
 
 		return err
 	}
 
+	log.Info().Msgf("user does exist, update %d", user.UserId)
 	return UpdateUser(user)
 }
 
