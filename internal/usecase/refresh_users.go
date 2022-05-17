@@ -34,8 +34,6 @@ func refreshUsers() {
 
 	for {
 
-		time.Sleep(time.Second * 20)
-
 		users, err := coflnet.GetUsersFromId(id)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting users")
@@ -64,6 +62,10 @@ func refreshUsers() {
 }
 
 func refreshUser(id int) error {
+
+	// wait to not get into api limit
+	defer time.Sleep(time.Second * 20)
+
 	u, err := coflnet.LoadUserById(id)
 	if err != nil {
 		return err
