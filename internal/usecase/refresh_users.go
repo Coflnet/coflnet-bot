@@ -30,11 +30,10 @@ func StartRefresh() {
 }
 
 func refreshUsers() {
-	id := 0
-
+	offset := 0
 	for {
 
-		users, err := coflnet.GetUsersFromId(id)
+		users, err := coflnet.GetUsersFromId(offset)
 		if err != nil {
 			log.Error().Err(err).Msg("error getting users")
 			return
@@ -44,18 +43,15 @@ func refreshUsers() {
 			return
 		}
 
-		maxId := id
 		for _, user := range users {
 
-			err := refreshUser(user.UserId)
+			err := refreshUser(offset)
 			if err != nil {
 				log.Error().Err(err).Msgf("error loading user %d", user.UserId)
 				continue
 			}
 
-			if id > maxId {
-				maxId = id
-			}
+			offset++
 		}
 
 	}

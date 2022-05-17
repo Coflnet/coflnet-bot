@@ -1318,7 +1318,6 @@ type PlayerDataResponse struct {
 		RewardConsumed          bool   `json:"rewardConsumed"`
 		LevelingReward29        bool   `json:"levelingReward_29"`
 		LastAdsenseGenerateTime int64  `json:"lastAdsenseGenerateTime"`
-		LastClaimedReward       int64  `json:"lastClaimedReward"`
 		TotalRewards            int    `json:"totalRewards"`
 		TotalDailyRewards       int    `json:"totalDailyRewards"`
 		RewardStreak            int    `json:"rewardStreak"`
