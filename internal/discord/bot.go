@@ -69,10 +69,15 @@ func messageCreate(_ *discordgo.Session, m *discordgo.MessageCreate) {
 	metrics.MessageProcessed()
 }
 
+type AllowedMentions struct {
+	Parse []string `json:"parse"`
+}
+
 type WebhookRequest struct {
 	Content   string `json:"content"`
 	Username  string `json:"username"`
 	AvatarUrl string `json:"avatar_url"`
+	AllowedMentionsData AllowedMentions `json:"allowed_mentions"`
 }
 
 func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
@@ -87,6 +92,7 @@ func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 		Content:   message.Message,
 		Username:  message.Name,
 		AvatarUrl: iconUrl,
+		AllowedMentionsData: AllowedMentions{Parse: make([]string, 0)}
 	}
 
 	body, err := json.Marshal(data)
