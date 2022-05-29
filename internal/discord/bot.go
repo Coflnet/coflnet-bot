@@ -74,9 +74,9 @@ type AllowedMentions struct {
 }
 
 type WebhookRequest struct {
-	Content   string `json:"content"`
-	Username  string `json:"username"`
-	AvatarUrl string `json:"avatar_url"`
+	Content             string          `json:"content"`
+	Username            string          `json:"username"`
+	AvatarUrl           string          `json:"avatar_url"`
 	AllowedMentionsData AllowedMentions `json:"allowed_mentions"`
 }
 
@@ -89,10 +89,10 @@ func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 	iconUrl := fmt.Sprintf("https://crafatar.com/avatars/%s", message.UUID)
 	url := os.Getenv("CHAT_WEBHOOK")
 	data := &WebhookRequest{
-		Content:   message.Message,
-		Username:  message.Name,
-		AvatarUrl: iconUrl,
-		AllowedMentionsData: AllowedMentions{Parse: make([]string, 0)}
+		Content:             message.Message,
+		Username:            message.Name,
+		AvatarUrl:           iconUrl,
+		AllowedMentionsData: AllowedMentions{Parse: make([]string, 0)},
 	}
 
 	body, err := json.Marshal(data)
