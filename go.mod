@@ -3,7 +3,7 @@ module github.com/Coflnet/coflnet-bot
 go 1.16
 
 require (
-	github.com/bwmarrin/discordgo v0.24.0
+	github.com/bwmarrin/discordgo v0.25.1-0.20220603125853-c8c153872c36
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
 	github.com/go-redis/redis/v8 v8.11.5

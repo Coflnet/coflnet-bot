@@ -30,7 +30,7 @@ func Init() {
 	http.Handle("/metrics", promhttp.Handler())
 	err := http.ListenAndServe(":2112", nil)
 	if err != nil {
-		log.Fatal().Err(err).Msgf("error starting metrics server")
+		log.Panic().Err(err).Msgf("error starting metrics server")
 		return
 	}
 }

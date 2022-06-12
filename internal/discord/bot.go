@@ -30,6 +30,21 @@ func InitDiscord() {
 	if err != nil {
 		log.Error().Err(err).Msgf("error in discord session")
 	}
+
+	log.Warn().Msg("skip command registering, commands are still dev")
+	// err = registerCommands()
+	// if err != nil {
+	// 	log.Panic().Err(err).Msg("Failed to register commands")
+	// }
+}
+
+func StopDiscord() {
+	unregisterCommands()
+	err := session.Close()
+	if err != nil {
+		log.Error().Err(err).Msgf("error closing discord session")
+		return
+	}
 }
 
 func getSession() *discordgo.Session {
@@ -78,6 +93,34 @@ type WebhookRequest struct {
 	Username            string          `json:"username"`
 	AvatarUrl           string          `json:"avatar_url"`
 	AllowedMentionsData AllowedMentions `json:"allowed_mentions"`
+}
+
+func SendMsgToDevChat(message string) error {
+	if message == "" {
+		return fmt.Errorf("can not send an empty message")
+	}
+
+	data := &WebhookRequest{
+		Content:             message,
+		Username:            "cofl bot",
+		AllowedMentionsData: AllowedMentions{Parse: make([]string, 0)},
+	}
+
+	body, err := json.Marshal(data)
+	if err != nil {
+		log.Error().Err(err).Msgf("can not marshal webhook request")
+		return err
+	}
+
+	url := os.Getenv("DEV_WEBHOOK")
+	_, err = http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
+
+	if err != nil {
+		log.Error().Err(err).Msgf("error when sending webhook request")
+		return err
+	}
+
+	return nil
 }
 
 func SendMessageToDiscordChat(message *mongo.ChatMessage) error {

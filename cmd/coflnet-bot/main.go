@@ -7,7 +7,6 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/Coflnet/coflnet-bot/internal/usecase"
-
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 )
@@ -54,6 +53,7 @@ func main() {
 
 	// open discord session and wait for messages
 	discord.InitDiscord()
+	defer discord.StopDiscord()
 
 	// start the refresh of the user table
 	go usecase.StartRefresh()
@@ -61,13 +61,13 @@ func main() {
 	// start api
 	err = api.Start()
 	if err != nil {
-		log.Fatal().Err(err).Msg("fatal error from api server")
+		log.Panic().Err(err).Msg("fatal error from api server")
 	}
 }
 
 func startRedisChatConsume() {
 	err := discord.StartConsume()
 	if err != nil {
-		log.Fatal().Err(err).Msgf("error consuming messages from chat")
+		log.Panic().Err(err).Msgf("error consuming messages from chat")
 	}
 }

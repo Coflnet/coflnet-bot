@@ -1,6 +1,7 @@
 package discord
 
 import (
+	"fmt"
 	"github.com/Coflnet/coflnet-bot/internal/model"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/rs/zerolog/log"
@@ -9,13 +10,21 @@ import (
 func SetFlipperRoleForUser(user *model.User) error {
 
 	// set discord role at the end of the function
-	defer func() {
-		log.Info().Msgf("finished setting flipper role for user %d set role to %t", user.UserId, user.HasFlipperRole)
-		err := mongo.SetFlipperRoleForUser(user)
+	defer func(u *model.User) {
+		log.Info().Msgf("finished setting flipper role for user %s set role to %t", discordNameForUser(u), u.HasFlipperRole)
+		err := mongo.SetFlipperRoleForUser(u)
 		if err != nil {
-			log.Error().Err(err).Msgf("error when saving user %d", user.UserId)
+			log.Error().Err(err).Msgf("error when saving user %d", u.UserId)
 		}
-	}()
+
+		if u.HasFlipperRole {
+			err := SendMsgToDevChat(fmt.Sprintf("give user %s the flipper role, he has premium until %v", discordNameForUser(u), u.PremiumUntil))
+			if err != nil {
+				log.Error().Err(err).Msgf("can not send message to dev chat")
+				return
+			}
+		}
+	}(user)
 
 	if user.DiscordNames == nil || len(user.DiscordNames) == 0 {
 		log.Info().Msgf("user %d has no discord names, skip flipper role check", user.UserId)
@@ -23,15 +32,7 @@ func SetFlipperRoleForUser(user *model.User) error {
 		return nil
 	}
 
-	// TODO dont assume first discord name, that is not an empty string is the correct username
-	// search the discord username for the user
-	var discordName = ""
-	for _, d := range user.DiscordNames {
-		if d != "" {
-			discordName = d
-			break
-		}
-	}
+	discordName := discordNameForUser(user)
 	if discordName == "" {
 		log.Info().Msgf("user %s has no discord name, skip flip role set", user.UserId)
 		user.HasFlipperRole = false
@@ -49,4 +50,18 @@ func SetFlipperRoleForUser(user *model.User) error {
 	user.HasFlipperRole = true
 
 	return nil
+}
+
+// TODO dont assume first discord name, that is not an empty string is the correct username
+// search the discord username for the user
+func discordNameForUser(u *model.User) string {
+	var discordName = ""
+	for _, d := range u.DiscordNames {
+		if d != "" {
+			discordName = d
+			break
+		}
+	}
+
+	return discordName
 }

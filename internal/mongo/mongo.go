@@ -16,6 +16,7 @@ var (
 	messageCollection  *mongo.Collection
 	coflChatCollection *mongo.Collection
 	userCollection     *mongo.Collection
+	muteCollection     *mongo.Collection
 )
 
 func Init() error {
@@ -31,6 +32,7 @@ func Init() error {
 	messageCollection = database.Collection("messages")
 	coflChatCollection = database.Collection("cofl_chat")
 	userCollection = database.Collection("users")
+	muteCollection = database.Collection("mutes")
 
 	return nil
 }
