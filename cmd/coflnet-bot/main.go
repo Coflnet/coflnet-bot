@@ -6,7 +6,6 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/kafka"
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
-	"github.com/Coflnet/coflnet-bot/internal/usecase"
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 )
@@ -56,7 +55,7 @@ func main() {
 	defer discord.StopDiscord()
 
 	// start the refresh of the user table
-	go usecase.StartRefresh()
+	// go usecase.StartRefresh()
 
 	// start api
 	err = api.Start()
