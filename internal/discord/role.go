@@ -9,12 +9,18 @@ import (
 
 func SetFlipperRoleForUser(user *model.User) error {
 
+	userHadFlipperRoleBefore := user.HasFlipperRole
+
 	// set discord role at the end of the function
-	defer func(u *model.User) {
+	defer func(u *model.User, hadFlipperRoleBefore bool) {
 		log.Info().Msgf("finished setting flipper role for user %s set role to %t", discordNameForUser(u), u.HasFlipperRole)
 		err := mongo.SetFlipperRoleForUser(u)
 		if err != nil {
 			log.Error().Err(err).Msgf("error when saving user %d", u.UserId)
+		}
+
+		if hadFlipperRoleBefore {
+			return
 		}
 
 		if u.HasFlipperRole {
@@ -24,7 +30,7 @@ func SetFlipperRoleForUser(user *model.User) error {
 				return
 			}
 		}
-	}(user)
+	}(user, userHadFlipperRoleBefore)
 
 	if user.DiscordNames == nil || len(user.DiscordNames) == 0 {
 		log.Info().Msgf("user %d has no discord names, skip flipper role check", user.UserId)
