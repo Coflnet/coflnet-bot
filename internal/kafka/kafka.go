@@ -102,6 +102,12 @@ func ProcessTransactionMessage(message *kafka.Message) error {
 		return err
 	}
 
+	// only check if amount is negative, recommended by ekwav
+	if t.Amount < 0 {
+		log.Info().Msgf("got a transaction message with negative amount, ignoring")
+		return nil
+	}
+
 	log.Info().Msgf("got a %s message from user %d", t.ProductSlug, t.UserId)
 	id, err := strconv.Atoi(t.UserId)
 	if err != nil {
