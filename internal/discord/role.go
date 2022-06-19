@@ -5,6 +5,7 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/model"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/rs/zerolog/log"
+	"os"
 )
 
 func SetFlipperRoleForUser(user *model.User) error {
@@ -24,11 +25,18 @@ func SetFlipperRoleForUser(user *model.User) error {
 		}
 
 		if u.HasFlipperRole {
-			err := SendMsgToDevChat(fmt.Sprintf("give user %s the flipper role, he has premium until %v", discordNameForUser(u), u.PremiumUntil))
+			err := giveUserFlipperRole(u)
+			if err != nil {
+				log.Error().Err(err).Msgf("error when giving flipper role to user %d", u.UserId)
+				return
+			}
+
+			err = SendMsgToDevChat(fmt.Sprintf("give user %s the flipper role, he has premium until %v", discordNameForUser(u), u.PremiumUntil))
 			if err != nil {
 				log.Error().Err(err).Msgf("can not send message to dev chat")
 				return
 			}
+
 		}
 	}(user, userHadFlipperRoleBefore)
 
@@ -56,6 +64,49 @@ func SetFlipperRoleForUser(user *model.User) error {
 	user.HasFlipperRole = true
 
 	return nil
+}
+
+func giveUserFlipperRole(user *model.User) error {
+
+	guild := os.Getenv("DISCORD_GUILD")
+	role := os.Getenv("DISCORD_FLIPPER_ROLE")
+
+	if guild == "" || role == "" {
+		return fmt.Errorf("discord guild or role is not set")
+	}
+
+	userId := ""
+	runs := 0
+	lastUser := ""
+
+	for {
+		members, err := session.GuildMembers(guild, lastUser, 1000)
+		if err != nil {
+			return err
+		}
+
+		for _, member := range members {
+			if member.User.Username == discordNameForUser(user) {
+				userId = member.User.ID
+			}
+			lastUser = member.User.ID
+		}
+
+		if userId != "" {
+			break
+		}
+
+		runs++
+		if runs > 20 {
+			break
+		}
+	}
+
+	if userId == "" {
+		return fmt.Errorf("user %s not found in discord", discordNameForUser(user))
+	}
+
+	return session.GuildMemberRoleAdd(guild, userId, role)
 }
 
 // TODO dont assume first discord name, that is not an empty string is the correct username
