@@ -10,6 +10,9 @@ import (
 )
 
 func StartDiscordMessagesConsumer() {
+
+	log.Info().Msgf("consuming topic %s", os.Getenv("TOPIC_DEV_CHAT"))
+
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  []string{os.Getenv("KAFKA_HOST")},
 		GroupID:  "coflnet-bot-cg",
