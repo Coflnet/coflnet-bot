@@ -54,5 +54,10 @@ func consumeDiscordMessages(r *kafka.Reader) error {
 	if err != nil {
 		return err
 	}
+
+	if err := r.CommitMessages(ctx, m); err != nil {
+		return err
+	}
+
 	return nil
 }
