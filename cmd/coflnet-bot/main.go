@@ -34,19 +34,22 @@ func main() {
 	// redis
 	go startRedisChatConsume()
 
-	// start kakfak transaction consume
+	// start kafka transaction consume
 	go func() {
 		err := kafka.StartTransactionConsume()
 		if err != nil {
-			log.Fatal().Err(err).Msgf("error consuming messages from kafka")
+			log.Panic().Err(err).Msgf("error consuming messages from kafka")
 		}
 	}()
+
+	// start dev chat consumer
+	go kafka.StartDiscordMessagesConsumer()
 
 	// start kafka verification consume
 	go func() {
 		err := kafka.StartVerificationConsume()
 		if err != nil {
-			log.Fatal().Err(err).Msgf("error consuming messages from kafka")
+			log.Panic().Err(err).Msgf("error consuming messages from kafka")
 		}
 	}()
 
