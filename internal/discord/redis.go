@@ -65,7 +65,6 @@ func StartConsume() error {
 			continue
 		}
 
-		log.Info().Msgf("received redis message: %s", msg.Payload)
 		err = processMessage(msg)
 		if err != nil {
 			log.Error().Err(err).Msgf("error processing redis message")

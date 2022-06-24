@@ -66,8 +66,6 @@ func ObserveMessages() {
 }
 
 func messageCreate(_ *discordgo.Session, m *discordgo.MessageCreate) {
-	log.Info().Msgf("received discord message: %s", m.Content)
-
 	err := mongo.InsertMessage(m.Message)
 
 	if err != nil {
