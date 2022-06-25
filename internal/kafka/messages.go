@@ -61,3 +61,30 @@ func consumeDiscordMessages(r *kafka.Reader) error {
 
 	return nil
 }
+
+func consumeDiscordSpamMessages(r *kafka.Reader) error {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	m, err := r.FetchMessage(ctx)
+	if err != nil {
+		return err
+	}
+
+	var msg *discord.DiscordMessageToSend
+	err = json.Unmarshal(m.Value, &msg)
+	if err != nil {
+		return err
+	}
+
+	err = discord.SendMessageToDevSpamLog(msg)
+	if err != nil {
+		return err
+	}
+
+	if err := r.CommitMessages(ctx, m); err != nil {
+		return err
+	}
+
+	return nil
+}

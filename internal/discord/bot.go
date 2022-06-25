@@ -192,6 +192,37 @@ func SendMessageToDevLog(msg *DiscordMessageToSend) error {
 	return nil
 
 }
+func SendMessageToDevSpamLog(msg *DiscordMessageToSend) error {
+	if msg.Message == "" {
+		return fmt.Errorf("no message is set")
+	}
+
+	data := &WebhookRequest{
+		Content:             msg.Message,
+		Username:            "cofl-bot",
+		AvatarUrl:           "https://cdn.discordapp.com/app-icons/888725077191974913/0c0e3b97e6865091ef14162083a54a42.png?size=256",
+		AllowedMentionsData: AllowedMentions{Parse: make([]string, 0)},
+	}
+
+	body, err := json.Marshal(data)
+	if err != nil {
+		log.Error().Err(err).Msgf("can not marshal webhook request")
+		return err
+	}
+
+	url := os.Getenv("DEV_SPAM_WEBHOOK")
+	_, err = http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
+
+	if err != nil {
+		log.Error().Err(err).Msgf("error sending message to discord chat")
+		return err
+	}
+
+	// TODO intentional error to trigger ci fail pipeline
+	ffff
+
+	return nil
+}
 
 type DiscordMessageToSend struct {
 	Message string
