@@ -218,9 +218,6 @@ func SendMessageToDevSpamLog(msg *DiscordMessageToSend) error {
 		return err
 	}
 
-	// TODO intentional error to trigger ci fail pipeline
-	ffff
-
 	return nil
 }
 

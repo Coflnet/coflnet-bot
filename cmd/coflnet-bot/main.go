@@ -44,6 +44,7 @@ func main() {
 
 	// start dev chat consumer
 	go kafka.StartDiscordMessagesConsumer()
+	go kafka.StartDiscordSpamMessagesConsumer()
 
 	// start kafka verification consume
 	go func() {
