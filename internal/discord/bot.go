@@ -20,7 +20,7 @@ var (
 
 func InitDiscord() {
 	session = getSession()
-	session.Identify.Intents = discordgo.IntentsAllWithoutPrivileged
+	session.Identify.Intents = discordgo.PermissionUseSlashCommands
 
 	coflChatId = os.Getenv("DISCORD_COFLCHAT_ID")
 
