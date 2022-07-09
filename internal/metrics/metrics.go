@@ -24,6 +24,11 @@ var (
 		Name: "discord_coflnet_bot_user_loaded",
 		Help: "Count of users loaded",
 	})
+
+	inGameMuteTriggered = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "discord_coflnet_bot_in_game_mute_triggered",
+		Help: "Count of in game mute triggered",
+	})
 )
 
 func Init() {
@@ -45,4 +50,8 @@ func ErrorOccurred() {
 
 func UserLoaded() {
 	userLoaded.Inc()
+}
+
+func InGameMuteTriggered() {
+	inGameMuteTriggered.Inc()
 }

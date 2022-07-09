@@ -59,6 +59,7 @@ func main() {
 	defer discord.StopDiscord()
 
 	// start the refresh of the user table
+	// disabled for now
 	// go usecase.StartRefresh()
 
 	// start api

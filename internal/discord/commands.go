@@ -1,178 +1,22 @@
 package discord
 
 import (
-	"fmt"
-	"github.com/Coflnet/coflnet-bot/internal/coflnet"
-	"github.com/Coflnet/coflnet-bot/internal/model"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
 	"os"
-	"time"
 )
 
 var registeredCommands []*discordgo.ApplicationCommand
 
 func registerCommands() error {
-	var zero float64 = 0
-	var banPerms int64 = discordgo.PermissionBanMembers
 	commands := []*discordgo.ApplicationCommand{
-		{
-			Name:                     "in-game-mute",
-			Description:              "Mute a user in in-game-chat",
-			DefaultMemberPermissions: &banPerms,
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "username",
-					Description: "The username of the user to mute",
-					Required:    true,
-				},
-				{
-					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "reason",
-					Description: "The reason for the mute",
-					Required:    true,
-				},
-				{
-					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "message",
-					Description: "Additional message",
-					Required:    false,
-				},
-				{
-					Type:        discordgo.ApplicationCommandOptionInteger,
-					Name:        "weeks",
-					Description: "Mute for how many weeks",
-					MinValue:    &zero,
-					MaxValue:    52,
-					Required:    false,
-				},
-				{
-					Type:        discordgo.ApplicationCommandOptionInteger,
-					Name:        "days",
-					Description: "Mute for how many days",
-					MinValue:    &zero,
-					MaxValue:    52,
-					Required:    false,
-				},
-				{
-					Type:        discordgo.ApplicationCommandOptionInteger,
-					Name:        "hours",
-					Description: "Mute for how many hours",
-					MinValue:    &zero,
-					MaxValue:    24,
-					Required:    false,
-				},
-			},
-		},
+		ingameMuteCommand(),
+		auctionStatCommand(),
 	}
 
 	commandHandlers := map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"in-game-mute": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-
-			// check permissions
-			isPermitted := isUserPermittedToMutePlayers(i.Member)
-			if !isPermitted {
-				log.Warn().Msgf("User %s is not permitted to mute players", i.Member.Nick)
-
-				// the incident will not be reported
-				// just the same message as
-				// nonsudo is not in the sudoers file.  This incident will be reported.
-				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-					Type: discordgo.InteractionResponseChannelMessageWithSource,
-					Data: &discordgo.InteractionResponseData{
-						Content: "you do not have permissions to mute players, this incident will be reported",
-					},
-				})
-				if err != nil {
-					log.Error().Err(err).Msgf("Error sending message to user %s: %s", i.User.Username, err)
-				}
-				return
-			}
-
-			options := i.ApplicationCommandData().Options
-			optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
-			for _, opt := range options {
-				optionMap[opt.Name] = opt
-			}
-
-			username := fmt.Sprintf("%v", optionMap["username"].Value)
-			muter := i.Member.User.Username
-			reason := fmt.Sprintf("%v", optionMap["reason"].Value)
-
-			message := ""
-			if v, ok := optionMap["message"]; ok {
-				message = fmt.Sprintf("%v", v.Value)
-			}
-
-			hours := 0
-			if v, ok := optionMap["hours"]; ok {
-				fHours := v.Value.(float64)
-				hours = int(fHours)
-			}
-
-			days := 0
-			if v, ok := optionMap["days"]; ok {
-				fDays := v.Value.(float64)
-				if fDays != 0 {
-					days = int(fDays)
-				}
-			}
-
-			weeks := 0
-			if v, ok := optionMap["weeks"]; ok {
-				fWeeks := v.Value.(float64)
-				if fWeeks != 0 {
-					weeks = int(fWeeks)
-				}
-			}
-
-			mute, err := muteCommand(username, muter, reason, message, hours, days, weeks)
-			if err != nil {
-				log.Error().Err(err).Msgf("failed to mute user")
-
-				if e, ok := err.(*InvalidMuteUntilDurationError); ok {
-					respErr := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-						Type: discordgo.InteractionResponseChannelMessageWithSource,
-						Data: &discordgo.InteractionResponseData{
-							Content:         e.Error(),
-							AllowedMentions: &discordgo.MessageAllowedMentions{},
-						},
-					})
-
-					if respErr != nil {
-						log.Error().Err(respErr).Msgf("Error sending message to user %s: %s", i.User.Username, respErr)
-					}
-					return
-				}
-
-				err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-					Type: discordgo.InteractionResponseChannelMessageWithSource,
-					Data: &discordgo.InteractionResponseData{
-						Content:         fmt.Sprintf("there was an error when muting %s please contact <@!256771988352139264>", username),
-						AllowedMentions: &discordgo.MessageAllowedMentions{},
-					},
-				})
-
-				if err != nil {
-					log.Error().Err(err).Msgf("failed to respond to interaction")
-				}
-
-				return
-			}
-
-			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content:         fmt.Sprintf("user %s was muted until %v", username, mute.MuteUntil),
-					AllowedMentions: &discordgo.MessageAllowedMentions{},
-				},
-			})
-
-			if err != nil {
-				log.Error().Err(err).Msgf("error in in-game-mute command")
-			}
-		},
+		"in-game-mute":  ingameMuteCommandHandler,
+		"auction-count": auctionStatCommmandHandler,
 	}
 
 	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -189,7 +33,6 @@ func registerCommands() error {
 			return err
 		}
 
-		registeredCommands = append(registeredCommands, registeredCommand)
 		log.Info().Msgf("Created command '%v'", v.Name)
 		registeredCommands = append(registeredCommands, registeredCommand)
 	}
@@ -197,59 +40,17 @@ func registerCommands() error {
 	return nil
 }
 
-func unregisterCommands() {
+func unregisterCommands() error {
+
+	log.Info().Msgf("unregistering %d commands", len(registeredCommands))
 	for _, c := range registeredCommands {
 		err := session.ApplicationCommandDelete(session.State.User.ID, os.Getenv("DISCORD_GUILD"), c.ID)
 		if err != nil {
 			log.Error().Err(err).Msgf("Cannot delete '%v' command: %v", c.Name, err)
+			return err
 		}
 	}
-}
 
-func muteCommand(username, muter, reason, message string, hours, days, weeks int) (*model.Mute, error) {
-
-	muteUntil := time.Now()
-	muteUntil = muteUntil.Add(time.Hour * time.Duration(hours))
-	muteUntil = muteUntil.Add(time.Hour * 24 * time.Duration(days))
-	muteUntil = muteUntil.Add(time.Hour * 24 * 7 * time.Duration(weeks))
-
-	// check if time until is at least 50 minutes in the future
-	if muteUntil.Before(time.Now().Add(time.Minute * 50)) {
-		return nil, &InvalidMuteUntilDurationError{}
-	}
-
-	mute := model.Mute{
-		Username:  username,
-		Muter:     muter,
-		MuteUntil: muteUntil,
-		Reason:    reason,
-	}
-
-	// add message only if it is not empty
-	if message != "" {
-		mute.Message = message
-	}
-
-	err := coflnet.MutePlayer(&mute)
-	if err != nil {
-		return nil, err
-	}
-
-	return &mute, nil
-}
-
-func isUserPermittedToMutePlayers(u *discordgo.Member) bool {
-	for _, role := range u.Roles {
-		log.Info().Msgf("role: %v", role)
-		if role == os.Getenv("DISCORD_MUTE_ROLE") {
-			return true
-		}
-	}
-	return false
-}
-
-type InvalidMuteUntilDurationError struct{}
-
-func (err *InvalidMuteUntilDurationError) Error() string {
-	return "mute time until must be at least 1 hour in the future"
+	log.Info().Msgf("unregistered %d commands", len(registeredCommands))
+	return nil
 }

@@ -31,16 +31,19 @@ func InitDiscord() {
 		log.Error().Err(err).Msgf("error in discord session")
 	}
 
-	log.Warn().Msg("skip command registering, commands are still dev")
-	// err = registerCommands()
-	// if err != nil {
-	// 	log.Panic().Err(err).Msg("Failed to register commands")
-	// }
+	err = registerCommands()
+	if err != nil {
+		log.Panic().Err(err).Msg("Failed to register commands")
+	}
 }
 
 func StopDiscord() {
-	unregisterCommands()
-	err := session.Close()
+	err := unregisterCommands()
+	if err != nil {
+		return
+	}
+
+	err = session.Close()
 	if err != nil {
 		log.Error().Err(err).Msgf("error closing discord session")
 		return
