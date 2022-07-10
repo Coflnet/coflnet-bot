@@ -11,12 +11,14 @@ var registeredCommands []*discordgo.ApplicationCommand
 func registerCommands() error {
 	commands := []*discordgo.ApplicationCommand{
 		ingameMuteCommand(),
+		ingameUnmuteCommand(),
 		auctionStatCommand(),
 	}
 
 	commandHandlers := map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"in-game-mute":  ingameMuteCommandHandler,
-		"auction-count": auctionStatCommmandHandler,
+		"in-game-mute":   ingameMuteCommandHandler,
+		"auction-count":  auctionStatCommmandHandler,
+		"in-game-unmute": ingameUnmuteCommandHandler,
 	}
 
 	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
