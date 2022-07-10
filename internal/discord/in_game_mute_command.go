@@ -87,6 +87,14 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 		if err != nil {
 			log.Error().Err(err).Msgf("Error sending message to user %s: %s", i.User.Username, err)
 		}
+
+		err = SendMessageToDevLog(&DiscordMessageToSend{
+			Message: fmt.Sprintf("user %s tried to mute someone but did not have permissions", i.User.Username),
+		})
+		if err != nil {
+			log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
+			return
+		}
 		return
 	}
 
