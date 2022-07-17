@@ -1,0 +1,38 @@
+basePath: /api
+definitions:
+  model.FlipTrack:
+    properties:
+      foundTime:
+        type: string
+      originAuction:
+        type: string
+      sell:
+        properties:
+          sellPrice:
+            type: number
+          uuid:
+            type: string
+        type: object
+      seller:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /flipTracked:
+    post:
+      consumes:
+      - application/json
+      description: webhook for tracked flips
+      parameters:
+      - description: message/rfc822
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/model.FlipTrack'
+      responses:
+        "200":
+          description: ""
+      summary: flipTracked
+swagger: "2.0"
