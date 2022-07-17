@@ -34,7 +34,7 @@ func StartTransactionConsume() error {
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  []string{os.Getenv("KAFKA_HOST")},
 		GroupID:  "transaction-discord-consumer",
-		Topic:    os.Getenv("TOPIC_TRANSACTION"),
+		Topic:    transactionTopic(),
 		MinBytes: 10e3,
 		MaxBytes: 10e6,
 	})
@@ -66,7 +66,7 @@ func StartVerificationConsume() error {
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  []string{os.Getenv("KAFKA_HOST")},
 		GroupID:  "verification-discord-consumer",
-		Topic:    os.Getenv("TOPIC_VERIFICATION"),
+		Topic:    transactionTopic(),
 		MinBytes: 10e3,
 		MaxBytes: 10e6,
 	})
@@ -140,4 +140,13 @@ func ProcessVerificationMessage(message *kafka.Message) error {
 
 	log.Info().Msgf("deserialized verification message with userId %d", msg.UserId)
 	return nil
+}
+
+func transactionTopic() string {
+	t := os.Getenv("TOPIC_TRANSACTION")
+	if t == "" {
+		log.Panic().Msg("TOPIC_TRANSACTION not set")
+	}
+
+	return t
 }
