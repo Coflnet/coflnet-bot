@@ -12,10 +12,14 @@ import (
 
 func StartFlipSummaryProcessing() {
 	for {
-		err := processFlipSummary()
+		somethingSent, err := processFlipSummary()
 		if err != nil {
 			log.Error().Err(err).Msg("error processing flip summary")
 			metrics.FlipSummaryProcessingError()
+		}
+
+		if !somethingSent {
+			continue
 		}
 
 		metrics.FlipSummarySend()
@@ -23,24 +27,29 @@ func StartFlipSummaryProcessing() {
 	}
 }
 
-func processFlipSummary() error {
+// returns true if somthing was sent
+func processFlipSummary() (bool, error) {
 	msg, err := kafka.ConsumeFlipSummary()
 
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	var flip model.Flip
 	err = json.Unmarshal(msg.Value, &flip)
 
 	if err != nil {
-		return err
+		return false, err
+	}
+
+	if flip.Profit < 100_000 {
+		return false, nil
 	}
 
 	err = discord.FlipTracked(&flip)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	return kafka.CommitFlipSummary(msg)
+	return true, kafka.CommitFlipSummary(msg)
 }
