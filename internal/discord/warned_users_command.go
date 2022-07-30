@@ -33,7 +33,18 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		optionMap[opt.Name] = opt
 	}
 
-	user := optionMap["user"].Value.(*discordgo.User)
+	userId := optionMap["user"].Value.(string)
+	user, err := s.GuildMember(i.GuildID, userId)
+	if err != nil {
+		_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content:         "❌did not found user with id " + userId,
+				AllowedMentions: &discordgo.MessageAllowedMentions{},
+			},
+		})
+		return
+	}
 
 	if user == nil {
 		_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -62,12 +73,12 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content:         "❌ there was a problem when searching warnings for user " + user.Username,
+				Content:         "❌ there was a problem when searching warnings for user " + user.Nick,
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
 			},
 		})
 		err = SendMessageToDevLog(&DiscordMessageToSend{
-			Message: "❌ there was a problem when listing warnings for user " + user.Username,
+			Message: "❌ there was a problem when listing warnings for user " + user.Nick,
 		})
 		if err != nil {
 			log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
@@ -79,12 +90,12 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content:         fmt.Sprintf("✅ Here is a list of warnings for %s\n%s", user.Username, formattedWarnings(warnings)),
+			Content:         fmt.Sprintf("✅ Here is a list of warnings for %s\n%s", user.Nick, formattedWarnings(warnings)),
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
 		},
 	})
 	err = SendMessageToDevLog(&DiscordMessageToSend{
-		Message: "✅ User " + user.Username + " has been warned, this is his " + fmt.Sprintf("%d", len(warnings)) + " warning",
+		Message: "✅ User " + user.Nick + " has been warned, this is his " + fmt.Sprintf("%d", len(warnings)) + " warning",
 	})
 	if err != nil {
 		log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)

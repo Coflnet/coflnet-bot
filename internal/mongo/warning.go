@@ -17,13 +17,13 @@ func InsertWarning(warning *model.Warning) error {
 	return err
 }
 
-func WarningsByUser(user *discordgo.User) ([]*model.Warning, error) {
+func WarningsByUser(user *discordgo.Member) ([]*model.Warning, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	filter := bson.M{"$and": []bson.M{
-		{"user.id": user.ID},
+		{"user.user.id": user.User.ID},
 		{"until": bson.M{"$gt": time.Now()}},
 	}}
 
