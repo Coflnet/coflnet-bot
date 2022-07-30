@@ -1,8 +1,10 @@
 package discord
 
 import (
+	"fmt"
 	"github.com/Coflnet/coflnet-bot/internal/model"
 	"github.com/bwmarrin/discordgo"
+	"github.com/dustin/go-humanize"
 	"github.com/rs/zerolog/log"
 	"os"
 	"strconv"
@@ -15,17 +17,25 @@ func FlipTracked(flip *model.Flip) error {
 			{
 				Title: flip.Buy.ItemName,
 				Author: &discordgo.MessageEmbedAuthor{
-					Name: flip.Buy.ProfileID,
-					// IconURL: flip.Buy.,
+					Name:    flip.Buy.ProfileID,
+					IconURL: iconUrl(flip),
 				},
 				Fields: []*discordgo.MessageEmbedField{
 					{
 						Name:  "price",
-						Value: strconv.Itoa(flip.Sell.HighestBidAmount),
+						Value: humanize.Comma(int64(flip.Sell.HighestBidAmount)),
 					},
 					{
 						Name:  "profit",
-						Value: strconv.Itoa(flip.Profit),
+						Value: humanize.Comma(int64(flip.Profit)),
+					},
+					{
+						Name:  "Time",
+						Value: fmt.Sprintf("<t:%d:f>", flip.Sell.End.Unix()),
+					},
+					{
+						Name:  "flip of the day",
+						Value: strconv.Itoa(flip.AmountOfFlipsFromBuyerOfTheDay),
 					},
 				},
 				Type: "rich",
@@ -39,6 +49,10 @@ func FlipTracked(flip *model.Flip) error {
 	}
 
 	return nil
+}
+
+func iconUrl(flip *model.Flip) string {
+	return fmt.Sprintf("https://crafatar.com/avatars/%s", flip.Sell.AuctioneerID)
 }
 
 func flipsChannelId() string {
