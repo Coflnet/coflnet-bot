@@ -42,7 +42,7 @@ func processFlipSummary() (bool, error) {
 		return false, err
 	}
 
-	if flip.Profit < 100_000 {
+	if flip.Profit < 500_000 {
 		return false, nil
 	}
 
