@@ -39,6 +39,11 @@ var (
 		Name: "discord_coflnet_bot_flip_summary_processing_error",
 		Help: "Errors while processing flip summaries",
 	})
+
+	flipSummarySend = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "discord_coflnet_bot_flip_summary_send",
+		Help: "The amount of flip summaries send",
+	})
 )
 
 func Init() {
@@ -72,4 +77,8 @@ func InGameUnmuteTriggered() {
 
 func FlipSummaryProcessingError() {
 	flipSummaryProcessingError.Inc()
+}
+
+func FlipSummarySend() {
+	flipSummarySend.Inc()
 }

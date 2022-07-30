@@ -18,7 +18,8 @@ func StartFlipSummaryProcessing() {
 			metrics.FlipSummaryProcessingError()
 		}
 
-		time.Sleep(time.Second * 1)
+		metrics.FlipSummarySend()
+		time.Sleep(time.Millisecond * 1500)
 	}
 }
 
