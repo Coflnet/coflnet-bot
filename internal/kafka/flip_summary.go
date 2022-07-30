@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	kafkago "github.com/segmentio/kafka-go"
 	"time"
 )
@@ -14,6 +15,11 @@ func ConsumeFlipSummary() (*kafkago.Message, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	go func(m *kafkago.Message) {
+		offset := m.Offset
+		metrics.FlipSummaryOffset(int(offset))
+	}(&msg)
 
 	return &msg, nil
 }

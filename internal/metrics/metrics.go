@@ -44,6 +44,11 @@ var (
 		Name: "discord_coflnet_bot_flip_summary_send",
 		Help: "The amount of flip summaries send",
 	})
+
+	flipSummaryOffset = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "discord_coflnet_bot_flip_summary_offset",
+		Help: "The current offset of the flip summary",
+	})
 )
 
 func Init() {
@@ -81,4 +86,8 @@ func FlipSummaryProcessingError() {
 
 func FlipSummarySend() {
 	flipSummarySend.Inc()
+}
+
+func FlipSummaryOffset(offset int) {
+	flipSummaryOffset.Set(float64(offset))
 }
