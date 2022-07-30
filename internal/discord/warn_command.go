@@ -74,6 +74,7 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
 			},
 		})
+		log.Warn().Msgf("reason is empty")
 		return
 	}
 
@@ -85,6 +86,7 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
 			},
 		})
+		log.Warn().Msgf("days input %f is not between 0 and 365", days)
 		return
 	}
 
@@ -96,6 +98,7 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
 			},
 		})
+		log.Warn().Msgf("user %s is not permitted to warn players", i.Member.User.Username)
 		return
 	}
 
@@ -108,6 +111,7 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
 			},
 		})
+		log.Error().Err(err).Msgf("error warning user")
 		err = SendMessageToDevLog(&DiscordMessageToSend{
 			Message: "❌ there was a problem when warning user " + username(user),
 		})
