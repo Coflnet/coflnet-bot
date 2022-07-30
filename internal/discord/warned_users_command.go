@@ -94,12 +94,6 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
 		},
 	})
-	err = SendMessageToDevLog(&DiscordMessageToSend{
-		Message: "✅ User " + user.Nick + " has been warned, this is his " + fmt.Sprintf("%d", len(warnings)) + " warning",
-	})
-	if err != nil {
-		log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
-	}
 }
 
 func formattedWarnings(warnings []*model.Warning) string {
