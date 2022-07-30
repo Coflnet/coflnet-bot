@@ -29,6 +29,18 @@ type VerificationMessage struct {
 	UserId int64 `msgpack:"alias:UserId"`
 }
 
+var flipSummaryReader *kafka.Reader
+
+func Init() {
+	flipSummaryReader = kafka.NewReader(kafka.ReaderConfig{
+		Brokers:  []string{os.Getenv("KAFKA_HOST")},
+		GroupID:  "flip-summary-discord-consumer",
+		Topic:    flipSummaryTopic(),
+		MinBytes: 10e3,
+		MaxBytes: 10e6,
+	})
+}
+
 func StartTransactionConsume() error {
 
 	r := kafka.NewReader(kafka.ReaderConfig{
@@ -83,8 +95,7 @@ func StartVerificationConsume() error {
 		log.Info().Msgf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 		err = ProcessVerificationMessage(&m)
 		if err != nil {
-			log.Error().Err(err).Msgf("error processing kafka verification message")
-			continue
+			log.Error().Err(err).Msgf("error processing kafka verification message, commit it nevertheless")
 		}
 
 		if err := r.CommitMessages(ctx, m); err != nil {
@@ -146,6 +157,15 @@ func transactionTopic() string {
 	t := os.Getenv("TOPIC_TRANSACTION")
 	if t == "" {
 		log.Panic().Msg("TOPIC_TRANSACTION not set")
+	}
+
+	return t
+}
+
+func flipSummaryTopic() string {
+	t := os.Getenv("TOPIC_FLIPSUMMARY")
+	if t == "" {
+		log.Panic().Msg("TOPIC_FLIPSUMMARY not set")
 	}
 
 	return t

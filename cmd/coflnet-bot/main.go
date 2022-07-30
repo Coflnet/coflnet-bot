@@ -6,6 +6,7 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/kafka"
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
+	"github.com/Coflnet/coflnet-bot/internal/usecase"
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 )
@@ -43,8 +44,10 @@ func main() {
 	}()
 
 	// start dev chat consumer
+	kafka.Init()
 	go kafka.StartDiscordMessagesConsumer()
 	go kafka.StartDiscordSpamMessagesConsumer()
+	go usecase.StartFlipSummaryProcessing()
 
 	// start kafka verification consume
 	go func() {

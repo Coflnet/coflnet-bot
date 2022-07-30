@@ -6,31 +6,26 @@ import (
 	"github.com/rs/zerolog/log"
 	"os"
 	"strconv"
-	"time"
 )
 
-func FlipTracked(trackedFlip *model.FlipTrack) error {
+func FlipTracked(flip *model.Flip) error {
 
 	_, err := session.ChannelMessageSendComplex(flipsChannelId(), &discordgo.MessageSend{
 		Embeds: []*discordgo.MessageEmbed{
 			{
-				Title: trackedFlip.Seller,
+				Title: flip.Buy.ItemName,
 				Author: &discordgo.MessageEmbedAuthor{
-					Name: trackedFlip.Seller,
-					// IconURL: iconUrl,
+					Name: flip.Buy.ProfileID,
+					// IconURL: flip.Buy.,
 				},
 				Fields: []*discordgo.MessageEmbedField{
 					{
 						Name:  "price",
-						Value: strconv.Itoa(int(trackedFlip.Sell.SellPrice)),
+						Value: strconv.Itoa(flip.Sell.HighestBidAmount),
 					},
 					{
-						Name:  "auctionUuid",
-						Value: trackedFlip.OriginAuction,
-					},
-					{
-						Name:  "time",
-						Value: trackedFlip.FoundTime.Format(time.RFC3339),
+						Name:  "profit",
+						Value: strconv.Itoa(flip.Profit),
 					},
 				},
 				Type: "rich",
