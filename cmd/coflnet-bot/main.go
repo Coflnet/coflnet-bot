@@ -36,12 +36,12 @@ func main() {
 	go startRedisChatConsume()
 
 	// start kafka transaction consume
-	go func() {
-		err := kafka.StartTransactionConsume()
-		if err != nil {
-			log.Panic().Err(err).Msgf("error consuming messages from kafka")
-		}
-	}()
+	// go func() {
+	// 	err := kafka.StartTransactionConsume()
+	// 	if err != nil {
+	// 		log.Panic().Err(err).Msgf("error consuming messages from kafka")
+	// 	}
+	// }()
 
 	// start dev chat consumer
 	kafka.Init()
