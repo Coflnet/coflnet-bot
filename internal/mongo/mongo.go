@@ -18,6 +18,7 @@ var (
 	userCollection     *mongo.Collection
 	muteCollection     *mongo.Collection
 	unMuteCollection   *mongo.Collection
+	warningCollection  *mongo.Collection
 )
 
 func Init() error {
@@ -35,6 +36,7 @@ func Init() error {
 	userCollection = database.Collection("users")
 	muteCollection = database.Collection("mutes")
 	unMuteCollection = database.Collection("unmutes")
+	warningCollection = database.Collection("warnings")
 
 	return nil
 }

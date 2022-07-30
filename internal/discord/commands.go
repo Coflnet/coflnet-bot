@@ -13,12 +13,16 @@ func registerCommands() error {
 		ingameMuteCommand(),
 		ingameUnmuteCommand(),
 		auctionStatCommand(),
+		warnCommand(),
+		userWarnings(),
 	}
 
 	commandHandlers := map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"in-game-mute":   ingameMuteCommandHandler,
 		"auction-count":  auctionStatCommmandHandler,
 		"in-game-unmute": ingameUnmuteCommandHandler,
+		"user-warnings":  userWarningsHandler,
+		"warn-user":      warnUserHandler,
 	}
 
 	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {

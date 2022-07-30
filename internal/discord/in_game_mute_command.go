@@ -81,7 +81,7 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "you do not have permissions to mute players, this incident will be reported",
+				Content: "❌ you do not have permissions to mute players, this incident will be reported",
 			},
 		})
 		if err != nil {
@@ -160,7 +160,7 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 		err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content:         fmt.Sprintf("there was an error when muting %s please contact <@!256771988352139264>", username),
+				Content:         fmt.Sprintf("❌ there was an error when muting %s please contact <@!256771988352139264>", username),
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
 			},
 		})
@@ -175,7 +175,7 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content:         fmt.Sprintf("user %s was muted until %v", username, mute.MuteUntil),
+			Content:         fmt.Sprintf("🔇 user %s was muted until %v", username, mute.MuteUntil),
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
 		},
 	})
@@ -185,7 +185,7 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 	}
 
 	err = SendMessageToDevLog(&DiscordMessageToSend{
-		Message: fmt.Sprintf("user %s was muted by %s for %s", username, muter, reason),
+		Message: fmt.Sprintf("🔇 user %s was muted by %s for %s", username, muter, reason),
 	})
 
 	if err != nil {
