@@ -19,7 +19,7 @@ func Start() error {
 	r.GET("/api/player/:id", getUserById)
 	r.GET("/api/player/discord/:tag", GetUserByDiscordTag)
 
-	r.POST("/api/flipTracked", flipTracked)
+	// r.POST("/api/flipTracked", flipTracked)
 
 	return r.Run()
 }
