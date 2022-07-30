@@ -36,8 +36,8 @@ func ingameMuteCommand() *discordgo.ApplicationCommand {
 			{
 				Type:        discordgo.ApplicationCommandOptionString,
 				Name:        "message",
-				Description: "Additional message",
-				Required:    false,
+				Description: "Message for the muted user",
+				Required:    true,
 			},
 			{
 				Type:        discordgo.ApplicationCommandOptionInteger,
