@@ -156,7 +156,7 @@ func warnUser(user *discordgo.Member, reason string, muter *discordgo.Member, da
 
 func isUserPermittedToWarnPlayers(user *discordgo.Member) bool {
 	for _, role := range user.Roles {
-		if role == helperRole() {
+		if role == helperRole() || role == devRole() || role == modRole() {
 			return true
 		}
 	}
@@ -168,6 +168,22 @@ func helperRole() string {
 	r := os.Getenv("HELPER_ROLE")
 	if r == "" {
 		log.Panic().Msg("HELPER_ROLE is not set")
+	}
+	return r
+}
+
+func devRole() string {
+	r := os.Getenv("DEV_ROLE")
+	if r == "" {
+		log.Panic().Msg("DEV_ROLE is not set")
+	}
+	return r
+}
+
+func modRole() string {
+	r := os.Getenv("MOD_ROLE")
+	if r == "" {
+		log.Panic().Msg("MOD_ROLE is not set")
 	}
 	return r
 }
