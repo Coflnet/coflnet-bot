@@ -73,12 +73,12 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content:         "❌ there was a problem when searching warnings for user " + user.Nick,
+				Content:         "❌ there was a problem when searching warnings for user " + username(user),
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
 			},
 		})
 		err = SendMessageToDevLog(&DiscordMessageToSend{
-			Message: "❌ there was a problem when listing warnings for user " + user.Nick,
+			Message: "❌ there was a problem when listing warnings for user " + username(user),
 		})
 		if err != nil {
 			log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
@@ -90,7 +90,7 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content:         fmt.Sprintf("✅ Here is a list of warnings for %s\n%s", user.Nick, formattedWarnings(warnings)),
+			Content:         fmt.Sprintf("✅ Here is a list of warnings for %s\n%s", username(user), formattedWarnings(warnings)),
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
 		},
 	})
@@ -99,7 +99,14 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func formattedWarnings(warnings []*model.Warning) string {
 	var result string
 	for i, warning := range warnings {
-		result += fmt.Sprintf("- %d. %s until %s\n", i+1, warning.Reason, warning.Until.Format("2006-01-02 15:04:05"))
+		result += fmt.Sprintf("- %d. %s until %s\n", i+1, warning.Reason, fmt.Sprintf("<t:%d:f>", warning.Until.Unix()))
 	}
 	return result
+}
+
+func username(user *discordgo.Member) string {
+	if user.Nick != "" {
+		return user.Nick
+	}
+	return user.User.Username
 }

@@ -104,12 +104,12 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content:         "❌ there was a problem when warning user " + user.Nick,
+				Content:         "❌ there was a problem when warning user " + username(user),
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
 			},
 		})
 		err = SendMessageToDevLog(&DiscordMessageToSend{
-			Message: "❌ there was a problem when warning user " + user.Nick,
+			Message: "❌ there was a problem when warning user " + username(user),
 		})
 		if err != nil {
 			log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
@@ -121,12 +121,12 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content:         "✅ User " + user.Nick + " has been warned, this is his " + fmt.Sprintf("%d", warnings) + " warning",
+			Content:         "✅ User " + username(user) + " has been warned, this is his " + fmt.Sprintf("%d", warnings) + " warning",
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
 		},
 	})
 	err = SendMessageToDevLog(&DiscordMessageToSend{
-		Message: "✅ User " + user.Nick + " has been warned, this is his " + fmt.Sprintf("%d", warnings) + " warning",
+		Message: "✅ User " + username(user) + " has been warned, this is his " + fmt.Sprintf("%d", warnings) + " warning",
 	})
 	if err != nil {
 		log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
