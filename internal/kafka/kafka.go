@@ -3,7 +3,6 @@ package kafka
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -95,7 +94,7 @@ func StartVerificationConsume() error {
 		log.Info().Msgf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 		err = ProcessVerificationMessage(&m)
 		if err != nil {
-			log.Error().Err(err).Msgf("error processing kafka verification message, commit it nevertheless")
+			log.Warn().Err(err).Msgf("error processing verification message, ignoring")
 		}
 
 		if err := r.CommitMessages(ctx, m); err != nil {
@@ -139,13 +138,9 @@ func ProcessTransactionMessage(message *kafka.Message) error {
 func ProcessVerificationMessage(message *kafka.Message) error {
 	content := message.Value
 
-	log.Info().Msgf("got a verification message, dont really know what to do with it")
-	fmt.Println(content)
-
 	var msg VerificationMessage
 	err := msgpack.Unmarshal(content, &msg)
 	if err != nil {
-		log.Error().Err(err).Msgf("could not deserialize verification message")
 		return err
 	}
 
