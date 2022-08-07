@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/Coflnet/coflnet-bot/internal/model"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
@@ -124,12 +126,20 @@ func SendMsgToDevChat(message string) error {
 	return nil
 }
 
-func GiveUserWarnedRole(user *discordgo.Member) error {
+func GiveUserWarnedRole(user *discordgo.Member, w *model.Warning) error {
+	// give role
 	err := session.GuildMemberRoleAdd(guildId(), user.User.ID, warnedRole())
 	if err != nil {
 		return err
 	}
 
+	// send message to player
+	err = SendMessageToUser(fmt.Sprintf("⚠️ you have been warned by %s until %s", username(user), DiscordFormattedTime(w.Until)), user)
+	if err != nil {
+		return err
+	}
+
+	// send message to log
 	return SendMessageToDevSpamLog(&DiscordMessageToSend{
 		Message: fmt.Sprintf("⚠️ user %s has been given the warned role", username(user)),
 	})
@@ -144,6 +154,20 @@ func RemoveUserWarnedRole(user *discordgo.Member) error {
 	return SendMessageToDevSpamLog(&DiscordMessageToSend{
 		Message: fmt.Sprintf("⚠️ warned role has been removed from user %s", username(user)),
 	})
+}
+
+func SendMessageToUser(message string, member *discordgo.Member) error {
+	channel, err := session.UserChannelCreate(member.User.ID)
+	if err != nil {
+		return err
+	}
+
+	_, err = session.ChannelMessageSend(channel.ID, message)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
@@ -248,4 +272,8 @@ func SendMessageToDevSpamLog(msg *DiscordMessageToSend) error {
 
 type DiscordMessageToSend struct {
 	Message string
+}
+
+func DiscordFormattedTime(t time.Time) string {
+	return fmt.Sprintf("<t:%d:f>", t.Unix())
 }
