@@ -37,6 +37,10 @@ func FlipTracked(flip *model.Flip) error {
 						Name:  "flip of the day",
 						Value: strconv.Itoa(flip.AmountOfFlipsFromBuyerOfTheDay),
 					},
+					{
+						Name:  "Finder",
+						Value: fmt.Sprintf("%s", flip.Finder),
+					},
 				},
 				Type: "rich",
 			},
