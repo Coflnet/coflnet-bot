@@ -125,12 +125,12 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content:         "✅ User " + username(user) + " has been warned, this is his " + fmt.Sprintf("%d", warnings) + " warning",
+			Content:         fmt.Sprintf("✅ User %s has been warned, this is his %d. warning", username(user), warnings),
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
 		},
 	})
 	err = SendMessageToDevLog(&DiscordMessageToSend{
-		Message: "✅ User " + username(user) + " has been warned, this is his " + fmt.Sprintf("%d", warnings) + " warning",
+		Message: fmt.Sprintf("✅ User %s has been warned, this is his %d. warning", username(user), warnings),
 	})
 	if err != nil {
 		log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
@@ -146,6 +146,11 @@ func warnUser(user *discordgo.Member, reason string, muter *discordgo.Member, da
 	}
 
 	err := mongo.InsertWarning(warning)
+	if err != nil {
+		return 0, err
+	}
+
+	err = GiveUserWarnedRole(user)
 	if err != nil {
 		return 0, err
 	}

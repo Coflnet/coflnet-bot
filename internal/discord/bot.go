@@ -124,6 +124,28 @@ func SendMsgToDevChat(message string) error {
 	return nil
 }
 
+func GiveUserWarnedRole(user *discordgo.Member) error {
+	err := session.GuildMemberRoleAdd(guildId(), user.User.ID, warnedRole())
+	if err != nil {
+		return err
+	}
+
+	return SendMessageToDevSpamLog(&DiscordMessageToSend{
+		Message: fmt.Sprintf("⚠️ user %s has been given the warned role", username(user)),
+	})
+}
+
+func RemoveUserWarnedRole(user *discordgo.Member) error {
+	err := session.GuildMemberRoleRemove(guildId(), user.User.ID, warnedRole())
+	if err != nil {
+		return err
+	}
+
+	return SendMessageToDevSpamLog(&DiscordMessageToSend{
+		Message: fmt.Sprintf("⚠️ warned role has been removed from user %s", username(user)),
+	})
+}
+
 func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 
 	if message.UUID == "" {

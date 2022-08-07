@@ -1,74 +1,36 @@
 package usecase
 
 import (
+	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"time"
 
-	"github.com/Coflnet/coflnet-bot/internal/coflnet"
 	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/rs/zerolog/log"
 )
 
 func StartRefresh() {
-	go func() {
-		for {
-			refreshUsers()
-
-			time.Sleep(time.Hour)
-		}
-	}()
-
-	go func() {
-		for {
-			log.Info().Msgf("start check of all users with flipper role")
-			CheckIfUsersStillShouldHaveFlipperRole()
-			log.Info().Msgf("finished check of all users with flipper role")
-
-			time.Sleep(time.Hour * 2)
-		}
-	}()
-}
-
-func refreshUsers() {
-	offset := 0
 	for {
-
-		users, err := coflnet.GetUsersFromId(offset)
+		warnings, err := mongo.ExpiredWarnings()
 		if err != nil {
-			log.Error().Err(err).Msg("error getting users")
-			return
+			log.Error().Err(err).Msg("error getting expired warnings")
+			metrics.ErrorOccurred()
 		}
 
-		if len(users) == 0 {
-			return
-		}
+		log.Info().Msgf("found %d expired warnings, remove role from users", len(warnings))
 
-		for _, user := range users {
-
-			err := refreshUser(user.UserId)
+		for warning := range warnings {
+			err = discord.RemoveUserWarnedRole(warning.User)
 			if err != nil {
-				log.Error().Err(err).Msgf("error loading user %d", user.UserId)
-				continue
+				log.Error().Err(err).Msgf("error removing warned role for user %d", warning.User)
+				metrics.ErrorOccurred()
 			}
 
-			offset++
+			time.Sleep(time.Minute * 5)
 		}
 
+		time.Sleep(time.Hour * 1)
 	}
-}
-
-func refreshUser(id int) error {
-
-	// wait to not get into api limit
-	defer time.Sleep(time.Second * 20)
-	log.Info().Msgf("loading user with id %d", id)
-
-	u, err := coflnet.LoadUserById(id)
-	if err != nil {
-		return err
-	}
-
-	return discord.SetFlipperRoleForUser(u)
 }
 
 func CheckIfUsersStillShouldHaveFlipperRole() {

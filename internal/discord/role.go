@@ -68,8 +68,8 @@ func SetFlipperRoleForUser(user *model.User) error {
 
 func giveUserFlipperRole(user *model.User) error {
 
-	guild := os.Getenv("DISCORD_GUILD")
-	role := os.Getenv("DISCORD_FLIPPER_ROLE")
+	guild := guildId()
+	role := flipperRole()
 
 	if guild == "" || role == "" {
 		return fmt.Errorf("discord guild or role is not set")
@@ -121,4 +121,28 @@ func discordNameForUser(u *model.User) string {
 	}
 
 	return discordName
+}
+
+func warnedRole() string {
+	r := os.Getenv("WARNED_ROLE")
+	if r == "" {
+		log.Panic().Msg("WARNED_ROLE is not set")
+	}
+	return r
+}
+
+func flipperRole() string {
+	r := os.Getenv("DISCORD_FLIPPER_ROLE")
+	if r == "" {
+		log.Panic().Msg("DISCORD_FLIPPER_ROLE is not set")
+	}
+	return r
+}
+
+func guildId() string {
+	g := os.Getenv("DISCORD_GUILD")
+	if g == "" {
+		log.Panic().Msg("DISCORD_GUILD is not set")
+	}
+	return g
 }

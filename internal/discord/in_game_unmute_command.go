@@ -80,7 +80,7 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 	_, err := unmuteCommand(username, unmuter, reason)
 
 	if err != nil {
-		log.Error().Err(err).Msgf("failed to unmute user")
+		log.Error().Err(err).Msgf("❌ failed to unmute user")
 		metrics.ErrorOccurred()
 
 		if e, ok := err.(*InvalidMuteUntilDurationError); ok {
@@ -93,7 +93,7 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 			})
 
 			if respErr != nil {
-				log.Error().Err(respErr).Msgf("Error sending message to user %s: %s", i.User.Username, respErr)
+				log.Error().Err(respErr).Msgf("❌ Error sending message to user %s: %s", i.User.Username, respErr)
 			}
 			return
 		}
@@ -101,13 +101,13 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 		err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content:         fmt.Sprintf("there was an error when unmuting %s please contact <@!256771988352139264>", username),
+				Content:         fmt.Sprintf("❌there was an error when unmuting %s please contact <@!256771988352139264>", username),
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
 			},
 		})
 
 		if err != nil {
-			log.Error().Err(err).Msgf("failed to respond to interaction")
+			log.Error().Err(err).Msgf("❌ failed to respond to interaction")
 		}
 
 		return
@@ -116,7 +116,7 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content:         fmt.Sprintf("user %s was unmuted by %s", username, unmuter),
+			Content:         fmt.Sprintf("🔈 user %s was unmuted by %s", username, unmuter),
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
 		},
 	})
@@ -126,7 +126,7 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 	}
 
 	err = SendMessageToDevLog(&DiscordMessageToSend{
-		Message: fmt.Sprintf("user %s was unmuted by %s for %s", username, unmuter, reason),
+		Message: fmt.Sprintf("🔈 user %s was unmuted by %s for %s", username, unmuter, reason),
 	})
 
 	if err != nil {
