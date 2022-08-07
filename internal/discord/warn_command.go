@@ -150,7 +150,7 @@ func warnUser(user *discordgo.Member, reason string, muter *discordgo.Member, da
 		return 0, err
 	}
 
-	err = GiveUserWarnedRole(user)
+	err = GiveUserWarnedRole(user, warning)
 	if err != nil {
 		return 0, err
 	}
