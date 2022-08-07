@@ -41,14 +41,7 @@ func main() {
 	go kafka.StartDiscordSpamMessagesConsumer()
 	go usecase.StartFlipSummaryProcessing()
 	go usecase.StartRefresh()
-
-	// start kafka verification consume
-	go func() {
-		err := kafka.StartVerificationConsume()
-		if err != nil {
-			log.Panic().Err(err).Msgf("error consuming messages from kafka")
-		}
-	}()
+	go usecase.StartTransactionConsumer()
 
 	// open discord session and wait for messages
 	discord.InitDiscord()
