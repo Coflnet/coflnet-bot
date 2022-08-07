@@ -35,19 +35,12 @@ func main() {
 	// redis
 	go startRedisChatConsume()
 
-	// start kafka transaction consume
-	// go func() {
-	// 	err := kafka.StartTransactionConsume()
-	// 	if err != nil {
-	// 		log.Panic().Err(err).Msgf("error consuming messages from kafka")
-	// 	}
-	// }()
-
 	// start dev chat consumer
 	kafka.Init()
 	go kafka.StartDiscordMessagesConsumer()
 	go kafka.StartDiscordSpamMessagesConsumer()
 	go usecase.StartFlipSummaryProcessing()
+	go usecase.StartRefresh()
 
 	// start kafka verification consume
 	go func() {
@@ -60,10 +53,6 @@ func main() {
 	// open discord session and wait for messages
 	discord.InitDiscord()
 	defer discord.StopDiscord()
-
-	// start the refresh of the user table
-	// disabled for now
-	// go usecase.StartRefresh()
 
 	// start api
 	err = api.Start()
