@@ -140,7 +140,7 @@ func GiveUserWarnedRole(user *discordgo.Member, w *model.Warning) error {
 	}
 
 	// send message to log
-	return SendMessageToDevSpamLog(&DiscordMessageToSend{
+	return SendMessageToDevLog(&DiscordMessageToSend{
 		Message: fmt.Sprintf("⚠️ user %s has been given the warned role", username(user)),
 	})
 }
@@ -151,7 +151,7 @@ func RemoveUserWarnedRole(user *discordgo.Member) error {
 		return err
 	}
 
-	return SendMessageToDevSpamLog(&DiscordMessageToSend{
+	return SendMessageToDevLog(&DiscordMessageToSend{
 		Message: fmt.Sprintf("⚠️ warned role has been removed from user %s", username(user)),
 	})
 }
