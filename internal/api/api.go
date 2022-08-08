@@ -19,7 +19,8 @@ func Start() error {
 	r.GET("/api/player/:id", getUserById)
 	r.GET("/api/player/discord/:tag", GetUserByDiscordTag)
 
-	// r.POST("/api/flipTracked", flipTracked)
+	r.GET("/api/warned", warnedUsers)
+	r.GET("/api/expiredWarnings", expiredWarnings)
 
 	return r.Run()
 }
