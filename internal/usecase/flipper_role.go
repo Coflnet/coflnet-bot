@@ -3,6 +3,7 @@ package usecase
 import (
 	"encoding/json"
 	"github.com/Coflnet/coflnet-bot/internal/coflnet"
+	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/kafka"
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/model"
@@ -67,9 +68,7 @@ func processTransactionMessage(message kafkago.Message) error {
 }
 
 func UpdateUserFlipperRole(user *model.User) error {
-	// TODO set the flipper role for the user
-	log.Warn().Msgf("updating flipper user role with id %d", user.UserId)
-	return nil
+	return discord.SetFlipperRoleForUser(user)
 }
 
 type TransactionMessage struct {

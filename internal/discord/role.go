@@ -21,6 +21,7 @@ func SetFlipperRoleForUser(user *model.User) error {
 		}
 
 		if hadFlipperRoleBefore {
+			log.Info().Msgf("user %s had flipper role before, skip it", discordNameForUser(u))
 			return
 		}
 
@@ -41,7 +42,7 @@ func SetFlipperRoleForUser(user *model.User) error {
 	}(user, userHadFlipperRoleBefore)
 
 	if user.DiscordNames == nil || len(user.DiscordNames) == 0 {
-		log.Info().Msgf("user %d has no discord names, skip flipper role check", user.UserId)
+		log.Info().Msgf("user %d has no discord names set, skip flipper role check", user.UserId)
 		user.HasFlipperRole = false
 		return nil
 	}
