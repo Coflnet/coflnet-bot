@@ -37,11 +37,13 @@ func LoadUserById(id int) (*model.User, error) {
 
 	mcUser, err := UserMcConnect(user.UserId)
 	if err != nil {
+		log.Error().Err(err).Msgf("can not load with id %d from mcConnect", user.UserId)
 		return nil, err
 	}
 
 	premiumTime, err := PaymentUserById(user.UserId)
 	if err != nil {
+		log.Error().Err(err).Msgf("can not load with id %d from payment", user.UserId)
 		return nil, err
 	}
 
