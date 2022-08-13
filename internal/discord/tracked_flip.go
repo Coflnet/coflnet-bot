@@ -2,6 +2,7 @@ package discord
 
 import (
 	"fmt"
+	"github.com/Coflnet/coflnet-bot/internal/coflnet"
 	"github.com/Coflnet/coflnet-bot/internal/model"
 	"github.com/bwmarrin/discordgo"
 	"github.com/dustin/go-humanize"
@@ -12,12 +13,18 @@ import (
 
 func FlipTracked(flip *model.Flip) error {
 
-	_, err := session.ChannelMessageSendComplex(flipsChannelId(), &discordgo.MessageSend{
+	playerName, err := coflnet.PlayerName(flip.Buy.AuctioneerID)
+	if err != nil {
+		log.Error().Err(err).Msgf("could not get player name for %s", flip.Buy.AuctioneerID)
+		return err
+	}
+
+	_, err = session.ChannelMessageSendComplex(flipsChannelId(), &discordgo.MessageSend{
 		Embeds: []*discordgo.MessageEmbed{
 			{
 				Title: flip.Buy.ItemName,
 				Author: &discordgo.MessageEmbedAuthor{
-					Name:    flip.Buy.ProfileID,
+					Name:    playerName,
 					IconURL: iconUrl(flip),
 				},
 				Fields: []*discordgo.MessageEmbedField{
