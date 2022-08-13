@@ -15,7 +15,11 @@ func UserById(id int) (*model.User, error) {
 
 	user, err := mongo.SearchByUserId(id)
 	if err != nil {
-		return nil, err
+
+		// if the error is not an usernotfound return it
+		if _, ok := err.(*model.UserNotFoundError); !ok {
+			return nil, err
+		}
 	}
 
 	if user != nil {
