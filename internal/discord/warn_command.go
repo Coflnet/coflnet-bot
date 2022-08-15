@@ -123,7 +123,7 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	// send success message
 	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content:         fmt.Sprintf("✅ User %s has been warned, this is his %d. warning", username(user), warnings),
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
