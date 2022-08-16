@@ -86,11 +86,16 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
+	text := fmt.Sprintf("✅ Here is a list of warnings for %s\n%s", username(user), formattedWarnings(warnings))
+	if len(warnings) == 0 {
+		text = fmt.Sprintf("✅ There are no warnings for %s", username(user))
+	}
+
 	// send success message
 	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content:         fmt.Sprintf("✅ Here is a list of warnings for %s\n%s", username(user), formattedWarnings(warnings)),
+			Content:         text,
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
 		},
 	})
