@@ -32,7 +32,7 @@ func SetFlipperRoleForUser(user *model.User) error {
 				return
 			}
 
-			err = SendMsgToDevChat(fmt.Sprintf("give user %s the flipper role, he has premium until %v", discordNameForUser(u), u.PremiumUntil))
+			err = SendMessageToFlipperRoleChannel(fmt.Sprintf("give user %s the flipper role, he has premium until %v", discordNameForUser(u), u.PremiumUntil))
 			if err != nil {
 				log.Error().Err(err).Msgf("can not send message to dev chat")
 				return

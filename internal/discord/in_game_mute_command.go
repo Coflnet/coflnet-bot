@@ -7,7 +7,6 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/model"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
-	"os"
 	"time"
 )
 
@@ -88,9 +87,9 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 			log.Error().Err(err).Msgf("Error sending message to user %s: %s", i.User.Username, err)
 		}
 
-		err = SendMessageToDevLog(&DiscordMessageToSend{
-			Message: fmt.Sprintf("user %s tried to mute someone but did not have permissions", i.User.Username),
-		})
+		err = SendMessageToMutesChannel(
+			fmt.Sprintf("user %s tried to mute someone but did not have permissions", i.User.Username),
+		)
 		if err != nil {
 			log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
 			return
@@ -184,10 +183,9 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 		log.Error().Err(err).Msgf("error in in-game-mute command")
 	}
 
-	err = SendMessageToDevLog(&DiscordMessageToSend{
-		Message: fmt.Sprintf("🔇 user %s was muted by %s for %s", username, muter, reason),
-	})
-
+	err = SendMessageToMutesChannel(
+		fmt.Sprintf("🔇 user %s was muted by %s for %s", username, muter, reason),
+	)
 	if err != nil {
 		log.Error().Err(err).Msgf("error in in-game-mute command")
 	}
@@ -228,7 +226,7 @@ func muteCommand(username, muter, reason, message string, hours, days, weeks int
 func isUserPermittedToMutePlayers(u *discordgo.Member) bool {
 	for _, role := range u.Roles {
 		log.Info().Msgf("role: %v", role)
-		if role == os.Getenv("DISCORD_MUTE_ROLE") {
+		if role == muteRole() {
 			return true
 		}
 	}

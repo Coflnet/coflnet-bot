@@ -77,9 +77,7 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
 			},
 		})
-		err = SendMessageToDevLog(&DiscordMessageToSend{
-			Message: "❌ there was a problem when listing warnings for user " + username(user),
-		})
+		err = SendMessageToWarningsChannel(fmt.Sprintf("❌ there was a problem when listing warnings for user %s", username(user)))
 		if err != nil {
 			log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
 		}

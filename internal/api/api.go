@@ -12,8 +12,8 @@ func Start() error {
 
 	r := gin.Default()
 
-	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	url := ginSwagger.URL("http://localhost:8080/api/swagger/doc.json") // The url pointing to API definition
+	r.GET("/api/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	r.GET("/api/xp/:player", xpOfPlayer)
 	r.GET("/api/player/:id", getUserById)

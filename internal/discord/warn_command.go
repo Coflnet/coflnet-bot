@@ -6,7 +6,6 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
-	"os"
 	"time"
 )
 
@@ -112,9 +111,9 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			},
 		})
 		log.Error().Err(err).Msgf("error warning user")
-		err = SendMessageToDevLog(&DiscordMessageToSend{
-			Message: "❌ there was a problem when warning user " + username(user),
-		})
+		err = SendMessageToWarningsChannel(
+			fmt.Sprintf("❌ there was a problem when warning user %s", username(user)),
+		)
 		if err != nil {
 			log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
 		}
@@ -130,9 +129,7 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Flags:           discordgo.MessageFlagsEphemeral,
 		},
 	})
-	err = SendMessageToDevLog(&DiscordMessageToSend{
-		Message: fmt.Sprintf("✅ User %s has been warned, this is his %d. warning", username(user), warnings),
-	})
+	err = SendMessageToWarningsChannel(fmt.Sprintf("✅ User %s has been warned, this is his %d. warning", username(user), warnings))
 	if err != nil {
 		log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
 	}
@@ -172,28 +169,4 @@ func isUserPermittedToWarnPlayers(user *discordgo.Member) bool {
 	}
 
 	return false
-}
-
-func helperRole() string {
-	r := os.Getenv("HELPER_ROLE")
-	if r == "" {
-		log.Panic().Msg("HELPER_ROLE is not set")
-	}
-	return r
-}
-
-func devRole() string {
-	r := os.Getenv("DEV_ROLE")
-	if r == "" {
-		log.Panic().Msg("DEV_ROLE is not set")
-	}
-	return r
-}
-
-func modRole() string {
-	r := os.Getenv("MOD_ROLE")
-	if r == "" {
-		log.Panic().Msg("MOD_ROLE is not set")
-	}
-	return r
 }

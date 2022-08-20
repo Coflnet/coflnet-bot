@@ -48,19 +48,21 @@ func CommitTransactionMessage(msg kafka.Message) error {
 }
 
 func transactionTopic() string {
-	t := os.Getenv("TOPIC_TRANSACTION")
-	if t == "" {
-		log.Panic().Msg("TOPIC_TRANSACTION not set")
-	}
-
-	return t
+	return getEnv("TOPIC_TRANSACTION")
 }
 
 func flipSummaryTopic() string {
-	t := os.Getenv("TOPIC_FLIPSUMMARY")
-	if t == "" {
-		log.Panic().Msg("TOPIC_FLIPSUMMARY not set")
-	}
+	return getEnv("TOPIC_FLIPSUMMARY")
+}
 
-	return t
+func devChatTopic() string {
+	return getEnv("TOPIC_DEV_CHAT")
+}
+
+func getEnv(e string) string {
+	v := os.Getenv(e)
+	if v == "" {
+		log.Panic().Msgf("%s not set", e)
+	}
+	return v
 }

@@ -38,7 +38,6 @@ func main() {
 	// start dev chat consumer
 	kafka.Init()
 	go kafka.StartDiscordMessagesConsumer()
-	go kafka.StartDiscordSpamMessagesConsumer()
 	go usecase.StartFlipSummaryProcessing()
 	go usecase.StartRefresh()
 	go usecase.StartTransactionConsumer()

@@ -17,7 +17,7 @@ import (
 
 func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 
-	if msg.ChannelID != coflChatId {
+	if msg.ChannelID != coflChatId() {
 		return nil
 	}
 

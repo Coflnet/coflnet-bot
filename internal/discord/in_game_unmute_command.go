@@ -56,9 +56,9 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 			metrics.ErrorOccurred()
 		}
 
-		err = SendMessageToDevLog(&DiscordMessageToSend{
-			Message: fmt.Sprintf("user %s tried to unmute someone but did not have permissions", i.User.Username),
-		})
+		err = SendMessageToMutesChannel(
+			fmt.Sprintf("user %s tried to unmute someone but did not have permissions", i.User.Username),
+		)
 		if err != nil {
 			log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
 			metrics.ErrorOccurred()
@@ -125,9 +125,9 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 		log.Error().Err(err).Msgf("error in in-game-unmute command")
 	}
 
-	err = SendMessageToDevLog(&DiscordMessageToSend{
-		Message: fmt.Sprintf("🔈 user %s was unmuted by %s for %s", username, unmuter, reason),
-	})
+	err = SendMessageToMutesChannel(
+		fmt.Sprintf("🔈 user %s was unmuted by %s for %s", username, unmuter, reason),
+	)
 
 	if err != nil {
 		log.Error().Err(err).Msgf("error in in-game-unmute command")

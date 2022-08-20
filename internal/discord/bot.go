@@ -16,15 +16,20 @@ import (
 )
 
 var (
-	session    *discordgo.Session
-	coflChatId string
+	session *discordgo.Session
+)
+
+const (
+	WARNINGS_CHANNEL     = "warnings"
+	MUTES_CHANNEL        = "mutes"
+	FLIPPER_ROLE_CHANNEL = "flipper-role"
+	CI_SUCCESS_CHANNEL   = "ci-success"
+	CI_FAILURE_CHANNEL   = "ci-failure"
 )
 
 func InitDiscord() {
 	session = getSession()
 	session.Identify.Intents = discordgo.IntentsAllWithoutPrivileged
-
-	coflChatId = os.Getenv("DISCORD_COFLCHAT_ID")
 
 	go ObserveMessages()
 	err := session.Open()
@@ -98,34 +103,6 @@ type WebhookRequest struct {
 	AllowedMentionsData AllowedMentions `json:"allowed_mentions"`
 }
 
-func SendMsgToDevChat(message string) error {
-	if message == "" {
-		return fmt.Errorf("can not send an empty message")
-	}
-
-	data := &WebhookRequest{
-		Content:             message,
-		Username:            "cofl bot",
-		AllowedMentionsData: AllowedMentions{Parse: make([]string, 0)},
-	}
-
-	body, err := json.Marshal(data)
-	if err != nil {
-		log.Error().Err(err).Msgf("can not marshal webhook request")
-		return err
-	}
-
-	url := os.Getenv("DEV_WEBHOOK")
-	_, err = http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
-
-	if err != nil {
-		log.Error().Err(err).Msgf("error when sending webhook request")
-		return err
-	}
-
-	return nil
-}
-
 func GiveUserWarnedRole(user *discordgo.Member, w *model.Warning) error {
 	// give role
 	err := session.GuildMemberRoleAdd(guildId(), user.User.ID, warnedRole())
@@ -143,9 +120,7 @@ func RemoveUserWarnedRole(user *discordgo.Member) error {
 		return err
 	}
 
-	return SendMessageToDevLog(&DiscordMessageToSend{
-		Message: fmt.Sprintf("⚠️ warned role has been removed from user %s", username(user)),
-	})
+	return SendMessageToWarningsChannel(fmt.Sprintf("⚠️ warned role has been removed from user %s", username(user)))
 }
 
 func SendMessageToUser(message string, member *discordgo.Member) error {
@@ -204,38 +179,53 @@ func sendInvalidUUIDMessageToDiscord(message *discordgo.Message) {
 	}
 }
 
-func SendMessageToDevLog(msg *DiscordMessageToSend) error {
-	if msg.Message == "" {
-		return fmt.Errorf("no message is set")
-	}
-
-	data := &WebhookRequest{
-		Content:             msg.Message,
-		Username:            "cofl-bot",
-		AvatarUrl:           "https://cdn.discordapp.com/app-icons/888725077191974913/0c0e3b97e6865091ef14162083a54a42.png?size=256",
-		AllowedMentionsData: AllowedMentions{Parse: make([]string, 0)},
-	}
-
-	body, err := json.Marshal(data)
-	if err != nil {
-		log.Error().Err(err).Msgf("can not marshal webhook request")
-		return err
-	}
-
-	url := os.Getenv("DEV_WEBHOOK")
-	_, err = http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
-
-	if err != nil {
-		log.Error().Err(err).Msgf("error sending message to discord chat")
-		return err
-	}
-
-	return nil
-
+func SendMessageToCiSuccess(msg string) error {
+	return SendMessageToNotificationServer(DiscordMessageToSend{
+		Message: msg,
+		Webhook: ciSuccessWebhook(),
+	})
 }
-func SendMessageToDevSpamLog(msg *DiscordMessageToSend) error {
+
+func SendMessageToCiFailureChannel(msg string) error {
+	return SendMessageToNotificationServer(DiscordMessageToSend{
+		Message: msg,
+		Webhook: ciFailureWebhook(),
+	})
+}
+
+func SendMessageToWarningsChannel(msg string) error {
+	return SendMessageToNotificationServer(DiscordMessageToSend{
+		Message: msg,
+		Webhook: warningsWebhook(),
+	})
+}
+
+func SendMessageToMutesChannel(msg string) error {
+	return SendMessageToNotificationServer(DiscordMessageToSend{
+		Message: msg,
+		Webhook: mutesWebhook(),
+	})
+}
+
+func SendMessageToFlipperRoleChannel(msg string) error {
+	return SendMessageToNotificationServer(DiscordMessageToSend{
+		Message: msg,
+		Webhook: flipperRoleWebhook(),
+	})
+}
+
+func SendMessageToNotificationServer(msg DiscordMessageToSend) error {
+
 	if msg.Message == "" {
 		return fmt.Errorf("no message is set")
+	}
+
+	if msg.Channel != "" {
+		msg.Webhook = webhookForChannel(msg.Channel)
+	}
+
+	if msg.Webhook == "" {
+		return fmt.Errorf("webhook or channel is not set or wrong")
 	}
 
 	data := &WebhookRequest{
@@ -251,19 +241,39 @@ func SendMessageToDevSpamLog(msg *DiscordMessageToSend) error {
 		return err
 	}
 
-	url := os.Getenv("DEV_SPAM_WEBHOOK")
+	url := os.Getenv(msg.Webhook)
 	_, err = http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
 
 	if err != nil {
-		log.Error().Err(err).Msgf("error sending message to discord chat")
+		log.Error().Err(err).Msgf("error when sending webhook request")
 		return err
 	}
 
 	return nil
+}
+
+func webhookForChannel(channel string) string {
+	switch channel {
+	case WARNINGS_CHANNEL:
+		return warningsWebhook()
+	case MUTES_CHANNEL:
+		return mutesWebhook()
+	case CI_SUCCESS_CHANNEL:
+		return ciSuccessWebhook()
+	case CI_FAILURE_CHANNEL:
+		return ciFailureWebhook()
+	case FLIPPER_ROLE_CHANNEL:
+		return flipperRoleWebhook()
+	}
+
+	log.Error().Msg("no webhook found for channel")
+	return ""
 }
 
 type DiscordMessageToSend struct {
 	Message string
+	Channel string
+	Webhook string
 }
 
 func DiscordFormattedTime(t time.Time) string {
