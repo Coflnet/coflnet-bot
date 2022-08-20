@@ -220,8 +220,14 @@ func SendMessageToNotificationServer(msg DiscordMessageToSend) error {
 		return fmt.Errorf("no message is set")
 	}
 
-	if msg.Channel != "" {
-		msg.Webhook = webhookForChannel(msg.Channel)
+	if msg.Webhook == "" {
+		if msg.Channel != "" {
+			msg.Webhook = webhookForChannel(msg.Channel)
+		}
+	}
+
+	if msg.Webhook == "" {
+		return fmt.Errorf("no webhook is set, webhook: %s, channel: %s", msg.Webhook, msg.Channel)
 	}
 
 	if msg.Webhook == "" {
