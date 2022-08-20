@@ -41,6 +41,7 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Data: &discordgo.InteractionResponseData{
 				Content:         "❌did not found user with id " + userId,
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
+				Flags:           discordgo.MessageFlagsEphemeral,
 			},
 		})
 		return
@@ -52,6 +53,7 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Data: &discordgo.InteractionResponseData{
 				Content:         "❌ no user provided",
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
+				Flags:           discordgo.MessageFlagsEphemeral,
 			},
 		})
 		return
@@ -63,6 +65,7 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Data: &discordgo.InteractionResponseData{
 				Content:         "❌ You don't have permission to list warnings of an user",
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
+				Flags:           discordgo.MessageFlagsEphemeral,
 			},
 		})
 		return
@@ -75,6 +78,7 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Data: &discordgo.InteractionResponseData{
 				Content:         "❌ there was a problem when searching warnings for user " + username(user),
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
+				Flags:           discordgo.MessageFlagsEphemeral,
 			},
 		})
 		err = SendMessageToWarningsChannel(fmt.Sprintf("❌ there was a problem when listing warnings for user %s", username(user)))
@@ -95,6 +99,7 @@ func userWarningsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		Data: &discordgo.InteractionResponseData{
 			Content:         text,
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
+			Flags:           discordgo.MessageFlagsEphemeral,
 		},
 	})
 }

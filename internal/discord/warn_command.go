@@ -60,6 +60,7 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Data: &discordgo.InteractionResponseData{
 				Content:         fmt.Sprintf("❌ Did not found user %s in guild", userId),
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
+				Flags:           discordgo.MessageFlagsEphemeral,
 			},
 		})
 		return
@@ -71,6 +72,7 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Data: &discordgo.InteractionResponseData{
 				Content:         "❌ You must provide a reason for the warning",
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
+				Flags:           discordgo.MessageFlagsEphemeral,
 			},
 		})
 		log.Warn().Msgf("reason is empty")
@@ -83,6 +85,7 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Data: &discordgo.InteractionResponseData{
 				Content:         "❌ Days must be between 0 and 365",
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
+				Flags:           discordgo.MessageFlagsEphemeral,
 			},
 		})
 		log.Warn().Msgf("days input %f is not between 0 and 365", days)
@@ -95,6 +98,7 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Data: &discordgo.InteractionResponseData{
 				Content:         "❌ You don't have permission to warn users",
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
+				Flags:           discordgo.MessageFlagsEphemeral,
 			},
 		})
 		log.Warn().Msgf("user %s is not permitted to warn players", i.Member.User.Username)
@@ -108,6 +112,7 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Data: &discordgo.InteractionResponseData{
 				Content:         "❌ there was a problem when warning user " + username(user),
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
+				Flags:           discordgo.MessageFlagsEphemeral,
 			},
 		})
 		log.Error().Err(err).Msgf("error warning user")

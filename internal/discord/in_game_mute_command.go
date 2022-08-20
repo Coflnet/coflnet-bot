@@ -147,6 +147,7 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 				Data: &discordgo.InteractionResponseData{
 					Content:         e.Error(),
 					AllowedMentions: &discordgo.MessageAllowedMentions{},
+					Flags:           discordgo.MessageFlagsEphemeral,
 				},
 			})
 
@@ -161,6 +162,7 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 			Data: &discordgo.InteractionResponseData{
 				Content:         fmt.Sprintf("❌ there was an error when muting %s please contact <@!256771988352139264>", username),
 				AllowedMentions: &discordgo.MessageAllowedMentions{},
+				Flags:           discordgo.MessageFlagsEphemeral,
 			},
 		})
 
@@ -176,6 +178,7 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 		Data: &discordgo.InteractionResponseData{
 			Content:         fmt.Sprintf("🔇 user %s was muted until %v", username, mute.MuteUntil),
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
+			Flags:           discordgo.MessageFlagsEphemeral,
 		},
 	})
 

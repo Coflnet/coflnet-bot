@@ -48,7 +48,9 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "you do not have permissions to unmute players, this incident will be reported",
+				Content:         "you do not have permissions to unmute players, this incident will be reported",
+				Flags:           discordgo.MessageFlagsEphemeral,
+				AllowedMentions: &discordgo.MessageAllowedMentions{},
 			},
 		})
 		if err != nil {
@@ -89,6 +91,7 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 				Data: &discordgo.InteractionResponseData{
 					Content:         e.Error(),
 					AllowedMentions: &discordgo.MessageAllowedMentions{},
+					Flags:           discordgo.MessageFlagsEphemeral,
 				},
 			})
 
@@ -101,8 +104,8 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 		err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content:         fmt.Sprintf("❌there was an error when unmuting %s please contact <@!256771988352139264>", username),
-				AllowedMentions: &discordgo.MessageAllowedMentions{},
+				Content: fmt.Sprintf("❌there was an error when unmuting %s please contact <@!256771988352139264>", username),
+				Flags:   discordgo.MessageFlagsEphemeral,
 			},
 		})
 
@@ -118,6 +121,7 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 		Data: &discordgo.InteractionResponseData{
 			Content:         fmt.Sprintf("🔈 user %s was unmuted by %s", username, unmuter),
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
+			Flags:           discordgo.MessageFlagsEphemeral,
 		},
 	})
 
