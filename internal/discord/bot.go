@@ -230,10 +230,6 @@ func SendMessageToNotificationServer(msg DiscordMessageToSend) error {
 		return fmt.Errorf("no webhook is set, webhook: %s, channel: %s", msg.Webhook, msg.Channel)
 	}
 
-	if msg.Webhook == "" {
-		return fmt.Errorf("webhook or channel is not set or wrong")
-	}
-
 	data := &WebhookRequest{
 		Content:             msg.Message,
 		Username:            "cofl-bot",
@@ -247,7 +243,7 @@ func SendMessageToNotificationServer(msg DiscordMessageToSend) error {
 		return err
 	}
 
-	url := os.Getenv(msg.Webhook)
+	url := msg.Webhook
 	_, err = http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
 
 	if err != nil {
