@@ -102,6 +102,8 @@ func giveUserFlipperRole(user *model.User) error {
 		}
 	}
 
+	log.Info().Msgf("user has the roles: %s, add the role %s", strings.Join(member.Roles, ", "), role)
+
 	log.Info().Msgf("set flipper role for user %s", members[0])
 	return session.GuildMemberRoleAdd(guild, members[0].User.ID, role)
 }

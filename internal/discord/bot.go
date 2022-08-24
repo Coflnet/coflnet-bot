@@ -116,6 +116,12 @@ func GiveUserWarnedRole(user *discordgo.Member, w *model.Warning) error {
 
 func RemoveUserWarnedRole(user *discordgo.Member) error {
 
+	user, err := session.GuildMember(guildId(), user.User.ID)
+	if err != nil {
+		log.Error().Err(err).Msgf("error refreshing user")
+		return err
+	}
+
 	roleFound := false
 	for _, role := range user.Roles {
 		if role == warnedRole() {
@@ -128,7 +134,7 @@ func RemoveUserWarnedRole(user *discordgo.Member) error {
 		return nil
 	}
 
-	err := session.GuildMemberRoleRemove(guildId(), user.User.ID, warnedRole())
+	err = session.GuildMemberRoleRemove(guildId(), user.User.ID, warnedRole())
 	if err != nil {
 		return err
 	}
