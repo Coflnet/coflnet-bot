@@ -94,6 +94,14 @@ func giveUserFlipperRole(user *model.User) error {
 		return fmt.Errorf("found no player with the name %s", discordNameWithoutTag)
 	}
 
+	member := members[0]
+	for _, userRole := range member.Roles {
+		if userRole == role {
+			// user already has the role, skip it
+			return nil
+		}
+	}
+
 	log.Info().Msgf("set flipper role for user %s", members[0])
 	return session.GuildMemberRoleAdd(guild, members[0].User.ID, role)
 }
