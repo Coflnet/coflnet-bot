@@ -51,6 +51,7 @@ func ExpiredWarnings() (<-chan model.Warning, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
 
+	// get all warnings that are expired
 	filter := bson.M{"until": bson.M{"$lt": time.Now()}}
 
 	warnings := make(chan model.Warning, 0)
@@ -67,7 +68,10 @@ func ExpiredWarnings() (<-chan model.Warning, error) {
 	go func() {
 		wg := sync.WaitGroup{}
 		var batch []model.Warning
+
+		// iterate over all expired warnings
 		for res.Next(ctx) {
+
 			if err := res.Decode(&batch); err != nil {
 				log.Error().Err(err).Msg("failed to decode warnings")
 				continue
@@ -83,7 +87,10 @@ func ExpiredWarnings() (<-chan model.Warning, error) {
 						return
 					}
 
-					if len(userWarnings) == 0 {
+					log.Info().Msgf("found a expired warning for the user %s", w.User.User.Username)
+					log.Info().Msgf("he has %d warnings", len(userWarnings))
+
+					if checkIfUserHasOnlyExpiredWarnings(userWarnings) {
 						warnings <- w
 					}
 				}(el)
@@ -95,4 +102,13 @@ func ExpiredWarnings() (<-chan model.Warning, error) {
 	}()
 
 	return warnings, nil
+}
+
+func checkIfUserHasOnlyExpiredWarnings(warnings []*model.Warning) bool {
+	for _, el := range warnings {
+		if el.Until.After(time.Now()) {
+			return false
+		}
+	}
+	return true
 }
