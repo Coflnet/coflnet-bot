@@ -1,12 +1,12 @@
 package usecase
 
 import (
-	"github.com/Coflnet/coflnet-bot/internal/metrics"
-	"time"
-
+	"fmt"
 	"github.com/Coflnet/coflnet-bot/internal/discord"
+	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/rs/zerolog/log"
+	"time"
 )
 
 func StartRefresh() {
@@ -23,9 +23,14 @@ func StartRefresh() {
 				log.Error().Err(err).Msgf("error removing warned role for user %d", warning.User)
 				metrics.ErrorOccurred()
 			}
-			time.Sleep(time.Minute * 5)
-		}
 
-		time.Sleep(time.Hour * 1)
+			err = discord.SendMessageToWarningsChannel(fmt.Sprintf("removed warned role from user %s", warning.User.Nick))
+			if err != nil {
+				log.Error().Err(err).Msgf("error sending message to warnings channel")
+				metrics.ErrorOccurred()
+			}
+
+			time.Sleep(time.Second * 10)
+		}
 	}
 }

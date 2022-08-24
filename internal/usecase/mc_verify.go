@@ -38,7 +38,7 @@ func StartMcVerifyConsumer() {
 			continue
 		}
 
-		time.Sleep(time.Minute * 5)
+		time.Sleep(time.Minute * 1)
 	}
 }
 

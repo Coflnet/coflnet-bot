@@ -38,7 +38,6 @@ func SetFlipperRoleForUser(user *model.User) error {
 				log.Error().Err(err).Msgf("can not send message to dev chat")
 				return
 			}
-
 		}
 	}(user, userHadFlipperRoleBefore)
 
