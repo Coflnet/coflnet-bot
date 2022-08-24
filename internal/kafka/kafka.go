@@ -16,6 +16,7 @@ type VerificationMessage struct {
 var (
 	flipSummaryReader *kafka.Reader
 	transactionReader *kafka.Reader
+	mcVerifyReader    *kafka.Reader
 )
 
 func Init() {
@@ -31,6 +32,14 @@ func Init() {
 		Brokers:  []string{os.Getenv("KAFKA_HOST")},
 		GroupID:  "verification-discord-consumer",
 		Topic:    transactionTopic(),
+		MinBytes: 10e3,
+		MaxBytes: 10e6,
+	})
+
+	mcVerifyReader = kafka.NewReader(kafka.ReaderConfig{
+		Brokers:  []string{os.Getenv("KAFKA_HOST")},
+		GroupID:  "mc-verify-discord-consumer",
+		Topic:    mcVerifyTopic(),
 		MinBytes: 10e3,
 		MaxBytes: 10e6,
 	})
@@ -57,6 +66,10 @@ func flipSummaryTopic() string {
 
 func devChatTopic() string {
 	return getEnv("TOPIC_DEV_CHAT")
+}
+
+func mcVerifyTopic() string {
+	return getEnv("TOPIC_MC_VERIFY")
 }
 
 func getEnv(e string) string {

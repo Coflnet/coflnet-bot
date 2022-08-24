@@ -41,6 +41,7 @@ func main() {
 	go usecase.StartFlipSummaryProcessing()
 	go usecase.StartRefresh()
 	go usecase.StartTransactionConsumer()
+	go usecase.StartMcVerifyConsumer()
 
 	// open discord session and wait for messages
 	discord.InitDiscord()

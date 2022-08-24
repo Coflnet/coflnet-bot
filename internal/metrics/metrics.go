@@ -49,6 +49,16 @@ var (
 		Name: "discord_coflnet_bot_flip_summary_offset",
 		Help: "The current offset of the flip summary",
 	})
+
+	mcVerifyMessageError = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "discord_coflnet_bot_mc_verify_message_error",
+		Help: "Errors while processing mc verify messages",
+	})
+
+	mcVerifyMessageProcessed = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "discord_coflnet_bot_mc_verify_message_processed",
+		Help: "The amount of mc verify messages processed",
+	})
 )
 
 func Init() {
@@ -90,4 +100,12 @@ func FlipSummarySend() {
 
 func FlipSummaryOffset(offset int) {
 	flipSummaryOffset.Set(float64(offset))
+}
+
+func McVerifyMessageError() {
+	mcVerifyMessageError.Inc()
+}
+
+func McVerifyMessageProcessed() {
+	mcVerifyMessageProcessed.Inc()
 }
