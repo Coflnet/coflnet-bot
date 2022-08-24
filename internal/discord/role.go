@@ -71,7 +71,7 @@ func SetFlipperRoleForUser(user *model.User) error {
 func giveUserFlipperRole(user *model.User) error {
 
 	guild := guildId()
-	// role := flipperRole()
+	role := flipperRole()
 
 	discordName := user.DiscordNames[0]
 	discordNameWithoutTag := strings.Split(discordName, "#")[0]
@@ -95,8 +95,8 @@ func giveUserFlipperRole(user *model.User) error {
 		return fmt.Errorf("found no player with the name %s", discordNameWithoutTag)
 	}
 
-	log.Warn().Msgf("set flipper role for user %s, not really testing", members[0])
-	return nil
+	log.Info().Msgf("set flipper role for user %s", members[0])
+	return session.GuildMemberRoleAdd(guild, members[0].User.ID, role)
 }
 
 // TODO dont assume first discord name, that is not an empty string is the correct username
