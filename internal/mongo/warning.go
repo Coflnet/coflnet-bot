@@ -67,34 +67,32 @@ func ExpiredWarnings() (<-chan model.Warning, error) {
 
 	go func() {
 		wg := sync.WaitGroup{}
-		var batch []model.Warning
+		var el model.Warning
 
 		// iterate over all expired warnings
 		for res.Next(ctx) {
 
-			if err := res.Decode(&batch); err != nil {
+			if err := res.Decode(&el); err != nil {
 				log.Error().Err(err).Msg("failed to decode warnings")
 				continue
 			}
 
-			for _, el := range batch {
-				wg.Add(1)
-				go func(w model.Warning) {
-					defer wg.Done()
-					userWarnings, err := WarningsByUser(w.User)
-					if err != nil {
-						log.Error().Err(err).Msg("failed to get user warnings")
-						return
-					}
+			wg.Add(1)
+			go func(w model.Warning) {
+				defer wg.Done()
+				userWarnings, err := WarningsByUser(w.User)
+				if err != nil {
+					log.Error().Err(err).Msg("failed to get user warnings")
+					return
+				}
 
-					log.Info().Msgf("found a expired warning for the user %s", w.User.User.Username)
-					log.Info().Msgf("he has %d warnings", len(userWarnings))
+				log.Info().Msgf("found a expired warning for the user %s", w.User.User.Username)
+				log.Info().Msgf("he has %d warnings", len(userWarnings))
 
-					if checkIfUserHasOnlyExpiredWarnings(userWarnings) {
-						warnings <- w
-					}
-				}(el)
-			}
+				if checkIfUserHasOnlyExpiredWarnings(userWarnings) {
+					warnings <- w
+				}
+			}(el)
 		}
 
 		wg.Wait()
