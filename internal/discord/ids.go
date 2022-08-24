@@ -3,14 +3,15 @@ package discord
 import (
 	"github.com/rs/zerolog/log"
 	"os"
+	"strings"
 )
 
 func coflChatId() string {
 	return getEnv("DISCORD_COFLCHAT_ID")
 }
 
-func muteRole() string {
-	return getEnv("DISCORD_MUTE_ROLE")
+func muteRoles() []string {
+	return strings.Split(getEnv("DISCORD_MUTE_ROLE"), ",")
 }
 
 func helperRole() string {

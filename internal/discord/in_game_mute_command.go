@@ -228,9 +228,10 @@ func muteCommand(username, muter, reason, message string, hours, days, weeks int
 
 func isUserPermittedToMutePlayers(u *discordgo.Member) bool {
 	for _, role := range u.Roles {
-		log.Info().Msgf("role: %v", role)
-		if role == muteRole() {
-			return true
+		for _, muteRole := range muteRoles() {
+			if role == muteRole {
+				return true
+			}
 		}
 	}
 	return false
