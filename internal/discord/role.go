@@ -6,6 +6,7 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/rs/zerolog/log"
 	"os"
+	"strings"
 )
 
 func SetFlipperRoleForUser(user *model.User) error {
@@ -70,44 +71,32 @@ func SetFlipperRoleForUser(user *model.User) error {
 func giveUserFlipperRole(user *model.User) error {
 
 	guild := guildId()
-	role := flipperRole()
+	// role := flipperRole()
 
-	if guild == "" || role == "" {
-		return fmt.Errorf("discord guild or role is not set")
+	discordName := user.DiscordNames[0]
+	discordNameWithoutTag := strings.Split(discordName, "#")[0]
+
+	log.Info().Msgf("search api for the player with string %s", discordNameWithoutTag)
+	members, err := session.GuildMembersSearch(guild, discordNameWithoutTag, 100)
+	if err != nil {
+		log.Error().Err(err).Msgf("error when searching for user %s", discordNameWithoutTag)
+		return err
 	}
 
-	userId := ""
-	runs := 0
-	lastUser := ""
+	log.Info().Msgf("searched discord api for the player with string %s, found %d players", discordNameWithoutTag, len(members))
 
-	for {
-		members, err := session.GuildMembers(guild, lastUser, 1000)
-		if err != nil {
-			return err
-		}
-
-		for _, member := range members {
-			if member.User.Username == discordNameForUser(user) {
-				userId = member.User.ID
-			}
-			lastUser = member.User.ID
-		}
-
-		if userId != "" {
-			break
-		}
-
-		runs++
-		if runs > 20 {
-			break
-		}
+	if len(members) > 1 {
+		log.Error().Msgf("found more than one player with the name %s", discordNameWithoutTag)
+		return fmt.Errorf("found more than one player with the name %s", discordNameWithoutTag)
 	}
 
-	if userId == "" {
-		return fmt.Errorf("user %s not found in discord", discordNameForUser(user))
+	if len(members) == 0 {
+		log.Error().Msgf("found no player with the name %s", discordNameWithoutTag)
+		return fmt.Errorf("found no player with the name %s", discordNameWithoutTag)
 	}
 
-	return session.GuildMemberRoleAdd(guild, userId, role)
+	log.Warn().Msgf("set flipper role for user %s, not really testing", members[0])
+	return nil
 }
 
 // TODO dont assume first discord name, that is not an empty string is the correct username
