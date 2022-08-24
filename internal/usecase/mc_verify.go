@@ -1,12 +1,14 @@
 package usecase
 
 import (
+	"github.com/Coflnet/coflnet-bot/internal/coflnet"
+	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/kafka"
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/rs/zerolog/log"
 	kafkago "github.com/segmentio/kafka-go"
 	"github.com/vmihailenco/msgpack/v5"
-	"time"
+	"strconv"
 )
 
 // when a user verifies their account, maybe he is qualified for the flipper role
@@ -24,12 +26,10 @@ func StartMcVerifyConsumer() {
 		if err := processMcVerifyKafkaMessage(msg); err != nil {
 			log.Error().Err(err).Msgf("error happened when checking mc verify message")
 			metrics.McVerifyMessageError()
-			time.Sleep(time.Hour * 3)
 			continue
 		}
 
 		metrics.McVerifyMessageProcessed()
-		time.Sleep(time.Hour * 3)
 
 		err = kafka.CommitMcVerify(msg)
 		if err != nil {
@@ -47,13 +47,23 @@ func processMcVerifyKafkaMessage(msg *kafkago.Message) error {
 		return err
 	}
 
-	log.Info().Msgf("got verification message %v", verificationMessage)
-	log.Warn().Msgf("do nothing with the message, this is only for testing")
-	return nil
+	id, err := strconv.Atoi(verificationMessage.UserId)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to convert user id to int, sky mc verify consume")
+		return err
+	}
+
+	user, err := coflnet.LoadUserById(id)
+	if err != nil {
+		log.Error().Err(err).Msgf("failed to load user with id %d", id)
+		return err
+	}
+
+	return discord.SetFlipperRoleForUser(user)
 }
 
 type McVerifyMessageContent struct {
-	UserID   string `msgpack:"userId"`
+	UserId   string `msgpack:"userId"`
 	UUID     string `msgpack:"uuid"`
 	Existing int    `msgpack:"existing"`
 }
