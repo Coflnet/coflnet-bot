@@ -115,6 +115,19 @@ func GiveUserWarnedRole(user *discordgo.Member, w *model.Warning) error {
 }
 
 func RemoveUserWarnedRole(user *discordgo.Member) error {
+
+	roleFound := false
+	for _, role := range user.Roles {
+		if role == warnedRole() {
+			roleFound = true
+		}
+	}
+
+	if !roleFound {
+		// user does not have the warned role skip it
+		return nil
+	}
+
 	err := session.GuildMemberRoleRemove(guildId(), user.User.ID, warnedRole())
 	if err != nil {
 		return err
