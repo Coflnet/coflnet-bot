@@ -9,7 +9,6 @@ import (
 	kafkago "github.com/segmentio/kafka-go"
 	"github.com/vmihailenco/msgpack/v5"
 	"strconv"
-	"time"
 )
 
 // when a user verifies their account, maybe he is qualified for the flipper role
@@ -37,8 +36,6 @@ func StartMcVerifyConsumer() {
 			log.Error().Err(err).Msg("failed to commit mc_verify topic")
 			continue
 		}
-
-		time.Sleep(time.Minute * 1)
 	}
 }
 
