@@ -11,12 +11,12 @@ import (
 
 func ingameUnmuteCommand() *discordgo.ApplicationCommand {
 
-	var modPerms int64 = discordgo.PermissionModerateMembers
+	var writePerm int64 = discordgo.PermissionSendMessages
 
 	return &discordgo.ApplicationCommand{
 		Name:                     "in-game-unmute",
 		Description:              "Unmute a user in in-game-chat",
-		DefaultMemberPermissions: &modPerms,
+		DefaultMemberPermissions: &writePerm,
 		Options: []*discordgo.ApplicationCommandOption{
 			{
 				Type:        discordgo.ApplicationCommandOptionString,

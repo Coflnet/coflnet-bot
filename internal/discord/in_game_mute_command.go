@@ -13,12 +13,12 @@ import (
 func ingameMuteCommand() *discordgo.ApplicationCommand {
 
 	var zero float64 = 0
-	var modPerms int64 = discordgo.PermissionModerateMembers
+	var writePerm int64 = discordgo.PermissionSendMessages
 
 	return &discordgo.ApplicationCommand{
 		Name:                     "in-game-mute",
 		Description:              "Mute a user in in-game-chat",
-		DefaultMemberPermissions: &modPerms,
+		DefaultMemberPermissions: &writePerm,
 		Options: []*discordgo.ApplicationCommandOption{
 			{
 				Type:        discordgo.ApplicationCommandOptionString,
