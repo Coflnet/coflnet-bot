@@ -130,12 +130,12 @@ func warnUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content:         fmt.Sprintf("✅ User %s has been warned, this is his %s. warning", username(user), humanize.Ordinal(warnings)),
+			Content:         fmt.Sprintf("✅ User %s has been warned, this is his %s warning", username(user), humanize.Ordinal(warnings)),
 			AllowedMentions: &discordgo.MessageAllowedMentions{},
 			Flags:           discordgo.MessageFlagsEphemeral,
 		},
 	})
-	err = SendMessageToWarningsChannel(fmt.Sprintf("✅ User %s has been warned, this is his %s. warning", username(user), humanize.Ordinal(warnings)))
+	err = SendMessageToWarningsChannel(fmt.Sprintf("✅ User %s has been warned, this is his %s warning", username(user), humanize.Ordinal(warnings)))
 	if err != nil {
 		log.Error().Err(err).Msgf("Error sending message to dev log: %s", err)
 	}
