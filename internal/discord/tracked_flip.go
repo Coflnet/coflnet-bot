@@ -8,7 +8,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/rs/zerolog/log"
 	"os"
-	"strconv"
 )
 
 func FlipTracked(flip *model.Flip) error {
@@ -41,12 +40,8 @@ func FlipTracked(flip *model.Flip) error {
 						Value: fmt.Sprintf("<t:%d:f>", flip.Sell.End.Unix()),
 					},
 					{
-						Name:  "flip of the day",
-						Value: strconv.Itoa(flip.AmountOfFlipsFromBuyerOfTheDay),
-					},
-					{
 						Name:  "Finder",
-						Value: fmt.Sprintf("%s", flip.Finder),
+						Value: finder(flip.Finder),
 					},
 				},
 				Type: "rich",
@@ -60,6 +55,14 @@ func FlipTracked(flip *model.Flip) error {
 	}
 
 	return nil
+}
+
+func finder(finder interface{}) string {
+	if finder == nil {
+		return "-"
+	}
+
+	return fmt.Sprintf("%s", finder)
 }
 
 func iconUrl(flip *model.Flip) string {
