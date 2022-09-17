@@ -25,6 +25,7 @@ const (
 	FLIPPER_ROLE_CHANNEL = "flipper-role"
 	CI_SUCCESS_CHANNEL   = "ci-success"
 	CI_FAILURE_CHANNEL   = "ci-failure"
+	FEEDBACK_CHANNEL     = "feedback"
 )
 
 func InitDiscord() {
@@ -285,6 +286,8 @@ func webhookForChannel(channel string) string {
 		return ciFailureWebhook()
 	case FLIPPER_ROLE_CHANNEL:
 		return flipperRoleWebhook()
+	case FEEDBACK_CHANNEL:
+		return feedbackWebhook()
 	}
 
 	log.Error().Msg("no webhook found for channel")

@@ -46,6 +46,10 @@ func flipperRoleWebhook() string {
 	return getEnv("DISCORD_FLIPPER_ROLE_WEBHOOK")
 }
 
+func feedbackWebhook() string {
+	return getEnv("DISCORD_FEEDBACK_WEBHOOK")
+}
+
 func getEnv(e string) string {
 	v := os.Getenv(e)
 	if v == "" {
