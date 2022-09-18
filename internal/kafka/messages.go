@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/Coflnet/coflnet-bot/internal/discord"
+	pubdiscord "github.com/Coflnet/coflnet-bot/pkg/discord"
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/kafka-go"
 	"os"
@@ -44,7 +45,7 @@ func consumeDiscordMessages(r *kafka.Reader) error {
 		return err
 	}
 
-	var msg discord.DiscordMessageToSend
+	var msg pubdiscord.DiscordMessageToSend
 	err = json.Unmarshal(m.Value, &msg)
 	if err != nil {
 		return err

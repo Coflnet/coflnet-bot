@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Coflnet/coflnet-bot/internal/model"
+	"github.com/Coflnet/coflnet-bot/pkg/discord"
 	"net/http"
 	"os"
 	"time"
@@ -17,15 +18,6 @@ import (
 
 var (
 	session *discordgo.Session
-)
-
-const (
-	WARNINGS_CHANNEL     = "warnings"
-	MUTES_CHANNEL        = "mutes"
-	FLIPPER_ROLE_CHANNEL = "flipper-role"
-	CI_SUCCESS_CHANNEL   = "ci-success"
-	CI_FAILURE_CHANNEL   = "ci-failure"
-	FEEDBACK_CHANNEL     = "feedback"
 )
 
 func InitDiscord() {
@@ -200,41 +192,41 @@ func sendInvalidUUIDMessageToDiscord(message *discordgo.Message) {
 }
 
 func SendMessageToCiSuccess(msg string) error {
-	return SendMessageToNotificationServer(DiscordMessageToSend{
+	return SendMessageToNotificationServer(discord.DiscordMessageToSend{
 		Message: msg,
 		Webhook: ciSuccessWebhook(),
 	})
 }
 
 func SendMessageToCiFailureChannel(msg string) error {
-	return SendMessageToNotificationServer(DiscordMessageToSend{
+	return SendMessageToNotificationServer(discord.DiscordMessageToSend{
 		Message: msg,
 		Webhook: ciFailureWebhook(),
 	})
 }
 
 func SendMessageToWarningsChannel(msg string) error {
-	return SendMessageToNotificationServer(DiscordMessageToSend{
+	return SendMessageToNotificationServer(discord.DiscordMessageToSend{
 		Message: msg,
 		Webhook: warningsWebhook(),
 	})
 }
 
 func SendMessageToMutesChannel(msg string) error {
-	return SendMessageToNotificationServer(DiscordMessageToSend{
+	return SendMessageToNotificationServer(discord.DiscordMessageToSend{
 		Message: msg,
 		Webhook: mutesWebhook(),
 	})
 }
 
 func SendMessageToFlipperRoleChannel(msg string) error {
-	return SendMessageToNotificationServer(DiscordMessageToSend{
+	return SendMessageToNotificationServer(discord.DiscordMessageToSend{
 		Message: msg,
 		Webhook: flipperRoleWebhook(),
 	})
 }
 
-func SendMessageToNotificationServer(msg DiscordMessageToSend) error {
+func SendMessageToNotificationServer(msg discord.DiscordMessageToSend) error {
 
 	if msg.Message == "" {
 		return fmt.Errorf("no message is set")
@@ -276,28 +268,22 @@ func SendMessageToNotificationServer(msg DiscordMessageToSend) error {
 
 func webhookForChannel(channel string) string {
 	switch channel {
-	case WARNINGS_CHANNEL:
+	case discord.WarningsChannel:
 		return warningsWebhook()
-	case MUTES_CHANNEL:
+	case discord.MutesChannel:
 		return mutesWebhook()
-	case CI_SUCCESS_CHANNEL:
+	case discord.CiSuccessChannel:
 		return ciSuccessWebhook()
-	case CI_FAILURE_CHANNEL:
+	case discord.CiFailureChannel:
 		return ciFailureWebhook()
-	case FLIPPER_ROLE_CHANNEL:
+	case discord.FlipperRoleChannel:
 		return flipperRoleWebhook()
-	case FEEDBACK_CHANNEL:
+	case discord.FeedbackChannel:
 		return feedbackWebhook()
 	}
 
 	log.Error().Msg("no webhook found for channel")
 	return ""
-}
-
-type DiscordMessageToSend struct {
-	Message string
-	Channel string
-	Webhook string
 }
 
 func DiscordFormattedTime(t time.Time) string {
