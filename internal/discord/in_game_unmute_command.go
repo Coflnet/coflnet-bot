@@ -83,7 +83,11 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 	username := fmt.Sprintf("%v", optionMap["username"].Value)
 	unmuter := i.Member.User.Username
 	reason := fmt.Sprintf("%v", optionMap["reason"].Value)
-	additionalInformation := fmt.Sprintf("%v", optionMap["additionalInformation"].Value)
+
+	additionalInformation := ""
+	if a := optionMap["additional-information"]; a != nil {
+		additionalInformation = fmt.Sprintf("%v", a.Value)
+	}
 
 	// mute the user
 	_, err := unmuteCommand(username, unmuter, reason, additionalInformation)

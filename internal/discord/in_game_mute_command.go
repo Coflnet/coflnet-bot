@@ -113,7 +113,10 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 	username := fmt.Sprintf("%v", optionMap["username"].Value)
 	muter := i.Member.User.Username
 	reason := fmt.Sprintf("%v", optionMap["reason"].Value)
-	additionalInformation := fmt.Sprintf("%v", optionMap["additional-information"].Value)
+	additionalInformation := ""
+	if a := optionMap["additional-information"]; a != nil {
+		additionalInformation = fmt.Sprintf("%v", a.Value)
+	}
 
 	message := ""
 	if v, ok := optionMap["message"]; ok {
