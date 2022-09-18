@@ -30,6 +30,12 @@ func ingameUnmuteCommand() *discordgo.ApplicationCommand {
 				Description: "The reason for the mute",
 				Required:    true,
 			},
+			{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "additional-information",
+				Description: "Additional information for the mute, e.g. link to the message",
+				Required:    false,
+			},
 		},
 	}
 }
@@ -77,9 +83,10 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 	username := fmt.Sprintf("%v", optionMap["username"].Value)
 	unmuter := i.Member.User.Username
 	reason := fmt.Sprintf("%v", optionMap["reason"].Value)
+	additionalInformation := fmt.Sprintf("%v", optionMap["additionalInformation"].Value)
 
 	// mute the user
-	_, err := unmuteCommand(username, unmuter, reason)
+	_, err := unmuteCommand(username, unmuter, reason, additionalInformation)
 
 	if err != nil {
 		log.Error().Err(err).Msgf("❌ failed to unmute user")
@@ -138,12 +145,13 @@ func ingameUnmuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 	}
 }
 
-func unmuteCommand(username, unmuter, reason string) (*model.Unmute, error) {
+func unmuteCommand(username, unmuter, reason, additionalInformation string) (*model.Unmute, error) {
 
 	unmute := model.Unmute{
-		Username: username,
-		Reason:   reason,
-		Unmuter:  unmuter,
+		Username:              username,
+		Reason:                reason,
+		Unmuter:               unmuter,
+		AdditionalInformation: additionalInformation,
 	}
 
 	err := coflnet.UnmutePlayer(&unmute)

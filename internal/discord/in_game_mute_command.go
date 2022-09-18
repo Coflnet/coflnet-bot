@@ -39,6 +39,12 @@ func ingameMuteCommand() *discordgo.ApplicationCommand {
 				Required:    true,
 			},
 			{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "additional-information",
+				Description: "Additional information for the mute, e.g. link to the message",
+				Required:    false,
+			},
+			{
 				Type:        discordgo.ApplicationCommandOptionInteger,
 				Name:        "weeks",
 				Description: "Mute for how many weeks",
@@ -107,6 +113,7 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 	username := fmt.Sprintf("%v", optionMap["username"].Value)
 	muter := i.Member.User.Username
 	reason := fmt.Sprintf("%v", optionMap["reason"].Value)
+	additionalInformation := fmt.Sprintf("%v", optionMap["additional-information"].Value)
 
 	message := ""
 	if v, ok := optionMap["message"]; ok {
@@ -136,7 +143,7 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 	}
 
 	// mute the user
-	mute, err := muteCommand(username, muter, reason, message, hours, days, weeks)
+	mute, err := muteCommand(username, muter, reason, message, additionalInformation, hours, days, weeks)
 
 	if err != nil {
 		log.Error().Err(err).Msgf("failed to mute user")
@@ -194,7 +201,7 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 	}
 }
 
-func muteCommand(username, muter, reason, message string, hours, days, weeks int) (*model.Mute, error) {
+func muteCommand(username, muter, reason, message, additionalInformation string, hours, days, weeks int) (*model.Mute, error) {
 
 	muteUntil := time.Now()
 	muteUntil = muteUntil.Add(time.Hour * time.Duration(hours))
@@ -207,10 +214,11 @@ func muteCommand(username, muter, reason, message string, hours, days, weeks int
 	}
 
 	mute := model.Mute{
-		Username:  username,
-		Muter:     muter,
-		MuteUntil: muteUntil,
-		Reason:    reason,
+		Username:              username,
+		Muter:                 muter,
+		MuteUntil:             muteUntil,
+		Reason:                reason,
+		AdditionalInformation: additionalInformation,
 	}
 
 	// add message only if it is not empty
