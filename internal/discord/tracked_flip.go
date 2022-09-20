@@ -43,6 +43,14 @@ func FlipTracked(flip *model.Flip) error {
 						Name:  "Finder",
 						Value: finder(flip.Finder),
 					},
+					{
+						Name:  "Sell UUID",
+						Value: flip.Sell.UUID,
+					},
+					{
+						Name:  "Buy UUID",
+						Value: flip.Buy.UUID,
+					},
 				},
 				Type: "rich",
 			},
