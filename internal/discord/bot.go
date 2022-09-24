@@ -8,7 +8,7 @@ import (
 	"github.com/Coflnet/coflnet-bot/pkg/discord"
 	"net/http"
 	"os"
-	"strings"
+	"regexp"
 	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
@@ -195,11 +195,13 @@ func sendInvalidUUIDMessageToDiscord(message *discordgo.Message) {
 }
 
 func sanitizeMessage(message string) string {
-	// if string starts with § remote the first two characters
-	// this is the color code in minecraft, but it can not be displayed in discord
-	if strings.HasPrefix(message, "§") {
-		message = message[2:]
-	}
+	// if the strings has a § in it, remove all § characters and the following character
+
+	log.Info().Msgf("sanitizing message: %s", message)
+	reg := regexp.MustCompile("§.")
+	message = reg.ReplaceAllString(message, "")
+	log.Info().Msgf("sanitized message: %s", message)
+
 	return message
 }
 
