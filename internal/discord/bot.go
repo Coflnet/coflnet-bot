@@ -8,6 +8,7 @@ import (
 	"github.com/Coflnet/coflnet-bot/pkg/discord"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
@@ -157,8 +158,10 @@ func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 
 	iconUrl := fmt.Sprintf("https://crafatar.com/avatars/%s", message.UUID)
 	url := os.Getenv("CHAT_WEBHOOK")
+
+	msg := message.Message
 	data := &WebhookRequest{
-		Content:             message.Message,
+		Content:             sanitizeMessage(msg),
 		Username:            message.Name,
 		AvatarUrl:           iconUrl,
 		AllowedMentionsData: AllowedMentions{Parse: make([]string, 0)},
@@ -189,6 +192,15 @@ func sendInvalidUUIDMessageToDiscord(message *discordgo.Message) {
 	if err != nil {
 		log.Error().Err(err).Msgf("there was an error when sending the message to discord")
 	}
+}
+
+func sanitizeMessage(message string) string {
+	// if string starts with § remote the first two characters
+	// this is the color code in minecraft, but it can not be displayed in discord
+	if strings.HasPrefix(message, "§") {
+		message = message[2:]
+	}
+	return message
 }
 
 func SendMessageToCiSuccess(msg string) error {
