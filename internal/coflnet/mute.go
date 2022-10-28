@@ -116,7 +116,7 @@ func sendMuteToAPI(muteRequest MuteRequest) (time.Time, error) {
 	var muteResponse MuteResponse
 	err = json.Unmarshal(b, &muteResponse)
 	if err != nil {
-		log.Error().Err(err).Msgf("can not decode mute response")
+		log.Error().Err(err).Msgf("can not decode mute response; response: " + string(b))
 		return time.Time{}, err
 	}
 
