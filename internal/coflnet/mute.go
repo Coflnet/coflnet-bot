@@ -7,6 +7,7 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/model"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/rs/zerolog/log"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -109,8 +110,11 @@ func sendMuteToAPI(muteRequest MuteRequest) (time.Time, error) {
 		return time.Time{}, fmt.Errorf("mute request failed with status code %d", resp.StatusCode)
 	}
 
+	var b []byte
+	b, err = io.ReadAll(resp.Body)
+
 	var muteResponse MuteResponse
-	err = json.NewDecoder(resp.Body).Decode(&muteResponse)
+	err = json.Unmarshal(b, &muteResponse)
 	if err != nil {
 		log.Error().Err(err).Msgf("can not decode mute response")
 		return time.Time{}, err
