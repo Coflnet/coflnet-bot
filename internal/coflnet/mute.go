@@ -22,16 +22,16 @@ type MuteRequest struct {
 }
 
 type MuteResponse struct {
-	UUID           string    `json:"uuid"`
-	Muter          string    `json:"muter"`
-	UnMuter        string    `json:"unMuter"`
-	Message        string    `json:"message"`
-	Reason         string    `json:"reason"`
-	ClientID       int       `json:"clientId"`
-	UnMuteClientID int       `json:"unMuteClientId"`
-	Timestamp      time.Time `json:"timestamp"`
-	Expires        time.Time `json:"expires"`
-	Status         int       `json:"status"`
+	UUID           string `json:"uuid"`
+	Muter          string `json:"muter"`
+	UnMuter        string `json:"unMuter"`
+	Message        string `json:"message"`
+	Reason         string `json:"reason"`
+	ClientID       int    `json:"clientId"`
+	UnMuteClientID int    `json:"unMuteClientId"`
+	Timestamp      string `json:"timestamp"`
+	Expires        string `json:"expires"`
+	Status         int    `json:"status"`
 }
 
 // MutePlayer sends a mute request to the cofl chat service and saves the mute in the internal database
@@ -121,5 +121,12 @@ func sendMuteToAPI(muteRequest MuteRequest) (time.Time, error) {
 	}
 
 	log.Info().Msgf("mute response from api: %v", muteResponse)
-	return muteResponse.Expires, nil
+	var t time.Time
+	t, err = time.Parse(time.RFC3339Nano, muteResponse.Expires)
+	if err != nil {
+		log.Error().Err(err).Msgf("can not parse time from mute response")
+		return time.Time{}, err
+	}
+
+	return t, nil
 }
