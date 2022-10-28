@@ -229,10 +229,13 @@ func muteCommand(username, muter, reason, message, additionalInformation string,
 		mute.Message = message
 	}
 
-	err := coflnet.MutePlayer(&mute)
+	expires, err := coflnet.MutePlayer(&mute)
 	if err != nil {
 		return nil, err
 	}
+
+	// use the expires from the chat api
+	mute.MuteUntil = expires
 
 	return &mute, nil
 }
