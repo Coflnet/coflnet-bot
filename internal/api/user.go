@@ -29,7 +29,7 @@ func getUserById(c *gin.Context) {
 
 	log.Info().Msgf("search player with id %d", userId)
 
-	user, err := coflnet.UserById(userId)
+	user, err := coflnet.LoadUserById(userId)
 	if err != nil {
 		if nf, ok := err.(*model.UserNotFoundError); ok {
 			log.Warn().Msgf("user with id %d not found", userId)
