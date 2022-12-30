@@ -182,8 +182,8 @@ func SendMessageToDiscordChat(message *mongo.ChatMessage) error {
 	return nil
 }
 
-func sendInvalidUUIDMessageToDiscord(message *discordgo.Message) {
-	_, err := session.ChannelMessageSendReply(message.ChannelID, " minecraft account not found / validated "+message.Author.Username, &discordgo.MessageReference{
+func sendInvalidUUIDMessageToDiscord(message *discordgo.Message, msg string) {
+	_, err := session.ChannelMessageSendReply(message.ChannelID, msg, &discordgo.MessageReference{
 		MessageID: message.ID,
 		ChannelID: message.ChannelID,
 		GuildID:   message.GuildID,
