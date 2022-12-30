@@ -17,11 +17,12 @@ import (
 
 func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 
+  // if the message was not sent in cofl chat skip it
 	if msg.ChannelID != coflChatId() {
 		return nil
 	}
 
-	// coflnet bot
+	// if the message was sent by the bot skip it
 	if msg.Author.ID == "888725077191974913" {
 		return nil
 	}
@@ -34,6 +35,7 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	if msg.Author.ID == "975127829916286986" {
 		return nil
 	}
+
 
 	log.Info().Msgf("sending message to chat api")
 

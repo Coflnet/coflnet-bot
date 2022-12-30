@@ -15,6 +15,7 @@ import (
 
 func PlayerData(uuid string) (*PlayerDataResponse, error) {
 
+  log.Info().Msgf("loading hypixel player data for uuid %s", uuid)
 	u, err := url.Parse(fmt.Sprintf("https://api.hypixel.net/player?key=%s&uuid=%s", os.Getenv("HYPIXEL_API_KEY"), uuid))
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing url")
@@ -28,6 +29,8 @@ func PlayerData(uuid string) (*PlayerDataResponse, error) {
 			"API_KEY": {Key()},
 		},
 	}
+
+  log.Info().Msgf("sending request: %s", request.URL.String())
 
 	resp, err := http.DefaultClient.Do(&request)
 

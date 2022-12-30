@@ -53,6 +53,7 @@ func processMcVerifyKafkaMessage(msg *kafkago.Message) error {
 		return err
 	}
 
+  log.Info().Msgf("loading user with id %d, because he verified his mc account", id)
 	user, err := coflnet.LoadUserById(id)
 	if err != nil {
 		log.Error().Err(err).Msgf("failed to load user with id %d", id)
