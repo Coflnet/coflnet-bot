@@ -46,12 +46,6 @@ func UserMcConnect(userId int) (*model.User, error) {
 		return nil, err
 	}
 
-	// if the user has no accounts, then the user probably doesn't exist
-	// so return an error, to indicate that
-	if len(result.Accounts) == 0 {
-		return nil, fmt.Errorf("user not found")
-	}
-
 	var uuids []string
 	for _, u := range result.Accounts {
 
@@ -71,8 +65,58 @@ func UserMcConnect(userId int) (*model.User, error) {
 	return &user, nil
 }
 
-func GetUsersFromId(startId int) ([]*model.User, error) {
-	url := fmt.Sprintf("%s/Connect/users?offset=%d", os.Getenv("MC_CONNECT_URL"), startId)
+func UserMcConnectByUUID(uuid string) (*model.User, error) {
+	url := fmt.Sprintf("%s/Connect/minecraft/%d", os.Getenv("MC_CONNECT_URL"), uuid)
+
+	response, err := http.DefaultClient.Get(url)
+	if err != nil {
+		log.Error().Err(err).Msgf("error getting user from mc connect, uuid: %d", uuid)
+		return nil, err
+	}
+
+	defer func() {
+		_ = response.Body.Close()
+	}()
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Error().Err(err).Msgf("error reading response body")
+		return nil, err
+	}
+
+	var result McConnectGetUserResponse
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		log.Error().Err(err).Msgf("error unmarshalling response body")
+		return nil, err
+	}
+
+	var uuids []string
+	for _, u := range result.Accounts {
+
+		// only add the verified ones
+		if !u.Verified {
+			continue
+		}
+
+		uuids = append(uuids, u.AccountUUID)
+	}
+
+  id, err := strconv.Atoi(result.ExternalID)
+  if err != nil {
+    log.Error().Err(err).Msgf("error converting external id to int")
+    return nil, err
+  }
+
+	user := model.User{
+		UserId:         id,
+		MinecraftUuids: uuids,
+	}
+
+	return &user, nil
+}
+
+func GetUsersFromId(amount, offset int) ([]*model.User, error) {
+	url := fmt.Sprintf("%s/Connect/users?amount=%d&offset=%d", os.Getenv("MC_CONNECT_URL"), amount, offset)
 
 	response, err := http.DefaultClient.Get(url)
 
@@ -100,12 +144,6 @@ func GetUsersFromId(startId int) ([]*model.User, error) {
 
 		var uuids []string
 		for _, u := range u.Accounts {
-
-			// only add the verified ones
-			if !u.Verified {
-				continue
-			}
-
 			uuids = append(uuids, u.AccountUUID)
 		}
 

@@ -2,8 +2,11 @@ package discord
 
 import (
 	"fmt"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
+
+	"github.com/Coflnet/coflnet-bot/internal/coflnet"
 )
 
 func refreshUser() *discordgo.ApplicationCommand {
@@ -53,6 +56,19 @@ func refreshUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
   log.Info().Msgf("refreshing the user %s", user.User.Username)
 
+  err = RefreshUserByPlayername(user.User.Username)
+  if err != nil {
+    log.Error().Err(err).Msg("Error refreshing user")
+	  _ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		  Type: discordgo.InteractionResponseChannelMessageWithSource,
+		  Data: &discordgo.InteractionResponseData{
+		  	Content:         "Sync failed",
+			  AllowedMentions: &discordgo.MessageAllowedMentions{},
+			  Flags:           discordgo.MessageFlagsEphemeral,
+		  },
+    })
+    return
+  }
 
 
 
@@ -66,3 +82,20 @@ func refreshUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		},
 	})
 }
+
+func RefreshUserByPlayername(name string) error {
+  uuid, err := coflnet.PlayerUUIDByName(name)   
+  if err != nil {
+    log.Error().Err(err).Msgf("can not get uuid for %s", name)
+    return err
+  }
+
+  _, err = coflnet.LoadUserByUUID(uuid)
+  if err != nil {
+    log.Error().Err(err).Msgf("can not load user for %s", name)
+    return err
+  }
+
+  return nil
+}
+

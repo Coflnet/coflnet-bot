@@ -58,7 +58,7 @@ func processTransactionMessage(message kafkago.Message) error {
 		return err
 	}
 
-	user, err := coflnet.UserById(id)
+	user, err := coflnet.LoadUserById(id)
 	if err != nil {
 		log.Error().Err(err).Msgf("loading user with id failed %d, cannot update role", t.UserId)
 		return err

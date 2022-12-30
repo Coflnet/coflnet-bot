@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"encoding/json"
-	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/kafka"
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/model"
@@ -46,10 +45,7 @@ func processFlipSummary() (bool, error) {
 		return false, nil
 	}
 
-	err = discord.FlipTracked(&flip)
-	if err != nil {
-		return false, err
-	}
+  // TODO removed
 
 	return true, kafka.CommitFlipSummary(msg)
 }

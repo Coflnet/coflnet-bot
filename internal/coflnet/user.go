@@ -11,31 +11,35 @@ import (
 )
 
 // UserById loads a user, potentially cached
-func UserById(id int) (*model.User, error) {
-	return LoadUserById(id)
-}
-
-// LoadUserById loads the user from different api's
 func LoadUserById(id int) (*model.User, error) {
-
 	user := &model.User{
 		UserId: id,
 	}
 
-  log.Info().Msgf("loading user with id %d", id)
 	mcUser, err := UserMcConnect(user.UserId)
 	if err != nil {
 		log.Error().Err(err).Msgf("can not load with id %d from mcConnect", user.UserId)
 		return nil, err
 	}
-  log.Info().Msgf("he has %d minecraft uuids", len(mcUser.MinecraftUuids))
 
-	premiumTime, err := PaymentUserById(user.UserId)
+	return LoadUser(mcUser)
+}
+
+func LoadUserByUUID(uuid string) (*model.User, error) {
+  user, err := UserMcConnectByUUID(uuid)
+  if err != nil {
+    return nil, err
+  }
+
+  return LoadUser(user)
+}
+
+func LoadUser(mcUser *model.User) (*model.User, error) {
+	premiumTime, err := PaymentUserById(mcUser.UserId)
 	if err != nil {
-		log.Error().Err(err).Msgf("can not load with id %d from payment", user.UserId)
+		log.Error().Err(err).Msgf("can not load with id %d from payment", mcUser.UserId)
 		return nil, err
 	}
-  log.Info().Msgf("he has %v premium days", premiumTime)
 
 	var discordNames []string
 	for _, uuid := range mcUser.MinecraftUuids {
@@ -43,13 +47,19 @@ func LoadUserById(id int) (*model.User, error) {
 		if err != nil {
 			return nil, err
 		}
+    discordName := player.Player.SocialMedia.Links.Discord
 
-    log.Info().Msgf("found the discord name %s", player.Player.SocialMedia.Links.Discord)
-		discordNames = append(discordNames, player.Player.SocialMedia.Links.Discord)
+    if discordName == "" {
+      continue
+    }
+
+    log.Info().Msgf("found the discord name %s", discordName)
+		discordNames = append(discordNames, discordName)
+    time.Sleep(1 * time.Second)
 	}
 
-	user = &model.User{
-		UserId:         id,
+  user := &model.User{
+		UserId:         mcUser.UserId,
 		MinecraftUuids: mcUser.MinecraftUuids,
 		DiscordNames:   discordNames,
 		PremiumUntil:   premiumTime,
