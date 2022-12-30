@@ -16,6 +16,7 @@ func registerCommands() error {
 		warnCommand(),
 		userWarnings(),
 		checkFlipperRole(),
+    refreshUser(),
 	}
 
 	commandHandlers := map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
@@ -25,6 +26,7 @@ func registerCommands() error {
 		"user-warnings":      userWarningsHandler,
 		"warn-user":          warnUserHandler,
 		"check-flipper-role": checkFlipperRoleHandler,
+		"refresh-user":       refreshUserHandler,
 	}
 
 	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
