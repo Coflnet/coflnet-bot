@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/rs/zerolog/log"
@@ -15,8 +14,11 @@ import (
 
 func PlayerData(uuid string) (*PlayerDataResponse, error) {
 
+  proxyUrl := fmt.Sprintf("http://sky-proxy.sky:8000/Proxy/hypixel?path=%s", url.QueryEscape("/player?uuid="+uuid))
+
   log.Info().Msgf("loading hypixel player data for uuid %s", uuid)
-	u, err := url.Parse(fmt.Sprintf("https://api.hypixel.net/player?key=%s&uuid=%s", os.Getenv("HYPIXEL_API_KEY"), uuid))
+  log.Info().Msgf("url for proxy is: %s", proxyUrl)
+	u, err := url.Parse(proxyUrl)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing url")
 		return nil, err
@@ -31,8 +33,8 @@ func PlayerData(uuid string) (*PlayerDataResponse, error) {
 	}
 
   log.Info().Msgf("sending request: %s", request.URL.String())
-
 	resp, err := http.DefaultClient.Do(&request)
+
 
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting player data")
@@ -50,6 +52,7 @@ func PlayerData(uuid string) (*PlayerDataResponse, error) {
 
 	var data PlayerDataResponse
 	err = json.Unmarshal(bytes, &data)
+
 	if err != nil {
 		log.Error().Err(err).Msgf("error unmarshalling response")
 		metrics.ErrorOccurred()
