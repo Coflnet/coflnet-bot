@@ -56,8 +56,7 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 
   err = RefreshUserByPlayername(msg.Author.Username)
   if err != nil {
-    log.Error().Err(err).Msgf("error refreshing user")
-    return err
+    // ignore error
   }
 
 	user, err := mongo.SearchByDiscordTag(username)
