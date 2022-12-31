@@ -54,6 +54,12 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	username := fmt.Sprintf("%s#%s", msg.Author.Username, msg.Author.Discriminator)
 	log.Info().Msgf("searching username %s", username)
 
+  err = RefreshUserByPlayername(username)
+  if err != nil {
+    log.Error().Err(err).Msgf("error refreshing user")
+    return err
+  }
+
 	user, err := mongo.SearchByDiscordTag(username)
 	if err != nil {
 		log.Warn().Err(err).Msgf("error when searching user %s in db", username)
