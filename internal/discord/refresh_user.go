@@ -37,11 +37,10 @@ func refreshUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	userId := optionMap["user"].Value.(string)
   fmt.Println(userId)
 
-  user, err := s.GuildMember(i.GuildID, userId)
-
+  uuid, err := coflnet.PlayerUUIDByName(userId)
   if err != nil {
+    log.Error().Err(err).Msg("Error getting uuid")
     log.Error().Err(err).Msg("Error getting user")
-
 	  _ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		  Type: discordgo.InteractionResponseChannelMessageWithSource,
 		  Data: &discordgo.InteractionResponseData{
@@ -53,12 +52,10 @@ func refreshUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
     return
   }
 
-
-  log.Info().Msgf("refreshing the user %s", user.User.Username)
-
-  err = RefreshUserByPlayername(user.User.Username)
+  _, err = coflnet.LoadUserByUUID(uuid)
   if err != nil {
-    log.Error().Err(err).Msg("Error refreshing user")
+    log.Error().Err(err).Msg("Error loading user")
+    log.Error().Err(err).Msg("Error getting user")
 	  _ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		  Type: discordgo.InteractionResponseChannelMessageWithSource,
 		  Data: &discordgo.InteractionResponseData{
@@ -69,8 +66,6 @@ func refreshUserHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
     })
     return
   }
-
-
 
 	// send success message
 	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
