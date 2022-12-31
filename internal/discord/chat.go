@@ -57,14 +57,14 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	user, err := mongo.SearchByDiscordTag(username)
 	if err != nil {
 		log.Warn().Err(err).Msgf("error when searching user %s in db", username)
-    sendInvalidUUIDMessageToDiscord(msg.Message, fmt.Sprintf("user with the name %s not found, please check if your discord name is set correctly on your hypixel profile, maybe try the refresh-user command", username))
+    sendInvalidUUIDMessageToDiscord(msg.Message, fmt.Sprintf("user with the name %s not found, please check if your discord name is set correctly on your hypixel profile, maybe try the /refresh-user command", username))
 		return err
 	}
 
 	if user == nil {
 		log.Warn().Msgf("user %s not found in db", username)
 
-		sendInvalidUUIDMessageToDiscord(msg.Message, fmt.Sprintf("user with the name %s not found, please check if your discord name is set correctly on your hypixel profile, maybe try the refresh-user command", username))
+		sendInvalidUUIDMessageToDiscord(msg.Message, fmt.Sprintf("user with the name %s not found, please check if your discord name is set correctly on your hypixel profile, maybe try the /refresh-user command", username))
 
 		return nil
 	}
