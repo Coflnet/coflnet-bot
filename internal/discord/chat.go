@@ -52,9 +52,9 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	u.Path = path.Join(u.Path, p)
 
 	username := fmt.Sprintf("%s#%s", msg.Author.Username, msg.Author.Discriminator)
-	log.Info().Msgf("searching username %s", username)
+	log.Info().Msgf("searching username %s", msg.Author.Username)
 
-  err = RefreshUserByPlayername(username)
+  err = RefreshUserByPlayername(msg.Author.Username)
   if err != nil {
     log.Error().Err(err).Msgf("error refreshing user")
     return err
