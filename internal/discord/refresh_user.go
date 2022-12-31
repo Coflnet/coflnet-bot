@@ -18,7 +18,7 @@ func refreshUser() *discordgo.ApplicationCommand {
 		DefaultMemberPermissions: &writePerm,
 		Options: []*discordgo.ApplicationCommandOption{
 		{
-				Type:        discordgo.ApplicationCommandOptionUser,
+				Type:        discordgo.ApplicationCommandOptionString,
 				Name:        "user",
 				Description: "The user to check",
 				Required:    true,
