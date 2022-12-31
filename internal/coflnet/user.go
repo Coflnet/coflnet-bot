@@ -31,7 +31,7 @@ func LoadUserByUUID(uuid string) (*model.User, error) {
     return nil, err
   }
 
-  return LoadUser(user)
+  return LoadUserById(user.UserId)
 }
 
 func LoadUser(mcUser *model.User) (*model.User, error) {
