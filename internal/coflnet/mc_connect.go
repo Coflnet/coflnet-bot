@@ -66,11 +66,12 @@ func UserMcConnect(userId int) (*model.User, error) {
 }
 
 func UserMcConnectByUUID(uuid string) (*model.User, error) {
-	url := fmt.Sprintf("%s/Connect/minecraft/%d", os.Getenv("MC_CONNECT_URL"), uuid)
+  log.Info().Msgf("checking mc connect user by the uuid: %s", uuid)
+	url := fmt.Sprintf("%s/Connect/minecraft/%s", os.Getenv("MC_CONNECT_URL"), uuid)
 
 	response, err := http.DefaultClient.Get(url)
 	if err != nil {
-		log.Error().Err(err).Msgf("error getting user from mc connect, uuid: %d", uuid)
+		log.Error().Err(err).Msgf("error getting user from mc connect, uuid: %s", uuid)
 		return nil, err
 	}
 
