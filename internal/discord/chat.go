@@ -79,7 +79,6 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	// TODO user minecraft uuids at 0 is potentially wrong
 	payload := &ChatApiPayload{
 		Message:    msg.Content,
-		Name:       msg.Author.Username,
 		UUID:       user.MinecraftUuids[0],
 		ClientName: "cofl-discord",
 		Prefix:     "[cofl-dc] ",
