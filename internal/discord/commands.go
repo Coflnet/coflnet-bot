@@ -1,9 +1,10 @@
 package discord
 
 import (
+	"os"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
-	"os"
 )
 
 var registeredCommands []*discordgo.ApplicationCommand
@@ -12,26 +13,38 @@ func registerCommands() error {
 	commands := []*discordgo.ApplicationCommand{
 		ingameMuteCommand(),
 		ingameUnmuteCommand(),
-		auctionStatCommand(),
 		warnCommand(),
 		userWarnings(),
 		checkFlipperRole(),
-    refreshUser(),
+		refreshUser(),
+		switchUsernameCommand(),
+		switchMinecraftAccountCommand(),
 	}
 
 	commandHandlers := map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"in-game-mute":       ingameMuteCommandHandler,
-		"auction-count":      auctionStatCommmandHandler,
-		"in-game-unmute":     ingameUnmuteCommandHandler,
-		"user-warnings":      userWarningsHandler,
-		"warn-user":          warnUserHandler,
-		"check-flipper-role": checkFlipperRoleHandler,
-		"refresh-user":       refreshUserHandler,
+		"in-game-mute":                 ingameMuteCommandHandler,
+		"in-game-unmute":               ingameUnmuteCommandHandler,
+		"user-warnings":                userWarningsHandler,
+		"warn-user":                    warnUserHandler,
+		"check-flipper-role":           checkFlipperRoleHandler,
+		"refresh-user":                 refreshUserHandler,
+		"switch-discord-username":      switchUsernameHandler,
+		"switch_username_select":       switchUsernameSelected,
+		"switch-minecraft-account":     switchMinecraftUUIDHandler,
+		"switch_minecraft_uuid_select": switchMinecraftSelected,
 	}
 
 	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
-			h(s, i)
+		switch i.Type {
+		case discordgo.InteractionApplicationCommand:
+			if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
+				h(s, i)
+			}
+		case discordgo.InteractionMessageComponent:
+
+			if h, ok := commandHandlers[i.MessageComponentData().CustomID]; ok {
+				h(s, i)
+			}
 		}
 	})
 
@@ -51,10 +64,9 @@ func registerCommands() error {
 }
 
 func unregisterCommands() error {
-
 	log.Info().Msgf("unregistering %d commands", len(registeredCommands))
 	for _, c := range registeredCommands {
-		err := session.ApplicationCommandDelete(session.State.User.ID, os.Getenv("DISCORD_GUILD"), c.ID)
+		err := session.ApplicationCommandDelete(session.State.User.ID, discordGuildId(), c.ID)
 		if err != nil {
 			log.Error().Err(err).Msgf("Cannot delete '%v' command: %v", c.Name, err)
 			return err

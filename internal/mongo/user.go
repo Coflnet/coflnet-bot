@@ -82,22 +82,17 @@ func UpdateUser(user *model.User) error {
 }
 
 func SaveUser(user *model.User) error {
-
-	log.Info().Msgf("saving user %d", user.UserId)
-
 	_, err := SearchByUserId(user.UserId)
 	if err != nil {
 
 		if _, ok := err.(*model.UserNotFoundError); ok {
 
-			log.Info().Msgf("user does not exist %d", user.UserId)
 			return InsertUser(user)
 		}
 
 		return err
 	}
 
-	log.Info().Msgf("user does exist, update %d", user.UserId)
 	return UpdateUser(user)
 }
 
@@ -147,4 +142,44 @@ func GetUsersWithFlipperRole() (<-chan *model.User, error) {
 	}()
 
 	return userChan, nil
+}
+
+func GetUserByDiscordName(name string) (*model.User, error) {
+  ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+  defer cancel()
+
+  filter := bson.D{{"discord_names", name}}
+  var user model.User
+  res := userCollection.FindOne(ctx, filter)
+
+  if err := res.Err(); err != nil {
+    return nil, res.Err()
+  }
+
+  err := res.Decode(&user)
+  if err != nil {
+    return nil, err
+  }
+
+  return &user, nil
+}
+
+func GetUserByMinecraftUuid(uuid string) (*model.User, error) {
+  ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+  defer cancel()
+
+  filter := bson.D{{"minecraft_uuids", uuid}}
+  var user model.User
+  res := userCollection.FindOne(ctx, filter)
+
+  if err := res.Err(); err != nil {
+    return nil, res.Err()
+  }
+
+  err := res.Decode(&user)
+  if err != nil {
+    return nil, err
+  }
+
+  return &user, nil
 }

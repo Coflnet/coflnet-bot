@@ -303,3 +303,11 @@ func webhookForChannel(channel string) string {
 func DiscordFormattedTime(t time.Time) string {
 	return fmt.Sprintf("<t:%d:f>", t.Unix())
 }
+
+func discordGuildId() string {
+  h := os.Getenv("DISCORD_GUILD")
+  if h == "" {
+    log.Panic().Msgf("no discord guild id is set")
+  }
+  return h
+}

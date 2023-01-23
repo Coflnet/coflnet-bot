@@ -9,8 +9,34 @@ type User struct {
 	MinecraftUuids []string  `json:"minecraftUuids" bson:"minecraft_uuids"`
 	LastRefresh    time.Time `json:"lastRefresh" bson:"last_refresh"`
 	HasFlipperRole bool      `json:"hasFlipperRole" bson:"has_flipper_role"`
+  PreferredUsername string `json:"preferredUsername" bson:"preferred_username"`
+  PreferredUUID string `json:"preferredUUID" bson:"preferred_uuid"`
 }
 
 func (u *User) HasPremium() bool {
 	return u.PremiumUntil.After(time.Now())
+}
+
+func (u *User) Username() string {
+  if u.PreferredUsername != "" {
+    return u.PreferredUsername
+  }
+
+  if len(u.DiscordNames) > 0 {
+    return u.DiscordNames[0]
+  }
+
+  return ""
+}
+
+func (u *User) UUID() string {
+  if u.PreferredUUID != "" {
+    return u.PreferredUUID
+  }
+
+  if len(u.MinecraftUuids) > 0 {
+    return u.MinecraftUuids[0]
+  }
+
+  return ""
 }

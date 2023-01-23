@@ -11,11 +11,8 @@ import (
 
 func PlayerName(uuid string) (string, error) {
 
-	url, err := url2.JoinPath(PlayerNameHost(), "/PlayerName/name/", uuid)
-	if err != nil {
-		log.Error().Err(err).Msgf("can not create url for playername request")
-		return "", err
-	}
+  url := fmt.Sprintf("https://sky.coflnet.com/api/player/%s/name", uuid)
+  log.Info().Msgf("getting playername from %s", url)
 
 	resp, err := http.Get(url)
 	if err != nil {

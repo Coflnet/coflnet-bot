@@ -3,7 +3,7 @@ module github.com/Coflnet/coflnet-bot
 go 1.19
 
 require (
-	github.com/bwmarrin/discordgo v0.25.1-0.20220603125853-c8c153872c36
+	github.com/bwmarrin/discordgo v0.27.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis/v8 v8.11.5

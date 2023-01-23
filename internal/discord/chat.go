@@ -52,7 +52,6 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	u.Path = path.Join(u.Path, p)
 
 	username := fmt.Sprintf("%s#%s", msg.Author.Username, msg.Author.Discriminator)
-	log.Info().Msgf("searching username %s", msg.Author.Username)
 
   err = RefreshUserByPlayername(msg.Author.Username)
   if err != nil {
@@ -79,7 +78,7 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	// TODO user minecraft uuids at 0 is potentially wrong
 	payload := &ChatApiPayload{
 		Message:    msg.Content,
-		UUID:       user.MinecraftUuids[0],
+		UUID:       user.UUID(),
 		ClientName: "cofl-discord",
 		Prefix:     "[cofl-dc] ",
 	}
