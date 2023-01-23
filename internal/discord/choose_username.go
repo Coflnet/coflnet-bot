@@ -39,8 +39,8 @@ func switchUsernameHandler(s *discordgo.Session, i *discordgo.InteractionCreate)
 	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content:         "Choose your preferred username",
-			Flags:           discordgo.MessageFlagsEphemeral,
+			Content: "Choose your preferred username",
+			Flags:   discordgo.MessageFlagsEphemeral,
 			Components: []discordgo.MessageComponent{
 				discordgo.ActionsRow{
 					Components: []discordgo.MessageComponent{
@@ -57,56 +57,56 @@ func switchUsernameHandler(s *discordgo.Session, i *discordgo.InteractionCreate)
 	if err != nil {
 		panic(err)
 	}
-
 }
 
 func switchUsernameSelected(s *discordgo.Session, i *discordgo.InteractionCreate) {
-
 	username := fmt.Sprintf("%s#%s", i.Member.User.Username, i.Member.User.Discriminator)
 
-  // get the user
-  user, err := mongo.GetUserByDiscordName(username)
-  if err != nil {
-    log.Error().Err(err).Msgf("error searching user %s", username)
-    err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-      Type: discordgo.InteractionResponseChannelMessageWithSource,
-      Data: &discordgo.InteractionResponseData{
-        Content: "❌ your username is not registered",
-      },
-    })
+	// get the user
+	user, err := mongo.GetUserByDiscordName(username)
+	if err != nil {
+		log.Error().Err(err).Msgf("error searching user %s", username)
+		err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "❌ your username is not registered",
+			},
+		})
 
-    if err != nil {
-      log.Error().Err(err).Msgf("Error sending message to user %s: %s", i.User.Username, err)
-    }
-    return
-  }
+		if err != nil {
+			log.Error().Err(err).Msgf("Error sending message to user %s: %s", i.User.Username, err)
+		}
+		return
+	}
 
-  user.PreferredUsername = i.MessageComponentData().Values[0]
+	user.PreferredUsername = i.MessageComponentData().Values[0]
 
-  // mongo update
-  err = mongo.UpdateUser(user)
-  if err != nil {
-    log.Error().Err(err).Msgf("error updating user %s", username)
-    err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-      Type: discordgo.InteractionResponseChannelMessageWithSource,
-      Data: &discordgo.InteractionResponseData{
-        Content: "❌ error updating your username",
-      },
-    })
+	// mongo update
+	err = mongo.UpdateUser(user)
+	if err != nil {
+		log.Error().Err(err).Msgf("error updating user %s", username)
+		err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "❌ error updating your username",
+			},
+		})
 
-    if err != nil {
-      log.Error().Err(err).Msgf("Error sending message to user %s: %s", i.User.Username, err)
-    }
+		if err != nil {
+			log.Error().Err(err).Msgf("Error sending message to user %s: %s", i.User.Username, err)
+		}
 
-    return
-  }
+		return
+	}
 
-  s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-    Type: discordgo.InteractionResponseChannelMessageWithSource,
-    Data: &discordgo.InteractionResponseData{
-      Content: "You selected " + i.MessageComponentData().Values[0],
-    },
-  })
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content:         "You selected " + i.MessageComponentData().Values[0],
+			Flags:           discordgo.MessageFlagsEphemeral,
+			AllowedMentions: &discordgo.MessageAllowedMentions{},
+		},
+	})
 }
 
 func buildUsernameSelectOptions(user *model.User) []discordgo.SelectMenuOption {

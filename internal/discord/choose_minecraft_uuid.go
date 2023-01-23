@@ -19,10 +19,8 @@ func switchMinecraftAccountCommand() *discordgo.ApplicationCommand {
 }
 
 func switchMinecraftUUIDHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
-
 	username := fmt.Sprintf("%s#%s", i.Member.User.Username, i.Member.User.Discriminator)
 	user, err := mongo.GetUserByDiscordName(username)
-
 	// if the user is not found, we can't do anything
 	if err != nil {
 		log.Error().Err(err).Msgf("error searching user %s", username)
@@ -42,8 +40,8 @@ func switchMinecraftUUIDHandler(s *discordgo.Session, i *discordgo.InteractionCr
 	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content:         "Choose your preferred minecraft account",
-			Flags:           discordgo.MessageFlagsEphemeral,
+			Content: "Choose your preferred minecraft account",
+			Flags:   discordgo.MessageFlagsEphemeral,
 			Components: []discordgo.MessageComponent{
 				discordgo.ActionsRow{
 					Components: []discordgo.MessageComponent{
@@ -60,86 +58,87 @@ func switchMinecraftUUIDHandler(s *discordgo.Session, i *discordgo.InteractionCr
 	if err != nil {
 		panic(err)
 	}
-
 }
 
 func switchMinecraftSelected(s *discordgo.Session, i *discordgo.InteractionCreate) {
-
 	username := fmt.Sprintf("%s#%s", i.Member.User.Username, i.Member.User.Discriminator)
 
-  // get the user
-  user, err := mongo.GetUserByDiscordName(username)
-  if err != nil {
-    log.Error().Err(err).Msgf("error searching user %s", username)
-    err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-      Type: discordgo.InteractionResponseChannelMessageWithSource,
-      Data: &discordgo.InteractionResponseData{
-        Content: "❌ your username is not registered",
-      },
-    })
+	// get the user
+	user, err := mongo.GetUserByDiscordName(username)
+	if err != nil {
+		log.Error().Err(err).Msgf("error searching user %s", username)
+		err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "❌ your username is not registered",
+			},
+		})
 
-    if err != nil {
-      log.Error().Err(err).Msgf("Error sending message to user %s: %s", i.User.Username, err)
-    }
-    return
-  }
+		if err != nil {
+			log.Error().Err(err).Msgf("Error sending message to user %s: %s", i.User.Username, err)
+		}
+		return
+	}
 
-  user.PreferredUUID = i.MessageComponentData().Values[0]
+	user.PreferredUUID = i.MessageComponentData().Values[0]
 
-  // mongo update
-  err = mongo.UpdateUser(user)
-  if err != nil {
-    log.Error().Err(err).Msgf("error updating user %s", username)
-    err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-      Type: discordgo.InteractionResponseChannelMessageWithSource,
-      Data: &discordgo.InteractionResponseData{
-        Content: "❌ error updating your username",
-      },
-    })
+	// mongo update
+	err = mongo.UpdateUser(user)
+	if err != nil {
+		log.Error().Err(err).Msgf("error updating user %s", username)
+		err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "❌ error updating your username",
+			},
+		})
 
-    if err != nil {
-      log.Error().Err(err).Msgf("Error sending message to user %s: %s", i.User.Username, err)
-    }
+		if err != nil {
+			log.Error().Err(err).Msgf("Error sending message to user %s: %s", i.User.Username, err)
+		}
 
-    return
-  }
+		return
+	}
 
+	uuid := i.MessageComponentData().Values[0]
+	name, err := coflnet.PlayerName(uuid)
+	if err != nil {
+		log.Error().Err(err).Msgf("error getting name for uuid %s", uuid)
 
-  uuid := i.MessageComponentData().Values[0]
-  name, err := coflnet.PlayerName(uuid)
-  if err != nil {
-    log.Error().Err(err).Msgf("error getting name for uuid %s", uuid)
-    _ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-      Type: discordgo.InteractionResponseChannelMessageWithSource,
-      Data: &discordgo.InteractionResponseData{
-        Content: "❌ error updating your username",
-      },
-    })
-    return
-  }
+		// send as ephemeral
+		err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				AllowedMentions: &discordgo.MessageAllowedMentions{},
+				Flags:           discordgo.MessageFlagsEphemeral,
+				Content:         "❌ error updating your username",
+			},
+		})
+		return
+	}
 
-  s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-    Type: discordgo.InteractionResponseChannelMessageWithSource,
-    Data: &discordgo.InteractionResponseData{
-      Content: "You selected " + name,
-    },
-  })
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content:         "You selected " + name,
+			Flags:           discordgo.MessageFlagsEphemeral,
+			AllowedMentions: &discordgo.MessageAllowedMentions{},
+		},
+	})
 }
 
 func buildMinecraftUuidSelectOptions(user *model.User) []discordgo.SelectMenuOption {
+	uuidUsernameMap := make(map[string]string)
+	for _, uuid := range user.MinecraftUuids {
 
-  uuidUsernameMap := make(map[string]string)
-  for _, uuid := range user.MinecraftUuids {
+		name, err := coflnet.PlayerName(uuid)
+		if err != nil {
+			log.Error().Err(err).Msgf("error getting name for uuid %s", uuid)
+			continue
+		}
 
-    name, err := coflnet.PlayerName(uuid)
-    if err != nil {
-      log.Error().Err(err).Msgf("error getting name for uuid %s", uuid)
-      continue
-    }
-
-    uuidUsernameMap[uuid] = name
-  }
-
+		uuidUsernameMap[uuid] = name
+	}
 
 	options := []discordgo.SelectMenuOption{}
 	for uuid, name := range uuidUsernameMap {
