@@ -12,9 +12,11 @@ import (
 )
 
 func switchMinecraftAccountCommand() *discordgo.ApplicationCommand {
+	var chatPerms int64 = discordgo.PermissionSendMessages
 	return &discordgo.ApplicationCommand{
 		Name:        "switch-minecraft-account",
 		Description: "Choose the preferred minecraft account, if you have multiple accounts",
+		DefaultMemberPermissions: &chatPerms,
 	}
 }
 
