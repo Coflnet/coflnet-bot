@@ -107,6 +107,7 @@ func SendMessageToChatApi(msg *discordgo.MessageCreate) error {
 	response, err := client.Do(request)
 	if err != nil {
 		log.Error().Err(err).Msgf("error sending request, status: %s")
+    return err
 	}
 
 	log.Info().Msgf("response code %s", response.Status)
