@@ -3,11 +3,11 @@ package mongo
 import (
 	"context"
 	"github.com/rs/zerolog/log"
-	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+  "github.com/Coflnet/coflnet-bot/internal/utils"
 )
 
 var (
@@ -24,8 +24,10 @@ var (
 func Init() error {
 
 	var err error
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	client, err = mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGO_HOST")))
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+  defer cancel()
+
+	client, err = mongo.Connect(ctx, options.Client().ApplyURI(mongoHost()))
 	if err != nil {
 		return err
 	}
@@ -42,9 +44,15 @@ func Init() error {
 }
 
 func CloseConnection() {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+  defer cancel()
+
 	err := client.Disconnect(ctx)
 	if err != nil {
 		log.Error().Err(err).Msgf("error closing mongo connection")
 	}
+}
+
+func mongoHost() string {
+  return utils.Env("MONGO_HOST")
 }
