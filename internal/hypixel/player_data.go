@@ -13,11 +13,7 @@ import (
 )
 
 func PlayerData(uuid string) (*PlayerDataResponse, error) {
-
-  proxyUrl := fmt.Sprintf("http://sky-proxy.sky:8000/Proxy/hypixel?path=%s", url.QueryEscape("/player?uuid="+uuid))
-
-  log.Info().Msgf("loading hypixel player data for uuid %s", uuid)
-  log.Info().Msgf("url for proxy is: %s", proxyUrl)
+	proxyUrl := fmt.Sprintf("http://sky-proxy.sky:8000/Proxy/hypixel?path=%s", url.QueryEscape("/player?uuid="+uuid))
 	u, err := url.Parse(proxyUrl)
 	if err != nil {
 		log.Error().Err(err).Msgf("error parsing url")
@@ -27,14 +23,9 @@ func PlayerData(uuid string) (*PlayerDataResponse, error) {
 	request := http.Request{
 		Method: "GET",
 		URL:    u,
-		Header: http.Header{
-			"API_KEY": {Key()},
-		},
 	}
 
-  log.Info().Msgf("sending request: %s", request.URL.String())
 	resp, err := http.DefaultClient.Do(&request)
-
 
 	if err != nil {
 		log.Error().Err(err).Msgf("error getting player data")
