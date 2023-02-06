@@ -195,13 +195,6 @@ func ingameMuteCommandHandler(s *discordgo.Session, i *discordgo.InteractionCrea
 	if err != nil {
 		log.Error().Err(err).Msgf("error in in-game-mute command")
 	}
-
-	err = SendMessageToMutesChannel(
-		fmt.Sprintf("🔇 user %s was muted by %s for %s until %s", username, muter, reason, DiscordFormattedTime(mute.MuteUntil)),
-	)
-	if err != nil {
-		log.Error().Err(err).Msgf("error in in-game-mute command")
-	}
 }
 
 func muteCommand(username, muter, reason, message, additionalInformation string, hours, days, weeks int) (*model.Mute, error) {
