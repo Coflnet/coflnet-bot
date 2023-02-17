@@ -36,10 +36,10 @@ func SearchByUserId(userId int) (*model.User, error) {
 }
 
 func SearchByDiscordTag(discordTag string) (*model.User, error) {
-	filter := bson.D{{"discord_names",
-		bson.D{{"$elemMatch", bson.D{{"$eq", discordTag}}}},
-	}}
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	filter := bson.D{{"discord_names", discordTag}}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
 
 	res := userCollection.FindOne(ctx, filter)
 
