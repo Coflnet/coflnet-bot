@@ -86,7 +86,6 @@ func checkFlipperRoleHandler(s *discordgo.Session, i *discordgo.InteractionCreat
 		return
 	}
 
-	beforeUpdate := dbUser.HasFlipperRole
 	err = SetFlipperRoleForUser(dbUser)
 	if err != nil {
 		log.Error().Err(err).Msgf("failed to set flipper role for user with tag %s", tag)
@@ -101,21 +100,9 @@ func checkFlipperRoleHandler(s *discordgo.Session, i *discordgo.InteractionCreat
 		return
 	}
 
-	if beforeUpdate == dbUser.HasFlipperRole {
-		_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content:         "⚠️ user flipper role has not changed",
-				AllowedMentions: &discordgo.MessageAllowedMentions{},
-				Flags:           discordgo.MessageFlagsEphemeral,
-			},
-		})
-		return
-	}
-
 	text := fmt.Sprintf("✅ user with tag %s has been updated, he has now the flipper role", tag)
 	if !dbUser.HasFlipperRole {
-		text = fmt.Sprintf("✅ user with tag %s has been updated, he has not the flipper role now", tag)
+		text = fmt.Sprintf("✅ user with tag %s has been updated, he does not have the flipper role", tag)
 	}
 
 	// send success message
