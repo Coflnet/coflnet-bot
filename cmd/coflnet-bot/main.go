@@ -4,7 +4,6 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/Coflnet/coflnet-bot/internal/usecase"
