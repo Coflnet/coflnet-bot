@@ -15,6 +15,8 @@ type DiscordCommand interface {
 }
 
 func (d *DiscordHandler) RegisterCommands() error {
+    
+    time.Sleep(time.Second * 10)
 
 	customCommands := []DiscordCommand{
 		CreateMuteCommand(),
@@ -30,6 +32,7 @@ func (d *DiscordHandler) RegisterCommands() error {
 
 	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
 	for i, v := range commands {
+        slog.Info("registering command; id %s", d.session.State.User.ID)
 		cmd, err := d.session.ApplicationCommandCreate(d.session.State.User.ID, utils.DiscordGuildId(), v)
 		if err != nil {
 			slog.Error("failed to register command", err)
