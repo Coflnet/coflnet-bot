@@ -81,7 +81,8 @@ func NewDiscordHandler() (*DiscordHandler, error) {
         return nil, err
     }
 
-    go instance.RegisterCommands()
+    // go instance.RegisterCommands()
+    slog.Warn("not registering commands")
 
     return instance, nil
 }
