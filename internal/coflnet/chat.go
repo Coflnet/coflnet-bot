@@ -4,11 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 
-	// "github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/Coflnet/coflnet-bot/schemas/chat"
 )
@@ -33,9 +32,9 @@ func NewChatClient() (*ChatApi, error) {
     }
 
     var err error
-    r := &ChatApi{}
-    r.apiClient, err = chat.NewClient(utils.ChatBaseUrl())
-    r.tracer = otel.Tracer(chatApiTracerName)
+    instance := &ChatApi{}
+    instance.apiClient, err = chat.NewClient(utils.ChatBaseUrl())
+    instance.tracer = otel.Tracer(chatApiTracerName)
 
     return instance, err
 }
