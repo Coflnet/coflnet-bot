@@ -7,6 +7,7 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/Coflnet/coflnet-bot/internal/usecase"
+	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -20,7 +21,10 @@ func main() {
 	setupTracer()
 
     // setup logger
-    h := slog.HandlerOptions{Level: slog.LevelDebug}.NewJSONHandler(os.Stderr)
+    h := slog.HandlerOptions{Level: slog.LevelInfo}.NewTextHandler(os.Stdout)
+    if utils.DebugEnabled() {
+        h = slog.HandlerOptions{Level: slog.LevelDebug}.NewTextHandler(os.Stdout)
+    }
     slog.SetDefault(slog.New(h))
 
 	// metrics
