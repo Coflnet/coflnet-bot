@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/Coflnet/coflnet-bot/internal/usecase"
@@ -40,6 +41,16 @@ func main() {
 
 	// start the kafka message processors
 	go startMessageProcessors()
+
+    // register discord commands
+    discordHandler, err := discord.NewDiscordHandler()
+    if err != nil {
+        panic(err)
+    }
+    err = discordHandler.RegisterCommands()
+    if err != nil {
+        panic(err)
+    }
 
 
 	// wait for interrupt

@@ -202,7 +202,7 @@ func (p *ChatProcessor) processRedisMessage(ctx context.Context, msg *redisgo.Me
 		return nil
 	}
 
-	err = p.discordHandler.SendMessageToIngameChat(message)
+	err = p.discordHandler.SendMessageToIngameChat(ctx, message)
 	if err != nil {
 		log.Error().Err(err).Msgf("could not send message to discord, message: %s", msg.Payload)
 		return err

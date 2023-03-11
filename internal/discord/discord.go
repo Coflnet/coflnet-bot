@@ -202,8 +202,8 @@ func (d *DiscordHandler) webhookForChannel(channel string) (string, error) {
 	return "", errors.New("no webhook found for channel")
 }
 
-func (d *DiscordHandler) SendMessageToIngameChat(message *mongo.ChatMessage) error {
-    _, span := d.tracer.Start(context.Background(), "send-discord-message-to-ingame-chat")
+func (d *DiscordHandler) SendMessageToIngameChat(ctx context.Context, message *mongo.ChatMessage) error {
+    _, span := d.tracer.Start(ctx, "send-discord-message-to-ingame-chat")
     defer span.End()
 
 	if message.UUID == "" {

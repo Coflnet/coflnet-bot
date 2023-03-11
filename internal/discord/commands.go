@@ -14,7 +14,7 @@ type DiscordCommand interface {
     HandleCommand(s *discordgo.Session, i *discordgo.InteractionCreate)
 }
 
-func (d *DiscordHandler) addCommands() error {
+func (d *DiscordHandler) RegisterCommands() error {
 
     customCommands := []DiscordCommand{
         CreateMuteCommand(),
