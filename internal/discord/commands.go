@@ -37,7 +37,6 @@ func (d *DiscordHandler) RegisterCommands() error {
 		cmd, err := d.session.ApplicationCommandCreate(d.session.State.User.ID, utils.DiscordGuildId(), v)
 		if err != nil {
 			slog.Error("failed to register command", err)
-			panic(err)
 		}
 		registeredCommands[i] = cmd
 		slog.Info(fmt.Sprintf("registered command %s", cmd.Name))
