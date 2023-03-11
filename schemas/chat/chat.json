@@ -1,0 +1,1432 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "SkyChat",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/Chat/send": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Tracks a flip",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "The uuid of the sender",
+                    "nullable": true
+                  },
+                  "name": {
+                    "maxLength": 16,
+                    "type": "string",
+                    "description": "If available the name of the sender",
+                    "nullable": true
+                  },
+                  "prefix": {
+                    "type": "string",
+                    "description": "What color/prefix the sender has, if empty the color will be white and message should be gray",
+                    "nullable": true
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Content of the message",
+                    "nullable": true
+                  },
+                  "clientName": {
+                    "type": "string",
+                    "description": "What client software sent this message",
+                    "nullable": true
+                  }
+                },
+                "additionalProperties": false,
+                "description": ""
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "The uuid of the sender",
+                    "nullable": true
+                  },
+                  "name": {
+                    "maxLength": 16,
+                    "type": "string",
+                    "description": "If available the name of the sender",
+                    "nullable": true
+                  },
+                  "prefix": {
+                    "type": "string",
+                    "description": "What color/prefix the sender has, if empty the color will be white and message should be gray",
+                    "nullable": true
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Content of the message",
+                    "nullable": true
+                  },
+                  "clientName": {
+                    "type": "string",
+                    "description": "What client software sent this message",
+                    "nullable": true
+                  }
+                },
+                "additionalProperties": false,
+                "description": ""
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "The uuid of the sender",
+                    "nullable": true
+                  },
+                  "name": {
+                    "maxLength": 16,
+                    "type": "string",
+                    "description": "If available the name of the sender",
+                    "nullable": true
+                  },
+                  "prefix": {
+                    "type": "string",
+                    "description": "What color/prefix the sender has, if empty the color will be white and message should be gray",
+                    "nullable": true
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Content of the message",
+                    "nullable": true
+                  },
+                  "clientName": {
+                    "type": "string",
+                    "description": "What client software sent this message",
+                    "nullable": true
+                  }
+                },
+                "additionalProperties": false,
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "The uuid of the sender",
+                      "nullable": true
+                    },
+                    "name": {
+                      "maxLength": 16,
+                      "type": "string",
+                      "description": "If available the name of the sender",
+                      "nullable": true
+                    },
+                    "prefix": {
+                      "type": "string",
+                      "description": "What color/prefix the sender has, if empty the color will be white and message should be gray",
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Content of the message",
+                      "nullable": true
+                    },
+                    "clientName": {
+                      "type": "string",
+                      "description": "What client software sent this message",
+                      "nullable": true
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": ""
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "The uuid of the sender",
+                      "nullable": true
+                    },
+                    "name": {
+                      "maxLength": 16,
+                      "type": "string",
+                      "description": "If available the name of the sender",
+                      "nullable": true
+                    },
+                    "prefix": {
+                      "type": "string",
+                      "description": "What color/prefix the sender has, if empty the color will be white and message should be gray",
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Content of the message",
+                      "nullable": true
+                    },
+                    "clientName": {
+                      "type": "string",
+                      "description": "What client software sent this message",
+                      "nullable": true
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": ""
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "The uuid of the sender",
+                      "nullable": true
+                    },
+                    "name": {
+                      "maxLength": 16,
+                      "type": "string",
+                      "description": "If available the name of the sender",
+                      "nullable": true
+                    },
+                    "prefix": {
+                      "type": "string",
+                      "description": "What color/prefix the sender has, if empty the color will be white and message should be gray",
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Content of the message",
+                      "nullable": true
+                    },
+                    "clientName": {
+                      "type": "string",
+                      "description": "What client software sent this message",
+                      "nullable": true
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": ""
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Chat/internal/client": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Create a nw Client",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "maxLength": 32,
+                    "type": "string",
+                    "description": "Uuid of the target user",
+                    "nullable": true
+                  },
+                  "quota": {
+                    "type": "integer",
+                    "description": "Per minute send quota",
+                    "format": "int32"
+                  },
+                  "contact": {
+                    "type": "string",
+                    "description": "User who is responsible for this client",
+                    "nullable": true
+                  },
+                  "webHook": {
+                    "type": "string",
+                    "description": "Webhook to post new messages too",
+                    "nullable": true
+                  },
+                  "webhookAuth": {
+                    "type": "string",
+                    "description": "Auth header value for the webhook",
+                    "nullable": true
+                  },
+                  "created": {
+                    "type": "string",
+                    "description": "When this was created",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false,
+                "description": "Client software capeable of sending messages"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "maxLength": 32,
+                    "type": "string",
+                    "description": "Uuid of the target user",
+                    "nullable": true
+                  },
+                  "quota": {
+                    "type": "integer",
+                    "description": "Per minute send quota",
+                    "format": "int32"
+                  },
+                  "contact": {
+                    "type": "string",
+                    "description": "User who is responsible for this client",
+                    "nullable": true
+                  },
+                  "webHook": {
+                    "type": "string",
+                    "description": "Webhook to post new messages too",
+                    "nullable": true
+                  },
+                  "webhookAuth": {
+                    "type": "string",
+                    "description": "Auth header value for the webhook",
+                    "nullable": true
+                  },
+                  "created": {
+                    "type": "string",
+                    "description": "When this was created",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false,
+                "description": "Client software capeable of sending messages"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "maxLength": 32,
+                    "type": "string",
+                    "description": "Uuid of the target user",
+                    "nullable": true
+                  },
+                  "quota": {
+                    "type": "integer",
+                    "description": "Per minute send quota",
+                    "format": "int32"
+                  },
+                  "contact": {
+                    "type": "string",
+                    "description": "User who is responsible for this client",
+                    "nullable": true
+                  },
+                  "webHook": {
+                    "type": "string",
+                    "description": "Webhook to post new messages too",
+                    "nullable": true
+                  },
+                  "webhookAuth": {
+                    "type": "string",
+                    "description": "Auth header value for the webhook",
+                    "nullable": true
+                  },
+                  "created": {
+                    "type": "string",
+                    "description": "When this was created",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false,
+                "description": "Client software capeable of sending messages"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "client": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "maxLength": 32,
+                          "type": "string",
+                          "description": "Uuid of the target user",
+                          "nullable": true
+                        },
+                        "quota": {
+                          "type": "integer",
+                          "description": "Per minute send quota",
+                          "format": "int32"
+                        },
+                        "contact": {
+                          "type": "string",
+                          "description": "User who is responsible for this client",
+                          "nullable": true
+                        },
+                        "webHook": {
+                          "type": "string",
+                          "description": "Webhook to post new messages too",
+                          "nullable": true
+                        },
+                        "webhookAuth": {
+                          "type": "string",
+                          "description": "Auth header value for the webhook",
+                          "nullable": true
+                        },
+                        "created": {
+                          "type": "string",
+                          "description": "When this was created",
+                          "format": "date-time"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "description": "Client software capeable of sending messages"
+                    },
+                    "apiKey": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Contains the client and its api key (only place where the api key is visible)"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "client": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "maxLength": 32,
+                          "type": "string",
+                          "description": "Uuid of the target user",
+                          "nullable": true
+                        },
+                        "quota": {
+                          "type": "integer",
+                          "description": "Per minute send quota",
+                          "format": "int32"
+                        },
+                        "contact": {
+                          "type": "string",
+                          "description": "User who is responsible for this client",
+                          "nullable": true
+                        },
+                        "webHook": {
+                          "type": "string",
+                          "description": "Webhook to post new messages too",
+                          "nullable": true
+                        },
+                        "webhookAuth": {
+                          "type": "string",
+                          "description": "Auth header value for the webhook",
+                          "nullable": true
+                        },
+                        "created": {
+                          "type": "string",
+                          "description": "When this was created",
+                          "format": "date-time"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "description": "Client software capeable of sending messages"
+                    },
+                    "apiKey": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Contains the client and its api key (only place where the api key is visible)"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "client": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "maxLength": 32,
+                          "type": "string",
+                          "description": "Uuid of the target user",
+                          "nullable": true
+                        },
+                        "quota": {
+                          "type": "integer",
+                          "description": "Per minute send quota",
+                          "format": "int32"
+                        },
+                        "contact": {
+                          "type": "string",
+                          "description": "User who is responsible for this client",
+                          "nullable": true
+                        },
+                        "webHook": {
+                          "type": "string",
+                          "description": "Webhook to post new messages too",
+                          "nullable": true
+                        },
+                        "webhookAuth": {
+                          "type": "string",
+                          "description": "Auth header value for the webhook",
+                          "nullable": true
+                        },
+                        "created": {
+                          "type": "string",
+                          "description": "When this was created",
+                          "format": "date-time"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "description": "Client software capeable of sending messages"
+                    },
+                    "apiKey": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Contains the client and its api key (only place where the api key is visible)"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Chat/mute": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Create a new mute for an user",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Data about the mute",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of the target user",
+                    "nullable": true
+                  },
+                  "muter": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of user performing the mute",
+                    "nullable": true
+                  },
+                  "unMuter": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of user performing the mute",
+                    "nullable": true
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Message for the user",
+                    "nullable": true
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Internal reason",
+                    "nullable": true
+                  },
+                  "clientId": {
+                    "type": "integer",
+                    "description": "What client software added the mute",
+                    "format": "int32"
+                  },
+                  "unMuteClientId": {
+                    "type": "integer",
+                    "description": "What client software added the mute",
+                    "format": "int32"
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "description": "When this was created",
+                    "format": "date-time"
+                  },
+                  "expires": {
+                    "type": "string",
+                    "description": "Until when this is active",
+                    "format": "date-time"
+                  },
+                  "status": {
+                    "enum": [
+                      0,
+                      1,
+                      2,
+                      4,
+                      8,
+                      16
+                    ],
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of the target user",
+                    "nullable": true
+                  },
+                  "muter": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of user performing the mute",
+                    "nullable": true
+                  },
+                  "unMuter": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of user performing the mute",
+                    "nullable": true
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Message for the user",
+                    "nullable": true
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Internal reason",
+                    "nullable": true
+                  },
+                  "clientId": {
+                    "type": "integer",
+                    "description": "What client software added the mute",
+                    "format": "int32"
+                  },
+                  "unMuteClientId": {
+                    "type": "integer",
+                    "description": "What client software added the mute",
+                    "format": "int32"
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "description": "When this was created",
+                    "format": "date-time"
+                  },
+                  "expires": {
+                    "type": "string",
+                    "description": "Until when this is active",
+                    "format": "date-time"
+                  },
+                  "status": {
+                    "enum": [
+                      0,
+                      1,
+                      2,
+                      4,
+                      8,
+                      16
+                    ],
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of the target user",
+                    "nullable": true
+                  },
+                  "muter": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of user performing the mute",
+                    "nullable": true
+                  },
+                  "unMuter": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of user performing the mute",
+                    "nullable": true
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Message for the user",
+                    "nullable": true
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Internal reason",
+                    "nullable": true
+                  },
+                  "clientId": {
+                    "type": "integer",
+                    "description": "What client software added the mute",
+                    "format": "int32"
+                  },
+                  "unMuteClientId": {
+                    "type": "integer",
+                    "description": "What client software added the mute",
+                    "format": "int32"
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "description": "When this was created",
+                    "format": "date-time"
+                  },
+                  "expires": {
+                    "type": "string",
+                    "description": "Until when this is active",
+                    "format": "date-time"
+                  },
+                  "status": {
+                    "enum": [
+                      0,
+                      1,
+                      2,
+                      4,
+                      8,
+                      16
+                    ],
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of the target user",
+                      "nullable": true
+                    },
+                    "muter": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of user performing the mute",
+                      "nullable": true
+                    },
+                    "unMuter": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of user performing the mute",
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Message for the user",
+                      "nullable": true
+                    },
+                    "reason": {
+                      "type": "string",
+                      "description": "Internal reason",
+                      "nullable": true
+                    },
+                    "clientId": {
+                      "type": "integer",
+                      "description": "What client software added the mute",
+                      "format": "int32"
+                    },
+                    "unMuteClientId": {
+                      "type": "integer",
+                      "description": "What client software added the mute",
+                      "format": "int32"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "When this was created",
+                      "format": "date-time"
+                    },
+                    "expires": {
+                      "type": "string",
+                      "description": "Until when this is active",
+                      "format": "date-time"
+                    },
+                    "status": {
+                      "enum": [
+                        0,
+                        1,
+                        2,
+                        4,
+                        8,
+                        16
+                      ],
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of the target user",
+                      "nullable": true
+                    },
+                    "muter": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of user performing the mute",
+                      "nullable": true
+                    },
+                    "unMuter": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of user performing the mute",
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Message for the user",
+                      "nullable": true
+                    },
+                    "reason": {
+                      "type": "string",
+                      "description": "Internal reason",
+                      "nullable": true
+                    },
+                    "clientId": {
+                      "type": "integer",
+                      "description": "What client software added the mute",
+                      "format": "int32"
+                    },
+                    "unMuteClientId": {
+                      "type": "integer",
+                      "description": "What client software added the mute",
+                      "format": "int32"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "When this was created",
+                      "format": "date-time"
+                    },
+                    "expires": {
+                      "type": "string",
+                      "description": "Until when this is active",
+                      "format": "date-time"
+                    },
+                    "status": {
+                      "enum": [
+                        0,
+                        1,
+                        2,
+                        4,
+                        8,
+                        16
+                      ],
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of the target user",
+                      "nullable": true
+                    },
+                    "muter": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of user performing the mute",
+                      "nullable": true
+                    },
+                    "unMuter": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of user performing the mute",
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Message for the user",
+                      "nullable": true
+                    },
+                    "reason": {
+                      "type": "string",
+                      "description": "Internal reason",
+                      "nullable": true
+                    },
+                    "clientId": {
+                      "type": "integer",
+                      "description": "What client software added the mute",
+                      "format": "int32"
+                    },
+                    "unMuteClientId": {
+                      "type": "integer",
+                      "description": "What client software added the mute",
+                      "format": "int32"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "description": "When this was created",
+                      "format": "date-time"
+                    },
+                    "expires": {
+                      "type": "string",
+                      "description": "Until when this is active",
+                      "format": "date-time"
+                    },
+                    "status": {
+                      "enum": [
+                        0,
+                        1,
+                        2,
+                        4,
+                        8,
+                        16
+                      ],
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Create a new mute for an user",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Data about the mute",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of the target user",
+                    "nullable": true
+                  },
+                  "unMuter": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of user performing the mute",
+                    "nullable": true
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Internal reason",
+                    "nullable": true
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of the target user",
+                    "nullable": true
+                  },
+                  "unMuter": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of user performing the mute",
+                    "nullable": true
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Internal reason",
+                    "nullable": true
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of the target user",
+                    "nullable": true
+                  },
+                  "unMuter": {
+                    "maxLength": 32,
+                    "minLength": 0,
+                    "type": "string",
+                    "description": "Uuid of user performing the mute",
+                    "nullable": true
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Internal reason",
+                    "nullable": true
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of the target user",
+                      "nullable": true
+                    },
+                    "unMuter": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of user performing the mute",
+                      "nullable": true
+                    },
+                    "reason": {
+                      "type": "string",
+                      "description": "Internal reason",
+                      "nullable": true
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of the target user",
+                      "nullable": true
+                    },
+                    "unMuter": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of user performing the mute",
+                      "nullable": true
+                    },
+                    "reason": {
+                      "type": "string",
+                      "description": "Internal reason",
+                      "nullable": true
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of the target user",
+                      "nullable": true
+                    },
+                    "unMuter": {
+                      "maxLength": 32,
+                      "minLength": 0,
+                      "type": "string",
+                      "description": "Uuid of user performing the mute",
+                      "nullable": true
+                    },
+                    "reason": {
+                      "type": "string",
+                      "description": "Internal reason",
+                      "nullable": true
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChatMessage": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "maxLength": 32,
+            "minLength": 0,
+            "type": "string",
+            "description": "The uuid of the sender",
+            "nullable": true
+          },
+          "name": {
+            "maxLength": 16,
+            "type": "string",
+            "description": "If available the name of the sender",
+            "nullable": true
+          },
+          "prefix": {
+            "type": "string",
+            "description": "What color/prefix the sender has, if empty the color will be white and message should be gray",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Content of the message",
+            "nullable": true
+          },
+          "clientName": {
+            "type": "string",
+            "description": "What client software sent this message",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": ""
+      },
+      "CientCreationResponse": {
+        "type": "object",
+        "properties": {
+          "client": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "maxLength": 32,
+                "type": "string",
+                "description": "Uuid of the target user",
+                "nullable": true
+              },
+              "quota": {
+                "type": "integer",
+                "description": "Per minute send quota",
+                "format": "int32"
+              },
+              "contact": {
+                "type": "string",
+                "description": "User who is responsible for this client",
+                "nullable": true
+              },
+              "webHook": {
+                "type": "string",
+                "description": "Webhook to post new messages too",
+                "nullable": true
+              },
+              "webhookAuth": {
+                "type": "string",
+                "description": "Auth header value for the webhook",
+                "nullable": true
+              },
+              "created": {
+                "type": "string",
+                "description": "When this was created",
+                "format": "date-time"
+              }
+            },
+            "additionalProperties": false,
+            "description": "Client software capeable of sending messages"
+          },
+          "apiKey": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Contains the client and its api key (only place where the api key is visible)"
+      },
+      "Client": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 32,
+            "type": "string",
+            "description": "Uuid of the target user",
+            "nullable": true
+          },
+          "quota": {
+            "type": "integer",
+            "description": "Per minute send quota",
+            "format": "int32"
+          },
+          "contact": {
+            "type": "string",
+            "description": "User who is responsible for this client",
+            "nullable": true
+          },
+          "webHook": {
+            "type": "string",
+            "description": "Webhook to post new messages too",
+            "nullable": true
+          },
+          "webhookAuth": {
+            "type": "string",
+            "description": "Auth header value for the webhook",
+            "nullable": true
+          },
+          "created": {
+            "type": "string",
+            "description": "When this was created",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Client software capeable of sending messages"
+      },
+      "Mute": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "maxLength": 32,
+            "minLength": 0,
+            "type": "string",
+            "description": "Uuid of the target user",
+            "nullable": true
+          },
+          "muter": {
+            "maxLength": 32,
+            "minLength": 0,
+            "type": "string",
+            "description": "Uuid of user performing the mute",
+            "nullable": true
+          },
+          "unMuter": {
+            "maxLength": 32,
+            "minLength": 0,
+            "type": "string",
+            "description": "Uuid of user performing the mute",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Message for the user",
+            "nullable": true
+          },
+          "reason": {
+            "type": "string",
+            "description": "Internal reason",
+            "nullable": true
+          },
+          "clientId": {
+            "type": "integer",
+            "description": "What client software added the mute",
+            "format": "int32"
+          },
+          "unMuteClientId": {
+            "type": "integer",
+            "description": "What client software added the mute",
+            "format": "int32"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "When this was created",
+            "format": "date-time"
+          },
+          "expires": {
+            "type": "string",
+            "description": "Until when this is active",
+            "format": "date-time"
+          },
+          "status": {
+            "enum": [
+              0,
+              1,
+              2,
+              4,
+              8,
+              16
+            ],
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MuteStatus": {
+        "enum": [
+          0,
+          1,
+          2,
+          4,
+          8,
+          16
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "UnMute": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "maxLength": 32,
+            "minLength": 0,
+            "type": "string",
+            "description": "Uuid of the target user",
+            "nullable": true
+          },
+          "unMuter": {
+            "maxLength": 32,
+            "minLength": 0,
+            "type": "string",
+            "description": "Uuid of user performing the mute",
+            "nullable": true
+          },
+          "reason": {
+            "type": "string",
+            "description": "Internal reason",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

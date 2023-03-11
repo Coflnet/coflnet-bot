@@ -1,78 +1,61 @@
 package discord
 
 import (
-	"os"
-
+	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/bwmarrin/discordgo"
-	"github.com/rs/zerolog/log"
+	"golang.org/x/exp/slog"
 )
 
-var registeredCommands []*discordgo.ApplicationCommand
+type DiscordCommand interface {
+    Name() string
+    CreateCommand() *discordgo.ApplicationCommand
+    HandleCommand(s *discordgo.Session, i *discordgo.InteractionCreate)
+}
 
-func registerCommands() error {
-	commands := []*discordgo.ApplicationCommand{
-		ingameMuteCommand(),
-		ingameUnmuteCommand(),
-		warnCommand(),
-		userWarnings(),
-		checkFlipperRole(),
-		refreshUser(),
-		switchUsernameCommand(),
-		switchMinecraftAccountCommand(),
+func (d *DiscordHandler) addCommands() error {
+
+    customCommands := []DiscordCommand{
+        CreateMuteCommand(),
+    }
+
+
+    // convert the custom commands into discordgo commands 
+	commands := make([]*discordgo.ApplicationCommand, 0)
+    commandHandlers := map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){}
+    for _, v := range customCommands {
+        commands = append(commands, v.CreateCommand())
+        commandHandlers[v.Name()] = v.HandleCommand
+    }
+
+
+	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
+	for i, v := range commands {
+		cmd, err := d.session.ApplicationCommandCreate(d.session.State.User.ID, utils.DiscordGuildId(), v)
+		if err != nil {
+			slog.Error("failed to register command", err)
+			panic(err)
+		}
+		registeredCommands[i] = cmd
 	}
 
-	commandHandlers := map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"in-game-mute":                 ingameMuteCommandHandler,
-		"in-game-unmute":               ingameUnmuteCommandHandler,
-		"user-warnings":                userWarningsHandler,
-		"warn-user":                    warnUserHandler,
-		"check-flipper-role":           checkFlipperRoleHandler,
-		"refresh-user":                 refreshUserHandler,
-		"switch-discord-username":      switchUsernameHandler,
-		"switch_username_select":       switchUsernameSelected,
-		"switch-minecraft-account":     switchMinecraftUUIDHandler,
-		"switch_minecraft_uuid_select": switchMinecraftSelected,
-	}
+	d.commands = registeredCommands
 
-	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		switch i.Type {
-		case discordgo.InteractionApplicationCommand:
-			if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
-				h(s, i)
-			}
-		case discordgo.InteractionMessageComponent:
 
-			if h, ok := commandHandlers[i.MessageComponentData().CustomID]; ok {
-				h(s, i)
-			}
+    // adding stuff to actually handle the commands
+    d.session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
+			h(s, i)
 		}
 	})
-
-	registeredCommands = make([]*discordgo.ApplicationCommand, len(commands))
-	for _, v := range commands {
-		registeredCommand, err := session.ApplicationCommandCreate(session.State.User.ID, os.Getenv("DISCORD_GUILD"), v)
-		if err != nil {
-			log.Error().Err(err).Msgf("Cannot create '%v' command: %v", v.Name, err)
-			return err
-		}
-
-		log.Info().Msgf("Created command '%v'", v.Name)
-		registeredCommands = append(registeredCommands, registeredCommand)
-	}
 
 	return nil
 }
 
-func unregisterCommands() error {
-	log.Info().Msgf("unregistering %d commands", len(registeredCommands))
-	for _, c := range registeredCommands {
-		err := session.ApplicationCommandDelete(session.State.User.ID, discordGuildId(), c.ID)
+func (d *DiscordHandler) unregisterCommands() {
+	for _, v := range d.commands {
+		err := d.session.ApplicationCommandDelete(d.session.State.User.ID, utils.DiscordGuildId(), v.ID)
 		if err != nil {
-			log.Error().Err(err).Msgf("Cannot delete '%v' command: %v", c.Name, err)
-			return err
+            slog.Error("failed to unregister command", err)
 		}
 	}
-
-	log.Info().Msgf("unregistered %d commands", len(registeredCommands))
-	return nil
 }

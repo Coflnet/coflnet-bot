@@ -1,62 +1,95 @@
 package main
 
 import (
-	"github.com/Coflnet/coflnet-bot/internal/api"
-	"github.com/Coflnet/coflnet-bot/internal/discord"
-	"github.com/Coflnet/coflnet-bot/internal/kafka"
+	"os"
+	"os/signal"
+
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/Coflnet/coflnet-bot/internal/usecase"
-	"github.com/joho/godotenv"
-	"github.com/rs/zerolog/log"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/sdk/resource"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	"golang.org/x/exp/slog"
 )
 
 func main() {
+	// setup tracer
+	setupTracer()
 
-	// env vars
-	err := godotenv.Load()
-	if err != nil {
-		log.Warn().Err(err).Msg("Error loading .env file")
-	} else {
-		log.Info().Msg("loaded .env file")
-	}
+    // setup logger
+    h := slog.HandlerOptions{Level: slog.LevelDebug}.NewJSONHandler(os.Stderr)
+    slog.SetDefault(slog.New(h))
 
 	// metrics
-	log.Info().Msg("starting metrics server")
 	go metrics.Init()
 
-	// mongo
-	err = mongo.Init()
+	// setup database connection
+	err := mongo.Init()
 	if err != nil {
-		log.Error().Err(err).Msg("error connecting to database")
+		slog.Error("error connecting to database", err)
+        panic(err)
 	}
 	defer mongo.CloseConnection()
 
-	// redis
-	go startRedisChatConsume()
+	// start the kafka message processors
+	go startMessageProcessors()
 
-	// start dev chat consumer
-	kafka.Init()
-	go kafka.StartDiscordMessagesConsumer()
-	go usecase.StartFlipSummaryProcessing()
-	go usecase.StartRefresh()
-	go usecase.StartTransactionConsumer()
-	go usecase.StartMcVerifyConsumer()
 
-	// open discord session and wait for messages
-	discord.InitDiscord()
-	defer discord.StopDiscord()
-
-	// start api
-	err = api.Start()
-	if err != nil {
-		log.Panic().Err(err).Msg("fatal error from api server")
-	}
+	// wait for interrupt
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	<-c
+	slog.Info("shutting down..")
 }
 
-func startRedisChatConsume() {
-	err := discord.StartConsume()
+func setupTracer() {
+	tp, err := tracerProvider()
 	if err != nil {
-		log.Panic().Err(err).Msgf("error consuming messages from chat")
+		slog.Error("failed to create tracer provider", err)
+        panic(err)
+	}
+
+	// Register our TracerProvider as the global so any imported
+	// instrumentation in the future will default to using it.
+	otel.SetTracerProvider(tp)
+}
+
+func tracerProvider() (*tracesdk.TracerProvider, error) {
+	// Create the Jaeger exporter
+	exp, err := jaeger.New(jaeger.WithAgentEndpoint())
+	if err != nil {
+		return nil, err
+	}
+	tp := tracesdk.NewTracerProvider(
+		// Always be sure to batch in production.
+		tracesdk.WithBatcher(exp),
+		// Record information about this application in a Resource.
+		tracesdk.WithResource(resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String("coflnet-bot"),
+			semconv.ServiceVersionKey.String("v0.0.1"),
+		)),
+	)
+	return tp, nil
+}
+
+func startMessageProcessors() {
+	processors := []usecase.MessageProcessor{
+		new(usecase.FlipProcessor),
+        new(usecase.ChatProcessor),
+        new(usecase.McVerifyProcessor),
+        
+        // new(usecase.DiscordMessageProcessor),
+	}
+
+	for _, p := range processors {
+		go func(p usecase.MessageProcessor) {
+			err := p.StartProcessing()
+            slog.Error("error in message processor", err)
+            panic(err)
+		}(p)
 	}
 }

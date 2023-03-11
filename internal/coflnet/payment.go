@@ -1,48 +1,95 @@
 package coflnet
 
 import (
-	"fmt"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"strings"
+	"context"
+	"errors"
+	"strconv"
+	"sync"
 	"time"
 
-	"github.com/rs/zerolog/log"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+
+	"github.com/Coflnet/coflnet-bot/internal/model"
+	"github.com/Coflnet/coflnet-bot/internal/utils"
+	"github.com/Coflnet/coflnet-bot/schemas/payments"
 )
 
-const PremiumProductSlug = "premium"
+const (
+    PaymentTraceName = "payment-api"
+)
 
-func PaymentUserById(userId int) (time.Time, error) {
-	url := fmt.Sprintf("%s/User/%d/owns/%s/until", os.Getenv("PAYMENT_URL"), userId, PremiumProductSlug)
+type PaymentApi struct {
+    tracer trace.Tracer
+    paymentClient *payments.Client
+}
 
-	response, err := http.DefaultClient.Get(url)
-	if err != nil {
-		log.Error().Err(err).Msgf("error getting user from payment, userId: %d", userId)
-		return time.Now(), err
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Error().Err(err).Msg("error closing reader")
-		}
-	}(response.Body)
+func NewPaymentApi() (*PaymentApi, error) {
+    var err error
+    r := &PaymentApi{}
 
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return time.Now(), err
-	}
+    r.paymentClient, err = payments.NewClient(utils.PaymentBaseUrl())
+    r.tracer = otel.Tracer(PaymentTraceName)
 
-	t := strings.ReplaceAll(string(body), "\"", "")
+    return r, err
+}
 
-	const layout = "2006-01-02T15:04:05"
-	result, err := time.Parse(layout, t)
 
-	if err != nil {
-		log.Error().Err(err).Msgf("could not parse premium time for user %d", userId)
-		return time.Now(), err
-	}
+// TODO make this fancier
+// load all products and map them to colors/roles
+func (p *PaymentApi) OwningTimesOfUser(ctx context.Context, userId int) ([]model.OwnedProducts, error) {
+    _, span := p.tracer.Start(ctx, "owning-times-of-user") 
+    defer span.End()
+    span.SetAttributes(attribute.Int("user-id", userId))
 
-	return result, nil
+    products := []string{"premium", "premium-plus", "pre-api"}
+
+    result := make([]model.OwnedProducts, len(products))
+    ch := make(chan model.OwnedProducts, len(products))
+    wg := sync.WaitGroup{}
+
+    for _, product := range products {
+        wg.Add(1)
+        go func(product string) {
+            t, err := p.OwningTimeProductOfUser(ctx, userId, product)
+            if err != nil {
+                span.RecordError(err)
+            }
+
+            ch <- model.OwnedProducts{
+                ProductSlug: product,
+                ExpiresAt: t,
+            }
+        }(product)
+    }
+
+    go func() {
+        for r := range ch {
+            result = append(result, r)
+            wg.Done()
+        }
+    }()
+
+    wg.Wait()
+    close(ch)
+
+    return result, nil
+}
+
+func (p *PaymentApi) OwningTimeProductOfUser(ctx context.Context, userId int, productSlug string) (time.Time, error) {
+    _, span := p.tracer.Start(ctx, "owning-time-product") 
+    defer span.End()
+
+    span.SetAttributes(attribute.Int("user-id", userId))
+    span.SetAttributes(attribute.String("product-slug", productSlug))
+
+    if p.paymentClient == nil {
+        return time.Time{}, errors.New("payment api client not initialized")
+    }
+
+    return p.paymentClient.UserUserIdOwnsProductSlugUntilGet(ctx, payments.UserUserIdOwnsProductSlugUntilGetParams{
+        UserId: strconv.Itoa(userId),
+        ProductSlug: productSlug,
+    })
 }

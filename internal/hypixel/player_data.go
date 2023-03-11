@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/rs/zerolog/log"
 )
 
@@ -46,7 +45,6 @@ func PlayerData(uuid string) (*PlayerDataResponse, error) {
 
 	if err != nil {
 		log.Error().Err(err).Msgf("error unmarshalling response")
-		metrics.ErrorOccurred()
 		return nil, err
 	}
 

@@ -1,166 +1,56 @@
 package coflnet
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/Coflnet/coflnet-bot/internal/model"
-	"io/ioutil"
-	"net/http"
-	"os"
+	"context"
+	"errors"
 	"strconv"
 
-	"github.com/rs/zerolog/log"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+
+	"github.com/Coflnet/coflnet-bot/internal/utils"
+	"github.com/Coflnet/coflnet-bot/schemas/mc_connect"
 )
 
-type McConnectGetUserResponse struct {
-	ExternalID string `json:"externalId"`
-	Accounts   []struct {
-		AccountUUID string `json:"accountUuid"`
-		Verified    bool   `json:"verified"`
-		UpdatedAt   string `json:"updatedAt"`
-	} `json:"accounts"`
+const (
+    mcConnectApiName = "mc-connect-api"
+)
+
+type McConnectApi struct { apiClient *mc_connect.Client
+    tracer trace.Tracer
 }
 
-func UserMcConnect(userId int) (*model.User, error) {
-	url := fmt.Sprintf("%s/Connect/user/%d", os.Getenv("MC_CONNECT_URL"), userId)
+func NewMcConnectClient() (*McConnectApi, error) {
+    var err error
+    r := &McConnectApi{}
 
-	response, err := http.DefaultClient.Get(url)
-	if err != nil {
-		log.Error().Err(err).Msgf("error getting user from mc connect, userId: %d", userId)
-		return nil, err
-	}
+    r.apiClient, err = mc_connect.NewClient(utils.McConnectBaseUrl())
+    r.tracer = otel.Tracer(mcConnectApiName)
 
-	defer func() {
-		_ = response.Body.Close()
-	}()
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Error().Err(err).Msgf("error reading response body")
-		return nil, err
-	}
-
-	var result McConnectGetUserResponse
-	err = json.Unmarshal(body, &result)
-	if err != nil {
-		log.Error().Err(err).Msgf("error unmarshalling response body")
-		return nil, err
-	}
-
-	var uuids []string
-	for _, u := range result.Accounts {
-
-		// only add the verified ones
-		if !u.Verified {
-			continue
-		}
-
-		uuids = append(uuids, u.AccountUUID)
-	}
-
-	user := model.User{
-		UserId:         userId,
-		MinecraftUuids: uuids,
-	}
-
-	return &user, nil
+    return r, err
 }
 
-func UserMcConnectByUUID(uuid string) (*model.User, error) {
-  log.Info().Msgf("checking mc connect user by the uuid: %s", uuid)
-	url := fmt.Sprintf("%s/Connect/minecraft/%s", os.Getenv("MC_CONNECT_URL"), uuid)
+func (a *McConnectApi) GetPlayer(ctx context.Context, id int) (*mc_connect.User, error) {
+    ctx, span := a.tracer.Start(ctx, "get-player-from-mc-connect-api")
+    defer span.End()
 
-	response, err := http.DefaultClient.Get(url)
-	if err != nil {
-		log.Error().Err(err).Msgf("error getting user from mc connect, uuid: %s", uuid)
-		return nil, err
-	}
+    span.SetAttributes(attribute.Int("id", id))
 
-	defer func() {
-		_ = response.Body.Close()
-	}()
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Error().Err(err).Msgf("error reading response body")
-		return nil, err
-	}
+    if a.apiClient == nil {
+        return nil, errors.New("mc connect api client not initialized")
+    }
 
-	var result McConnectGetUserResponse
-	err = json.Unmarshal(body, &result)
-	if err != nil {
-		log.Error().Err(err).Msgf("error unmarshalling response body")
-		return nil, err
-	}
+    user, err := a.apiClient.ConnectUserUserIdGet(ctx, mc_connect.ConnectUserUserIdGetParams{
+        UserId: strconv.Itoa(id),
+    })
 
-	var uuids []string
-	for _, u := range result.Accounts {
+    if err != nil {
+        span.RecordError(err)
+        return nil, err
+    }
 
-		// only add the verified ones
-		if !u.Verified {
-			continue
-		}
-
-		uuids = append(uuids, u.AccountUUID)
-	}
-
-  id, err := strconv.Atoi(result.ExternalID)
-  if err != nil {
-    log.Error().Err(err).Msgf("error converting external id to int")
-    return nil, err
-  }
-
-	user := model.User{
-		UserId:         id,
-		MinecraftUuids: uuids,
-	}
-
-	return &user, nil
+    return user, nil
 }
 
-func GetUsersFromId(amount, offset int) ([]*model.User, error) {
-	url := fmt.Sprintf("%s/Connect/users?amount=%d&offset=%d", os.Getenv("MC_CONNECT_URL"), amount, offset)
 
-	response, err := http.DefaultClient.Get(url)
-
-	if err != nil {
-		log.Error().Err(err).Msgf("there was an error when getting users from mc connect, url: %s", url)
-		return nil, err
-	}
-
-	defer func() {
-		_ = response.Body.Close()
-	}()
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Error().Err(err).Msgf("error reading response body")
-		return nil, err
-	}
-
-	var result []*McConnectGetUserResponse
-	err = json.Unmarshal(body, &result)
-
-	var users []*model.User
-
-	for _, u := range result {
-
-		var uuids []string
-		for _, u := range u.Accounts {
-			uuids = append(uuids, u.AccountUUID)
-		}
-
-		i, err := strconv.Atoi(u.ExternalID)
-		if err != nil {
-			log.Error().Err(err).Msgf("error converting external id to int")
-			continue
-		}
-
-		user := model.User{
-			UserId:         i,
-			MinecraftUuids: uuids,
-		}
-
-		users = append(users, &user)
-	}
-
-	return users, nil
-}

@@ -1,8 +1,9 @@
 package metrics
 
 import (
-	"github.com/rs/zerolog/log"
 	"net/http"
+
+	"golang.org/x/exp/slog"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -10,102 +11,35 @@ import (
 )
 
 var (
-	messagesProcessed = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "discord_coflnet_bot_messages_processed",
-		Help: "Count of processed messages",
+	DiscordMessagesProcessed = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "coflnet_bot_discord_messages_processed",
+		Help: "Count of processed discord messages",
 	})
 
-	errorsOccured = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "discord_coflnet_bot_errors_occured",
-		Help: "Count of errors occured",
-	})
+    MessagesForwardedToRedisChatChannel = promauto.NewCounter(prometheus.CounterOpts{
+        Name: "coflnet_bot_redis_chat_channel_messages_forwarded",
+        Help: "Count of discord messages forwarded to the redis chat channel",
+    })
 
-	userLoaded = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "discord_coflnet_bot_user_loaded",
-		Help: "Count of users loaded",
-	})
+    MessagesInsertedIntoDatabase  = promauto.NewCounter(prometheus.CounterOpts{
+        Name: "coflnet_bot_messages_inserted_into_database",
+        Help: "Count of discord messages inserted into the database",
+    })
 
-	inGameMuteTriggered = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "discord_coflnet_bot_in_game_mute_triggered",
-		Help: "Count of in game mute triggered",
-	})
-
-	inGameUnmuteTriggered = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "discord_coflnet_bot_in_game_unmute_triggered",
-		Help: "Count of in game unmute triggered",
-	})
-
-	flipSummaryProcessingError = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "discord_coflnet_bot_flip_summary_processing_error",
-		Help: "Errors while processing flip summaries",
-	})
-
-	flipSummarySend = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "discord_coflnet_bot_flip_summary_send",
-		Help: "The amount of flip summaries send",
-	})
-
-	flipSummaryOffset = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "discord_coflnet_bot_flip_summary_offset",
-		Help: "The current offset of the flip summary",
-	})
-
-	mcVerifyMessageError = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "discord_coflnet_bot_mc_verify_message_error",
-		Help: "Errors while processing mc verify messages",
-	})
-
-	mcVerifyMessageProcessed = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "discord_coflnet_bot_mc_verify_message_processed",
-		Help: "The amount of mc verify messages processed",
-	})
+    MessagesForwardedToCoflnetDiscordChatChannel  = promauto.NewCounter(prometheus.CounterOpts{
+        Name: "coflnet_bot_messages_forwarded_to_coflnet_discord_chat_channel",
+        Help: "Count of discord messages forwarded to the coflnet discord chat channel",
+    })
 )
 
 func Init() {
+    slog.Info("starting metrics server")
 	http.Handle("/metrics", promhttp.Handler())
 	err := http.ListenAndServe(":2112", nil)
+
+
 	if err != nil {
-		log.Panic().Err(err).Msgf("error starting metrics server")
-		return
+		slog.Error("error starting metrics server", err)
+        panic(err)
 	}
-}
-
-func MessageProcessed() {
-	messagesProcessed.Inc()
-}
-
-func ErrorOccurred() {
-	errorsOccured.Inc()
-}
-
-func UserLoaded() {
-	userLoaded.Inc()
-}
-
-func InGameMuteTriggered() {
-	inGameMuteTriggered.Inc()
-}
-
-func InGameUnmuteTriggered() {
-	inGameUnmuteTriggered.Inc()
-}
-
-func FlipSummaryProcessingError() {
-	flipSummaryProcessingError.Inc()
-}
-
-func FlipSummarySend() {
-	flipSummarySend.Inc()
-}
-
-func FlipSummaryOffset(offset int) {
-	flipSummaryOffset.Set(float64(offset))
-}
-
-func McVerifyMessageError() {
-	mcVerifyMessageError.Inc()
-}
-
-func McVerifyMessageProcessed() {
-	mcVerifyMessageProcessed.Inc()
 }

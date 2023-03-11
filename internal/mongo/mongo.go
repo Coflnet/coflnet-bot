@@ -2,30 +2,36 @@ package mongo
 
 import (
 	"context"
-	"github.com/rs/zerolog/log"
 	"time"
 
+	"github.com/rs/zerolog/log"
+
+	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-  "github.com/Coflnet/coflnet-bot/internal/utils"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
 	client             *mongo.Client
 	database           *mongo.Database
+
 	messageCollection  *mongo.Collection
 	coflChatCollection *mongo.Collection
 	userCollection     *mongo.Collection
 	muteCollection     *mongo.Collection
 	unMuteCollection   *mongo.Collection
 	warningCollection  *mongo.Collection
+
+    tracer trace.Tracer
 )
 
 func Init() error {
 
 	var err error
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-  defer cancel()
+    defer cancel()
 
 	client, err = mongo.Connect(ctx, options.Client().ApplyURI(mongoHost()))
 	if err != nil {
@@ -39,6 +45,8 @@ func Init() error {
 	muteCollection = database.Collection("mutes")
 	unMuteCollection = database.Collection("unmutes")
 	warningCollection = database.Collection("warnings")
+
+    tracer = otel.Tracer("mongo")
 
 	return nil
 }
