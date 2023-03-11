@@ -19,6 +19,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slog"
+	"google.golang.org/grpc/attributes"
 )
 
 const (
@@ -206,7 +207,7 @@ func (d *DiscordHandler) webhookForChannel(channel string) (string, error) {
 }
 
 func (d *DiscordHandler) SendMessageToIngameChat(ctx context.Context, message *mongo.ChatMessage) error {
-    _, span := d.tracer.Start(ctx, "send-discord-message-to-ingame-chat")
+    ctx, span := d.tracer.Start(ctx, "send-discord-message-to-ingame-chat")
     defer span.End()
 
 	if message.UUID == "" {
@@ -215,6 +216,8 @@ func (d *DiscordHandler) SendMessageToIngameChat(ctx context.Context, message *m
 
 	iconUrl := fmt.Sprintf("https://crafatar.com/avatars/%s", message.UUID)
 	url := os.Getenv("CHAT_WEBHOOK")
+    span.SetAttributes(attributes.String("iconUr", iconUrl))
+    span.SetAttributes(attributes.String("url", url))
 
 	msg := message.Message
 	data := &WebhookRequest{
@@ -230,7 +233,8 @@ func (d *DiscordHandler) SendMessageToIngameChat(ctx context.Context, message *m
         span.RecordError(err)
 	}
 
-	_, err = http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
+    response, err := http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
+    span.SetAttributes(attributes.Int("status", response.StatusCode))
 
 	if err != nil {
         slog.Error("error when sending webhook request", err)
