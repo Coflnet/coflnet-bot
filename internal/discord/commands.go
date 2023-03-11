@@ -49,6 +49,7 @@ func (d *DiscordHandler) RegisterCommands() error {
 		if err != nil {
             span.RecordError(err)
 			slog.Error("failed to register command", err)
+            return err
 		}
 
 		registeredCommands[i] = cmd
