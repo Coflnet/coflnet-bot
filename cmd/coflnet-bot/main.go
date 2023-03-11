@@ -43,11 +43,11 @@ func main() {
 	go startMessageProcessors()
 
     // unregister discord commands
-    discordHandler, err := discord.NewDiscordHandler()
-    if err != nil {
-        panic(err)
-    }
-    defer discordHandler.Close()
+    // discordHandler, err := discord.NewDiscordHandler()
+    // if err != nil {
+    //     panic(err)
+    // }
+    // defer discordHandler.Close()
 
 
 	// wait for interrupt
