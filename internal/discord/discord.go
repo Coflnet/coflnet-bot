@@ -81,9 +81,6 @@ func NewDiscordHandler() (*DiscordHandler, error) {
         return nil, err
     }
 
-    // go instance.RegisterCommands()
-    slog.Warn("not registering commands")
-
     return instance, nil
 }
 
@@ -104,6 +101,9 @@ func (d *DiscordHandler) initSession() error {
     go func() {
         d.session.Open()
         defer d.session.Close()
+
+        d.RegisterCommands()
+        defer d.Close()
 
         sig := make(chan os.Signal, 1)
         signal.Notify(sig, os.Interrupt)

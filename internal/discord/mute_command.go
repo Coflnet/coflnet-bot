@@ -64,7 +64,7 @@ func (m *MuteCommand) CreateCommand() *discordgo.ApplicationCommand {
             {
                 Name:        "user",
                 Description: "The user to mute",
-                Type:        discordgo.ApplicationCommandOptionUser,
+                Type:        discordgo.ApplicationCommandOptionString,
                 Required:    true,
             },
             {
@@ -76,6 +76,8 @@ func (m *MuteCommand) CreateCommand() *discordgo.ApplicationCommand {
             {
                 Name:        "message",
                 Description: "Message for the user",
+                Type:        discordgo.ApplicationCommandOptionString,
+                Required:    true,
             },
         },
     }
@@ -91,7 +93,7 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
     // check if the user is at least mod 
     if !utils.IsUserMod(i.Member.Roles) {
         err := errors.New(fmt.Sprintf("User %s is not a mod", i.Member.User.Username))
-        slog.Error("failed to mute user", err)
+        slog.Warn("failed to mute user", err)
         span.RecordError(err)
 
         s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{

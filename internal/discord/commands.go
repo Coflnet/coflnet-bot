@@ -44,7 +44,7 @@ func (d *DiscordHandler) RegisterCommands() error {
         span.SetAttributes(attribute.String("command-name", v.Name))
 
         
-        slog.Info("registering command; id %s", d.session.State.User.ID)
+        slog.Info(fmt.Sprintf("registering command: %s", v.Name))
 		cmd, err := d.session.ApplicationCommandCreate(d.session.State.User.ID, utils.DiscordGuildId(), v)
 		if err != nil {
             span.RecordError(err)
@@ -53,7 +53,7 @@ func (d *DiscordHandler) RegisterCommands() error {
 		}
 
 		registeredCommands[i] = cmd
-		slog.Info(fmt.Sprintf("registered command %s", cmd.Name))
+        slog.Info(fmt.Sprintf("registered command: %s", cmd.Name))
         span.SetAttributes(attribute.String("command-id", cmd.ID))
 	}
 
