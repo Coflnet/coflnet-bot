@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/exp/slog"
 
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/Coflnet/coflnet-bot/schemas/chat"
@@ -43,6 +44,12 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.APIChatSendPostReqA
     ctx, span := r.tracer.Start(ctx, "send-message-to-chat-api")
     defer span.End()
 
+    if msg.Message.IsSet() {
+        span.SetAttributes(attribute.String("message", msg.Message.Value))
+    }
+    if msg.Name.IsSet() {
+        span.SetAttributes(attribute.String("sender", msg.Name.Value))
+    }
 
     if r.apiClient == nil {
         return errors.New("chat api client not initialized")
@@ -51,6 +58,7 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.APIChatSendPostReqA
     response, err := r.apiClient.APIChatSendPost(ctx, msg)
 
     if err != nil {
+        slog.Error("error sending message to chat api", err)
         span.RecordError(err)
         return err
     }
@@ -58,6 +66,7 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.APIChatSendPostReqA
     if response.UUID.IsSet() {
         span.SetAttributes(attribute.String("response-sender", response.UUID.Value))
     }
+
     return nil
 }
 

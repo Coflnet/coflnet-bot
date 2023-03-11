@@ -214,7 +214,7 @@ func (p *ChatProcessor) processRedisMessage(ctx context.Context, msg *redisgo.Me
 
 
 func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *discordgo.Message) error {
-    ctx, span := p.tracer.Start(ctx, "send-discord-message-to-redis-chat-channel")
+    ctx, span := p.tracer.Start(ctx, "send-discord-message-to-chat-api")
     defer span.End()
 
     users, err := mongo.UsersByDiscordAccount(ctx, msg.Author)
