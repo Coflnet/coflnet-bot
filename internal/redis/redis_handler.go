@@ -2,12 +2,14 @@ package redis
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog/log"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/exp/slog"
 )
 
 const (
@@ -52,7 +54,7 @@ func (r *RedisHandler) ReceiveChatPubSubMessage(ctx context.Context) <-chan redi
 				continue
 			}
 
-			log.Debug().Msgf("receive message: %s", msg.Payload)
+            slog.Debug(fmt.Sprintf("receive message: %s", msg.Payload))
 
 			ch <- *msg
 		}
