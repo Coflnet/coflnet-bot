@@ -1,15 +1,16 @@
 package utils
 
 import (
-  "os"
-  "strings"
-  "github.com/rs/zerolog/log"
+	"fmt"
+	"os"
+	"strings"
 )
 
 func Env(key string) string {
   value, ok := os.LookupEnv(key)
   if !ok {
-    log.Panic().Msgf("missing %s environment variable", key)
+    err := fmt.Errorf("missing %s environment variable", key)
+    panic(err)
   }
   return value
 }
@@ -101,7 +102,8 @@ func FeedbackWebhook() string {
 func getEnv(e string) string {
 	v := os.Getenv(e)
 	if v == "" {
-		log.Panic().Msgf("%s not set", e)
+        err := fmt.Errorf("missing %s environment variable", e)
+        panic(err)
 	}
 	return v
 }

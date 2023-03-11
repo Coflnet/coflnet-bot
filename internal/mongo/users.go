@@ -72,9 +72,10 @@ func UsersByDiscordAccount(ctx context.Context, user *discordgo.User) ([]*model.
 	defer span.End()
 
     u, err := UsersByDiscordId(ctx, user.ID)
-    if err == nil {
+    if err == nil && u != nil {
         return u, nil
-    } else {
+    } 
+    if err != nil {
         span.RecordError(err)
     }
 
