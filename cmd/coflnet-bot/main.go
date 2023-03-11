@@ -42,15 +42,12 @@ func main() {
 	// start the kafka message processors
 	go startMessageProcessors()
 
-    // register discord commands
+    // unregister discord commands
     discordHandler, err := discord.NewDiscordHandler()
     if err != nil {
         panic(err)
     }
-    err = discordHandler.RegisterCommands()
-    if err != nil {
-        panic(err)
-    }
+    defer discordHandler.Close()
 
 
 	// wait for interrupt

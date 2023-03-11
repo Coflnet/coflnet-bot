@@ -81,6 +81,8 @@ func NewDiscordHandler() (*DiscordHandler, error) {
         return nil, err
     }
 
+    instance.RegisterCommands()
+
     return instance, nil
 }
 
