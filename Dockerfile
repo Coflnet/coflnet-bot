@@ -1,4 +1,4 @@
-FROM golang:1.19.0-bullseye as builder
+FROM golang:1.20.2-bullseye as builder
 
 WORKDIR /build
 
@@ -10,7 +10,7 @@ COPY . .
 
 RUN go build -o ./app cmd/coflnet-bot/main.go
 
-FROM gcr.io/distroless/base-debian11
+FROM gcr.io/distroless/static-debian11
 
 COPY --from=builder /build/app /app
 
