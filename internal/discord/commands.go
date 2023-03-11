@@ -1,6 +1,8 @@
 package discord
 
 import (
+	"fmt"
+
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/bwmarrin/discordgo"
 	"golang.org/x/exp/slog"
@@ -43,6 +45,7 @@ func (d *DiscordHandler) addCommands() error {
 
     // adding stuff to actually handle the commands
     d.session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+        slog.Info(fmt.Sprintf("got interaction: %s", i.ApplicationCommandData().Name))
 		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
 			h(s, i)
 		}
