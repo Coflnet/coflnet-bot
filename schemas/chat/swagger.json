@@ -13,7 +13,7 @@
         "summary": "Tracks a flip",
         "parameters": [
           {
-            "name": "authorization",
+            "name": "Authorization",
             "in": "header",
             "description": "",
             "schema": {
@@ -183,7 +183,7 @@
         "summary": "Create a new mute for an user",
         "parameters": [
           {
-            "name": "authorization",
+            "name": "Authorization",
             "in": "header",
             "description": "",
             "schema": {
@@ -281,7 +281,7 @@
         "summary": "Create a new mute for an user",
         "parameters": [
           {
-            "name": "authorization",
+            "name": "Authorization",
             "in": "header",
             "description": "",
             "schema": {

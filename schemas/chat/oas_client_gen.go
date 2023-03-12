@@ -6,6 +6,7 @@ import (
 	"context"
 	"net/url"
 	"time"
+    "os"
 
 	"github.com/go-faster/errors"
 	"go.opentelemetry.io/otel/attribute"
@@ -261,12 +262,18 @@ func (c *Client) sendAPIChatMutePost(ctx context.Context, request APIChatMutePos
 		// Validation is not needed for the empty body type.
 	case *APIChatMutePostApplicationJSON:
 		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
 		}
 	case *APIChatMutePostTextJSON:
 		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
@@ -309,6 +316,9 @@ func (c *Client) sendAPIChatMutePost(ctx context.Context, request APIChatMutePos
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
+
+    r.Header.Set("authorization", os.Getenv("COFL_CHAT_API_KEY"))
+
 	if err := encodeAPIChatMutePostRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
@@ -348,12 +358,18 @@ func (c *Client) sendAPIChatSendPost(ctx context.Context, request APIChatSendPos
 		// Validation is not needed for the empty body type.
 	case *APIChatSendPostApplicationJSON:
 		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
 		}
 	case *APIChatSendPostTextJSON:
 		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
@@ -396,6 +412,9 @@ func (c *Client) sendAPIChatSendPost(ctx context.Context, request APIChatSendPos
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
+
+    r.Header.Set("authorization", os.Getenv("COFL_CHAT_API_KEY"))
+
 	if err := encodeAPIChatSendPostRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
