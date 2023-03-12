@@ -117,8 +117,8 @@ func (a *ChatApi) MuteUser(ctx context.Context, mute *chat.APIChatMutePostTextJS
         span.RecordError(err)
         return nil, err
     default:
-        err = errors.New("unknown response")
-        slog.Error("error muting user, unknown response", err)
+        err = errors.New(fmt.Sprintf("unknown response: %v %v", r, response))
+        slog.Error("error muting user", err)
         span.RecordError(err)
         return nil, err
     }
