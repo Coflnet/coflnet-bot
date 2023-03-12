@@ -43,8 +43,8 @@ func (p *FlipProcessor) StartProcessing() error {
 	semaphore := make(chan struct{}, 10)
 
 	for msg := range msgs {
+		semaphore <- struct{}{}
 		go func(msg *kafkago.Message) {
-			semaphore <- struct{}{}
 			defer func() { <-semaphore }()
 
 			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
