@@ -4,6 +4,7 @@ package chat
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"time"
 
@@ -20,10 +21,6 @@ type Client struct {
 	serverURL *url.URL
 	baseClient
 }
-
-var _ Handler = struct {
-	*Client
-}{}
 
 // NewClient initializes new Client defined by OAS.
 func NewClient(serverURL string, opts ...ClientOption) (*Client, error) {
@@ -256,6 +253,8 @@ func (c *Client) APIChatMutePost(ctx context.Context, request APIChatMutePostReq
 func (c *Client) sendAPIChatMutePost(ctx context.Context, request APIChatMutePostReq) (res APIChatMutePostRes, err error) {
 	var otelAttrs []attribute.KeyValue
 	// Validate request before sending.
+
+    fmt.Println("validate")
 	switch request := request.(type) {
 	case *APIChatMutePostReqEmptyBody:
 		// Validation is not needed for the empty body type.
@@ -282,6 +281,7 @@ func (c *Client) sendAPIChatMutePost(ctx context.Context, request APIChatMutePos
 	}
 
 	// Run stopwatch.
+    fmt.Println("startTime")
 	startTime := time.Now()
 	defer func() {
 		elapsedDuration := time.Since(startTime)
@@ -292,6 +292,7 @@ func (c *Client) sendAPIChatMutePost(ctx context.Context, request APIChatMutePos
 	c.requests.Add(ctx, 1, otelAttrs...)
 
 	// Start a span for this request.
+    fmt.Println("startspan")
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIChatMutePost",
 		clientSpanKind,
 	)
@@ -310,6 +311,8 @@ func (c *Client) sendAPIChatMutePost(ctx context.Context, request APIChatMutePos
 	u := uri.Clone(c.requestURL(ctx))
 	u.Path += "/api/Chat/mute"
 
+    fmt.Println("EncodeRequest")
+
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "POST", u, nil)
 	if err != nil {
@@ -319,6 +322,7 @@ func (c *Client) sendAPIChatMutePost(ctx context.Context, request APIChatMutePos
 		return res, errors.Wrap(err, "encode request")
 	}
 
+    fmt.Println("SendRequest")
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -326,6 +330,7 @@ func (c *Client) sendAPIChatMutePost(ctx context.Context, request APIChatMutePos
 	}
 	defer resp.Body.Close()
 
+    fmt.Println("DecodeResponse")
 	stage = "DecodeResponse"
 	result, err := decodeAPIChatMutePostResponse(resp)
 	if err != nil {

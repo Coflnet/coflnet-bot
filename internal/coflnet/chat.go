@@ -98,6 +98,7 @@ func (a *ChatApi) MuteUser(ctx context.Context, mute *chat.APIChatMutePostTextJS
         span.RecordError(err)
         return nil, err
     }
+    slog.Info("got response from chat api")
 
     switch r := response.(type) {
     case *chat.APIChatMutePostApplicationJSONOK:
