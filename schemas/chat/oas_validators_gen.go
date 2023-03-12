@@ -8,13 +8,21 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func (s *APIChatInternalClientPostOKApplicationJSON) Validate() error {
+func (s *ChatMessage) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Client.Set {
+		if s.UUID.Set {
 			if err := func() error {
-				if err := s.Client.Value.Validate(); err != nil {
-					return err
+				if err := (validate.String{
+					MinLength:    0,
+					MinLengthSet: true,
+					MaxLength:    32,
+					MaxLengthSet: true,
+					Email:        false,
+					Hostname:     false,
+					Regex:        nil,
+				}).Validate(string(s.UUID.Value)); err != nil {
+					return errors.Wrap(err, "string")
 				}
 				return nil
 			}(); err != nil {
@@ -24,7 +32,33 @@ func (s *APIChatInternalClientPostOKApplicationJSON) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "client",
+			Name:  "uuid",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.Name.Set {
+			if err := func() error {
+				if err := (validate.String{
+					MinLength:    0,
+					MinLengthSet: false,
+					MaxLength:    16,
+					MaxLengthSet: true,
+					Email:        false,
+					Hostname:     false,
+					Regex:        nil,
+				}).Validate(string(s.Name.Value)); err != nil {
+					return errors.Wrap(err, "string")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "name",
 			Error: err,
 		})
 	}
@@ -33,7 +67,7 @@ func (s *APIChatInternalClientPostOKApplicationJSON) Validate() error {
 	}
 	return nil
 }
-func (s *APIChatInternalClientPostOKApplicationJSONClient) Validate() error {
+func (s *ClientThing) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
 		if s.Name.Set {
@@ -66,158 +100,7 @@ func (s *APIChatInternalClientPostOKApplicationJSONClient) Validate() error {
 	}
 	return nil
 }
-func (s *APIChatInternalClientPostReqApplicationJSON) Validate() error {
-	var failures []validate.FieldError
-	if err := func() error {
-		if s.Name.Set {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: false,
-					MaxLength:    32,
-					MaxLengthSet: true,
-					Email:        false,
-					Hostname:     false,
-					Regex:        nil,
-				}).Validate(string(s.Name.Value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "name",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-func (s *APIChatMuteDeleteOKApplicationJSON) Validate() error {
-	var failures []validate.FieldError
-	if err := func() error {
-		if s.UUID.Set {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: true,
-					MaxLength:    32,
-					MaxLengthSet: true,
-					Email:        false,
-					Hostname:     false,
-					Regex:        nil,
-				}).Validate(string(s.UUID.Value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "uuid",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.UnMuter.Set {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: true,
-					MaxLength:    32,
-					MaxLengthSet: true,
-					Email:        false,
-					Hostname:     false,
-					Regex:        nil,
-				}).Validate(string(s.UnMuter.Value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "unMuter",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-func (s *APIChatMuteDeleteReqApplicationJSON) Validate() error {
-	var failures []validate.FieldError
-	if err := func() error {
-		if s.UUID.Set {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: true,
-					MaxLength:    32,
-					MaxLengthSet: true,
-					Email:        false,
-					Hostname:     false,
-					Regex:        nil,
-				}).Validate(string(s.UUID.Value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "uuid",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.UnMuter.Set {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: true,
-					MaxLength:    32,
-					MaxLengthSet: true,
-					Email:        false,
-					Hostname:     false,
-					Regex:        nil,
-				}).Validate(string(s.UnMuter.Value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "unMuter",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-func (s *APIChatMutePostOKApplicationJSON) Validate() error {
+func (s *Mute) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
 		if s.UUID.Set {
@@ -320,7 +203,7 @@ func (s *APIChatMutePostOKApplicationJSON) Validate() error {
 	}
 	return nil
 }
-func (s APIChatMutePostOKApplicationJSONStatus) Validate() error {
+func (s MuteStatus) Validate() error {
 	switch s {
 	case 0:
 		return nil
@@ -337,243 +220,4 @@ func (s APIChatMutePostOKApplicationJSONStatus) Validate() error {
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
-}
-func (s *APIChatMutePostReqApplicationJSON) Validate() error {
-	var failures []validate.FieldError
-	if err := func() error {
-		if s.UUID.Set {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: true,
-					MaxLength:    32,
-					MaxLengthSet: true,
-					Email:        false,
-					Hostname:     false,
-					Regex:        nil,
-				}).Validate(string(s.UUID.Value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "uuid",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.Muter.Set {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: true,
-					MaxLength:    32,
-					MaxLengthSet: true,
-					Email:        false,
-					Hostname:     false,
-					Regex:        nil,
-				}).Validate(string(s.Muter.Value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "muter",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.UnMuter.Set {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: true,
-					MaxLength:    32,
-					MaxLengthSet: true,
-					Email:        false,
-					Hostname:     false,
-					Regex:        nil,
-				}).Validate(string(s.UnMuter.Value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "unMuter",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.Status.Set {
-			if err := func() error {
-				if err := s.Status.Value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "status",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-func (s APIChatMutePostReqApplicationJSONStatus) Validate() error {
-	switch s {
-	case 0:
-		return nil
-	case 1:
-		return nil
-	case 2:
-		return nil
-	case 4:
-		return nil
-	case 8:
-		return nil
-	case 16:
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-func (s *APIChatSendPostOKApplicationJSON) Validate() error {
-	var failures []validate.FieldError
-	if err := func() error {
-		if s.UUID.Set {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: true,
-					MaxLength:    32,
-					MaxLengthSet: true,
-					Email:        false,
-					Hostname:     false,
-					Regex:        nil,
-				}).Validate(string(s.UUID.Value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "uuid",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.Name.Set {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: false,
-					MaxLength:    16,
-					MaxLengthSet: true,
-					Email:        false,
-					Hostname:     false,
-					Regex:        nil,
-				}).Validate(string(s.Name.Value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "name",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-func (s *APIChatSendPostReqApplicationJSON) Validate() error {
-	var failures []validate.FieldError
-	if err := func() error {
-		if s.UUID.Set {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: true,
-					MaxLength:    32,
-					MaxLengthSet: true,
-					Email:        false,
-					Hostname:     false,
-					Regex:        nil,
-				}).Validate(string(s.UUID.Value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "uuid",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.Name.Set {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: false,
-					MaxLength:    16,
-					MaxLengthSet: true,
-					Email:        false,
-					Hostname:     false,
-					Regex:        nil,
-				}).Validate(string(s.Name.Value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "name",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
 }

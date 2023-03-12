@@ -40,7 +40,7 @@ func NewChatClient() (*ChatApi, error) {
     return instance, err
 }
 
-func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.APIChatSendPostReqApplicationJSON) error {
+func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.ChatMessage) error {
     ctx, span := r.tracer.Start(ctx, "send-message-to-chat-api")
     defer span.End()
 
@@ -55,7 +55,7 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.APIChatSendPostReqA
         return errors.New("chat api client not initialized")
     }
 
-    response, err := r.apiClient.APIChatSendPost(ctx, msg)
+    _, err := r.apiClient.APIChatSendPost(ctx, msg)
 
     if err != nil {
         slog.Error("error sending message to chat api", err)
@@ -63,27 +63,23 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.APIChatSendPostReqA
         return err
     }
 
-    if response.UUID.IsSet() {
-        span.SetAttributes(attribute.String("response-sender", response.UUID.Value))
-    }
-
     return nil
 }
 
-func (a *ChatApi) MuteUser(ctx context.Context, mute *chat.APIChatMutePostReqApplicationJSON) (*chat.APIChatMutePostOKApplicationJSON, error) {
+func (a *ChatApi) MuteUser(ctx context.Context, mute *chat.Mute) error {
     ctx, span := a.tracer.Start(ctx, "mute-user")
     defer span.End()
 
     if a.apiClient == nil {
-        return nil, errors.New("chat api client not initialized")
+        return errors.New("chat api client not initialized")
     }
 
-    response, err := a.apiClient.APIChatMutePost(ctx, mute)
+    return errors.New("muting users is currently not supported, sorry")
 
-    if err != nil {
-        span.RecordError(err)
-        return nil, err
-    }
-
-    return response, err
+    // _, err := a.apiClient.APIChatMutePost(ctx, mute)
+    // if err != nil {
+    //     span.RecordError(err)
+    //     return err
+    // }
+    // return err
 }

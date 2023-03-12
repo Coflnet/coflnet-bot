@@ -12,21 +12,7 @@ import (
 )
 
 func encodeAPIChatInternalClientPostRequest(
-	req *APIChatInternalClientPostReqApplicationJSON,
-	r *http.Request,
-) error {
-	const contentType = "application/json"
-	e := jx.GetEncoder()
-	{
-		req.Encode(e)
-	}
-	encoded := e.Bytes()
-	ht.SetBody(r, bytes.NewReader(encoded), contentType)
-	return nil
-}
-
-func encodeAPIChatMuteDeleteRequest(
-	req *APIChatMuteDeleteReqApplicationJSON,
+	req *ClientThing,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -40,7 +26,7 @@ func encodeAPIChatMuteDeleteRequest(
 }
 
 func encodeAPIChatMutePostRequest(
-	req *APIChatMutePostReqApplicationJSON,
+	req *Mute,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -54,7 +40,7 @@ func encodeAPIChatMutePostRequest(
 }
 
 func encodeAPIChatSendPostRequest(
-	req *APIChatSendPostReqApplicationJSON,
+	req *ChatMessage,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

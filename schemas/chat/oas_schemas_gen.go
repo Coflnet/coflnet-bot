@@ -6,35 +6,97 @@ import (
 	"time"
 )
 
-// Contains the client and its api key (only place where the api key is visible).
-type APIChatInternalClientPostOKApplicationJSON struct {
-	// Client software capeable of sending messages.
-	Client OptAPIChatInternalClientPostOKApplicationJSONClient `json:"client"`
-	ApiKey OptNilString                                        `json:"apiKey"`
+type APIChatMuteDeleteApplicationJSONBadRequest ErrorResponse
+
+func (*APIChatMuteDeleteApplicationJSONBadRequest) aPIChatMuteDeleteRes() {}
+
+type APIChatMuteDeleteApplicationJSONInternalServerError ErrorResponse
+
+func (*APIChatMuteDeleteApplicationJSONInternalServerError) aPIChatMuteDeleteRes() {}
+
+type APIChatMutePostApplicationJSONBadRequest ErrorResponse
+
+func (*APIChatMutePostApplicationJSONBadRequest) aPIChatMutePostRes() {}
+
+type APIChatMutePostApplicationJSONInternalServerError ErrorResponse
+
+func (*APIChatMutePostApplicationJSONInternalServerError) aPIChatMutePostRes() {}
+
+type APIChatSendPostApplicationJSONBadRequest ErrorResponse
+
+func (*APIChatSendPostApplicationJSONBadRequest) aPIChatSendPostRes() {}
+
+type APIChatSendPostApplicationJSONInternalServerError ErrorResponse
+
+func (*APIChatSendPostApplicationJSONInternalServerError) aPIChatSendPostRes() {}
+
+// Ref: #/components/schemas/ChatMessage
+type ChatMessage struct {
+	// The uuid of the sender.
+	UUID OptNilString `json:"uuid"`
+	// If available the name of the sender.
+	Name OptNilString `json:"name"`
+	// What color/prefix the sender has, if empty the color will be white and message should be gray.
+	Prefix OptNilString `json:"prefix"`
+	// Content of the message.
+	Message OptNilString `json:"message"`
+	// What client software sent this message.
+	ClientName OptNilString `json:"clientName"`
 }
 
-// GetClient returns the value of Client.
-func (s *APIChatInternalClientPostOKApplicationJSON) GetClient() OptAPIChatInternalClientPostOKApplicationJSONClient {
-	return s.Client
+// GetUUID returns the value of UUID.
+func (s *ChatMessage) GetUUID() OptNilString {
+	return s.UUID
 }
 
-// GetApiKey returns the value of ApiKey.
-func (s *APIChatInternalClientPostOKApplicationJSON) GetApiKey() OptNilString {
-	return s.ApiKey
+// GetName returns the value of Name.
+func (s *ChatMessage) GetName() OptNilString {
+	return s.Name
 }
 
-// SetClient sets the value of Client.
-func (s *APIChatInternalClientPostOKApplicationJSON) SetClient(val OptAPIChatInternalClientPostOKApplicationJSONClient) {
-	s.Client = val
+// GetPrefix returns the value of Prefix.
+func (s *ChatMessage) GetPrefix() OptNilString {
+	return s.Prefix
 }
 
-// SetApiKey sets the value of ApiKey.
-func (s *APIChatInternalClientPostOKApplicationJSON) SetApiKey(val OptNilString) {
-	s.ApiKey = val
+// GetMessage returns the value of Message.
+func (s *ChatMessage) GetMessage() OptNilString {
+	return s.Message
+}
+
+// GetClientName returns the value of ClientName.
+func (s *ChatMessage) GetClientName() OptNilString {
+	return s.ClientName
+}
+
+// SetUUID sets the value of UUID.
+func (s *ChatMessage) SetUUID(val OptNilString) {
+	s.UUID = val
+}
+
+// SetName sets the value of Name.
+func (s *ChatMessage) SetName(val OptNilString) {
+	s.Name = val
+}
+
+// SetPrefix sets the value of Prefix.
+func (s *ChatMessage) SetPrefix(val OptNilString) {
+	s.Prefix = val
+}
+
+// SetMessage sets the value of Message.
+func (s *ChatMessage) SetMessage(val OptNilString) {
+	s.Message = val
+}
+
+// SetClientName sets the value of ClientName.
+func (s *ChatMessage) SetClientName(val OptNilString) {
+	s.ClientName = val
 }
 
 // Client software capeable of sending messages.
-type APIChatInternalClientPostOKApplicationJSONClient struct {
+// Ref: #/components/schemas/ClientThing
+type ClientThing struct {
 	// Uuid of the target user.
 	Name OptNilString `json:"name"`
 	// Per minute send quota.
@@ -50,220 +112,104 @@ type APIChatInternalClientPostOKApplicationJSONClient struct {
 }
 
 // GetName returns the value of Name.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) GetName() OptNilString {
+func (s *ClientThing) GetName() OptNilString {
 	return s.Name
 }
 
 // GetQuota returns the value of Quota.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) GetQuota() OptInt32 {
+func (s *ClientThing) GetQuota() OptInt32 {
 	return s.Quota
 }
 
 // GetContact returns the value of Contact.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) GetContact() OptNilString {
+func (s *ClientThing) GetContact() OptNilString {
 	return s.Contact
 }
 
 // GetWebHook returns the value of WebHook.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) GetWebHook() OptNilString {
+func (s *ClientThing) GetWebHook() OptNilString {
 	return s.WebHook
 }
 
 // GetWebhookAuth returns the value of WebhookAuth.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) GetWebhookAuth() OptNilString {
+func (s *ClientThing) GetWebhookAuth() OptNilString {
 	return s.WebhookAuth
 }
 
 // GetCreated returns the value of Created.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) GetCreated() OptDateTime {
+func (s *ClientThing) GetCreated() OptDateTime {
 	return s.Created
 }
 
 // SetName sets the value of Name.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) SetName(val OptNilString) {
+func (s *ClientThing) SetName(val OptNilString) {
 	s.Name = val
 }
 
 // SetQuota sets the value of Quota.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) SetQuota(val OptInt32) {
+func (s *ClientThing) SetQuota(val OptInt32) {
 	s.Quota = val
 }
 
 // SetContact sets the value of Contact.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) SetContact(val OptNilString) {
+func (s *ClientThing) SetContact(val OptNilString) {
 	s.Contact = val
 }
 
 // SetWebHook sets the value of WebHook.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) SetWebHook(val OptNilString) {
+func (s *ClientThing) SetWebHook(val OptNilString) {
 	s.WebHook = val
 }
 
 // SetWebhookAuth sets the value of WebhookAuth.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) SetWebhookAuth(val OptNilString) {
+func (s *ClientThing) SetWebhookAuth(val OptNilString) {
 	s.WebhookAuth = val
 }
 
 // SetCreated sets the value of Created.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) SetCreated(val OptDateTime) {
+func (s *ClientThing) SetCreated(val OptDateTime) {
 	s.Created = val
 }
 
-// Client software capeable of sending messages.
-type APIChatInternalClientPostReqApplicationJSON struct {
-	// Uuid of the target user.
-	Name OptNilString `json:"name"`
-	// Per minute send quota.
-	Quota OptInt32 `json:"quota"`
-	// User who is responsible for this client.
-	Contact OptNilString `json:"contact"`
-	// Webhook to post new messages too.
-	WebHook OptNilString `json:"webHook"`
-	// Auth header value for the webhook.
-	WebhookAuth OptNilString `json:"webhookAuth"`
-	// When this was created.
-	Created OptDateTime `json:"created"`
+// Ref: #/components/schemas/ErrorResponse
+type ErrorResponse struct {
+	Slug    OptNilString `json:"slug"`
+	Message OptNilString `json:"message"`
+	Trace   OptNilString `json:"trace"`
 }
 
-// GetName returns the value of Name.
-func (s *APIChatInternalClientPostReqApplicationJSON) GetName() OptNilString {
-	return s.Name
+// GetSlug returns the value of Slug.
+func (s *ErrorResponse) GetSlug() OptNilString {
+	return s.Slug
 }
 
-// GetQuota returns the value of Quota.
-func (s *APIChatInternalClientPostReqApplicationJSON) GetQuota() OptInt32 {
-	return s.Quota
+// GetMessage returns the value of Message.
+func (s *ErrorResponse) GetMessage() OptNilString {
+	return s.Message
 }
 
-// GetContact returns the value of Contact.
-func (s *APIChatInternalClientPostReqApplicationJSON) GetContact() OptNilString {
-	return s.Contact
+// GetTrace returns the value of Trace.
+func (s *ErrorResponse) GetTrace() OptNilString {
+	return s.Trace
 }
 
-// GetWebHook returns the value of WebHook.
-func (s *APIChatInternalClientPostReqApplicationJSON) GetWebHook() OptNilString {
-	return s.WebHook
+// SetSlug sets the value of Slug.
+func (s *ErrorResponse) SetSlug(val OptNilString) {
+	s.Slug = val
 }
 
-// GetWebhookAuth returns the value of WebhookAuth.
-func (s *APIChatInternalClientPostReqApplicationJSON) GetWebhookAuth() OptNilString {
-	return s.WebhookAuth
+// SetMessage sets the value of Message.
+func (s *ErrorResponse) SetMessage(val OptNilString) {
+	s.Message = val
 }
 
-// GetCreated returns the value of Created.
-func (s *APIChatInternalClientPostReqApplicationJSON) GetCreated() OptDateTime {
-	return s.Created
+// SetTrace sets the value of Trace.
+func (s *ErrorResponse) SetTrace(val OptNilString) {
+	s.Trace = val
 }
 
-// SetName sets the value of Name.
-func (s *APIChatInternalClientPostReqApplicationJSON) SetName(val OptNilString) {
-	s.Name = val
-}
-
-// SetQuota sets the value of Quota.
-func (s *APIChatInternalClientPostReqApplicationJSON) SetQuota(val OptInt32) {
-	s.Quota = val
-}
-
-// SetContact sets the value of Contact.
-func (s *APIChatInternalClientPostReqApplicationJSON) SetContact(val OptNilString) {
-	s.Contact = val
-}
-
-// SetWebHook sets the value of WebHook.
-func (s *APIChatInternalClientPostReqApplicationJSON) SetWebHook(val OptNilString) {
-	s.WebHook = val
-}
-
-// SetWebhookAuth sets the value of WebhookAuth.
-func (s *APIChatInternalClientPostReqApplicationJSON) SetWebhookAuth(val OptNilString) {
-	s.WebhookAuth = val
-}
-
-// SetCreated sets the value of Created.
-func (s *APIChatInternalClientPostReqApplicationJSON) SetCreated(val OptDateTime) {
-	s.Created = val
-}
-
-type APIChatMuteDeleteOKApplicationJSON struct {
-	// Uuid of the target user.
-	UUID OptNilString `json:"uuid"`
-	// Uuid of user performing the mute.
-	UnMuter OptNilString `json:"unMuter"`
-	// Internal reason.
-	Reason OptNilString `json:"reason"`
-}
-
-// GetUUID returns the value of UUID.
-func (s *APIChatMuteDeleteOKApplicationJSON) GetUUID() OptNilString {
-	return s.UUID
-}
-
-// GetUnMuter returns the value of UnMuter.
-func (s *APIChatMuteDeleteOKApplicationJSON) GetUnMuter() OptNilString {
-	return s.UnMuter
-}
-
-// GetReason returns the value of Reason.
-func (s *APIChatMuteDeleteOKApplicationJSON) GetReason() OptNilString {
-	return s.Reason
-}
-
-// SetUUID sets the value of UUID.
-func (s *APIChatMuteDeleteOKApplicationJSON) SetUUID(val OptNilString) {
-	s.UUID = val
-}
-
-// SetUnMuter sets the value of UnMuter.
-func (s *APIChatMuteDeleteOKApplicationJSON) SetUnMuter(val OptNilString) {
-	s.UnMuter = val
-}
-
-// SetReason sets the value of Reason.
-func (s *APIChatMuteDeleteOKApplicationJSON) SetReason(val OptNilString) {
-	s.Reason = val
-}
-
-type APIChatMuteDeleteReqApplicationJSON struct {
-	// Uuid of the target user.
-	UUID OptNilString `json:"uuid"`
-	// Uuid of user performing the mute.
-	UnMuter OptNilString `json:"unMuter"`
-	// Internal reason.
-	Reason OptNilString `json:"reason"`
-}
-
-// GetUUID returns the value of UUID.
-func (s *APIChatMuteDeleteReqApplicationJSON) GetUUID() OptNilString {
-	return s.UUID
-}
-
-// GetUnMuter returns the value of UnMuter.
-func (s *APIChatMuteDeleteReqApplicationJSON) GetUnMuter() OptNilString {
-	return s.UnMuter
-}
-
-// GetReason returns the value of Reason.
-func (s *APIChatMuteDeleteReqApplicationJSON) GetReason() OptNilString {
-	return s.Reason
-}
-
-// SetUUID sets the value of UUID.
-func (s *APIChatMuteDeleteReqApplicationJSON) SetUUID(val OptNilString) {
-	s.UUID = val
-}
-
-// SetUnMuter sets the value of UnMuter.
-func (s *APIChatMuteDeleteReqApplicationJSON) SetUnMuter(val OptNilString) {
-	s.UnMuter = val
-}
-
-// SetReason sets the value of Reason.
-func (s *APIChatMuteDeleteReqApplicationJSON) SetReason(val OptNilString) {
-	s.Reason = val
-}
-
-type APIChatMutePostOKApplicationJSON struct {
+// Ref: #/components/schemas/Mute
+type Mute struct {
 	// Uuid of the target user.
 	UUID OptNilString `json:"uuid"`
 	// Uuid of user performing the mute.
@@ -281,517 +227,121 @@ type APIChatMutePostOKApplicationJSON struct {
 	// When this was created.
 	Timestamp OptDateTime `json:"timestamp"`
 	// Until when this is active.
-	Expires OptDateTime                               `json:"expires"`
-	Status  OptAPIChatMutePostOKApplicationJSONStatus `json:"status"`
+	Expires OptDateTime   `json:"expires"`
+	Status  OptMuteStatus `json:"status"`
 }
 
 // GetUUID returns the value of UUID.
-func (s *APIChatMutePostOKApplicationJSON) GetUUID() OptNilString {
+func (s *Mute) GetUUID() OptNilString {
 	return s.UUID
 }
 
 // GetMuter returns the value of Muter.
-func (s *APIChatMutePostOKApplicationJSON) GetMuter() OptNilString {
+func (s *Mute) GetMuter() OptNilString {
 	return s.Muter
 }
 
 // GetUnMuter returns the value of UnMuter.
-func (s *APIChatMutePostOKApplicationJSON) GetUnMuter() OptNilString {
+func (s *Mute) GetUnMuter() OptNilString {
 	return s.UnMuter
 }
 
 // GetMessage returns the value of Message.
-func (s *APIChatMutePostOKApplicationJSON) GetMessage() OptNilString {
+func (s *Mute) GetMessage() OptNilString {
 	return s.Message
 }
 
 // GetReason returns the value of Reason.
-func (s *APIChatMutePostOKApplicationJSON) GetReason() OptNilString {
+func (s *Mute) GetReason() OptNilString {
 	return s.Reason
 }
 
 // GetClientId returns the value of ClientId.
-func (s *APIChatMutePostOKApplicationJSON) GetClientId() OptInt32 {
+func (s *Mute) GetClientId() OptInt32 {
 	return s.ClientId
 }
 
 // GetUnMuteClientId returns the value of UnMuteClientId.
-func (s *APIChatMutePostOKApplicationJSON) GetUnMuteClientId() OptInt32 {
+func (s *Mute) GetUnMuteClientId() OptInt32 {
 	return s.UnMuteClientId
 }
 
 // GetTimestamp returns the value of Timestamp.
-func (s *APIChatMutePostOKApplicationJSON) GetTimestamp() OptDateTime {
+func (s *Mute) GetTimestamp() OptDateTime {
 	return s.Timestamp
 }
 
 // GetExpires returns the value of Expires.
-func (s *APIChatMutePostOKApplicationJSON) GetExpires() OptDateTime {
+func (s *Mute) GetExpires() OptDateTime {
 	return s.Expires
 }
 
 // GetStatus returns the value of Status.
-func (s *APIChatMutePostOKApplicationJSON) GetStatus() OptAPIChatMutePostOKApplicationJSONStatus {
+func (s *Mute) GetStatus() OptMuteStatus {
 	return s.Status
 }
 
 // SetUUID sets the value of UUID.
-func (s *APIChatMutePostOKApplicationJSON) SetUUID(val OptNilString) {
+func (s *Mute) SetUUID(val OptNilString) {
 	s.UUID = val
 }
 
 // SetMuter sets the value of Muter.
-func (s *APIChatMutePostOKApplicationJSON) SetMuter(val OptNilString) {
+func (s *Mute) SetMuter(val OptNilString) {
 	s.Muter = val
 }
 
 // SetUnMuter sets the value of UnMuter.
-func (s *APIChatMutePostOKApplicationJSON) SetUnMuter(val OptNilString) {
+func (s *Mute) SetUnMuter(val OptNilString) {
 	s.UnMuter = val
 }
 
 // SetMessage sets the value of Message.
-func (s *APIChatMutePostOKApplicationJSON) SetMessage(val OptNilString) {
+func (s *Mute) SetMessage(val OptNilString) {
 	s.Message = val
 }
 
 // SetReason sets the value of Reason.
-func (s *APIChatMutePostOKApplicationJSON) SetReason(val OptNilString) {
+func (s *Mute) SetReason(val OptNilString) {
 	s.Reason = val
 }
 
 // SetClientId sets the value of ClientId.
-func (s *APIChatMutePostOKApplicationJSON) SetClientId(val OptInt32) {
+func (s *Mute) SetClientId(val OptInt32) {
 	s.ClientId = val
 }
 
 // SetUnMuteClientId sets the value of UnMuteClientId.
-func (s *APIChatMutePostOKApplicationJSON) SetUnMuteClientId(val OptInt32) {
+func (s *Mute) SetUnMuteClientId(val OptInt32) {
 	s.UnMuteClientId = val
 }
 
 // SetTimestamp sets the value of Timestamp.
-func (s *APIChatMutePostOKApplicationJSON) SetTimestamp(val OptDateTime) {
+func (s *Mute) SetTimestamp(val OptDateTime) {
 	s.Timestamp = val
 }
 
 // SetExpires sets the value of Expires.
-func (s *APIChatMutePostOKApplicationJSON) SetExpires(val OptDateTime) {
+func (s *Mute) SetExpires(val OptDateTime) {
 	s.Expires = val
 }
 
 // SetStatus sets the value of Status.
-func (s *APIChatMutePostOKApplicationJSON) SetStatus(val OptAPIChatMutePostOKApplicationJSONStatus) {
+func (s *Mute) SetStatus(val OptMuteStatus) {
 	s.Status = val
 }
 
-type APIChatMutePostOKApplicationJSONStatus int32
+// Ref: #/components/schemas/MuteStatus
+type MuteStatus int32
 
 const (
-	APIChatMutePostOKApplicationJSONStatus0  APIChatMutePostOKApplicationJSONStatus = 0
-	APIChatMutePostOKApplicationJSONStatus1  APIChatMutePostOKApplicationJSONStatus = 1
-	APIChatMutePostOKApplicationJSONStatus2  APIChatMutePostOKApplicationJSONStatus = 2
-	APIChatMutePostOKApplicationJSONStatus4  APIChatMutePostOKApplicationJSONStatus = 4
-	APIChatMutePostOKApplicationJSONStatus8  APIChatMutePostOKApplicationJSONStatus = 8
-	APIChatMutePostOKApplicationJSONStatus16 APIChatMutePostOKApplicationJSONStatus = 16
+	MuteStatus0  MuteStatus = 0
+	MuteStatus1  MuteStatus = 1
+	MuteStatus2  MuteStatus = 2
+	MuteStatus4  MuteStatus = 4
+	MuteStatus8  MuteStatus = 8
+	MuteStatus16 MuteStatus = 16
 )
-
-type APIChatMutePostReqApplicationJSON struct {
-	// Uuid of the target user.
-	UUID OptNilString `json:"uuid"`
-	// Uuid of user performing the mute.
-	Muter OptNilString `json:"muter"`
-	// Uuid of user performing the mute.
-	UnMuter OptNilString `json:"unMuter"`
-	// Message for the user.
-	Message OptNilString `json:"message"`
-	// Internal reason.
-	Reason OptNilString `json:"reason"`
-	// What client software added the mute.
-	ClientId OptInt32 `json:"clientId"`
-	// What client software added the mute.
-	UnMuteClientId OptInt32 `json:"unMuteClientId"`
-	// When this was created.
-	Timestamp OptDateTime `json:"timestamp"`
-	// Until when this is active.
-	Expires OptDateTime                                `json:"expires"`
-	Status  OptAPIChatMutePostReqApplicationJSONStatus `json:"status"`
-}
-
-// GetUUID returns the value of UUID.
-func (s *APIChatMutePostReqApplicationJSON) GetUUID() OptNilString {
-	return s.UUID
-}
-
-// GetMuter returns the value of Muter.
-func (s *APIChatMutePostReqApplicationJSON) GetMuter() OptNilString {
-	return s.Muter
-}
-
-// GetUnMuter returns the value of UnMuter.
-func (s *APIChatMutePostReqApplicationJSON) GetUnMuter() OptNilString {
-	return s.UnMuter
-}
-
-// GetMessage returns the value of Message.
-func (s *APIChatMutePostReqApplicationJSON) GetMessage() OptNilString {
-	return s.Message
-}
-
-// GetReason returns the value of Reason.
-func (s *APIChatMutePostReqApplicationJSON) GetReason() OptNilString {
-	return s.Reason
-}
-
-// GetClientId returns the value of ClientId.
-func (s *APIChatMutePostReqApplicationJSON) GetClientId() OptInt32 {
-	return s.ClientId
-}
-
-// GetUnMuteClientId returns the value of UnMuteClientId.
-func (s *APIChatMutePostReqApplicationJSON) GetUnMuteClientId() OptInt32 {
-	return s.UnMuteClientId
-}
-
-// GetTimestamp returns the value of Timestamp.
-func (s *APIChatMutePostReqApplicationJSON) GetTimestamp() OptDateTime {
-	return s.Timestamp
-}
-
-// GetExpires returns the value of Expires.
-func (s *APIChatMutePostReqApplicationJSON) GetExpires() OptDateTime {
-	return s.Expires
-}
-
-// GetStatus returns the value of Status.
-func (s *APIChatMutePostReqApplicationJSON) GetStatus() OptAPIChatMutePostReqApplicationJSONStatus {
-	return s.Status
-}
-
-// SetUUID sets the value of UUID.
-func (s *APIChatMutePostReqApplicationJSON) SetUUID(val OptNilString) {
-	s.UUID = val
-}
-
-// SetMuter sets the value of Muter.
-func (s *APIChatMutePostReqApplicationJSON) SetMuter(val OptNilString) {
-	s.Muter = val
-}
-
-// SetUnMuter sets the value of UnMuter.
-func (s *APIChatMutePostReqApplicationJSON) SetUnMuter(val OptNilString) {
-	s.UnMuter = val
-}
-
-// SetMessage sets the value of Message.
-func (s *APIChatMutePostReqApplicationJSON) SetMessage(val OptNilString) {
-	s.Message = val
-}
-
-// SetReason sets the value of Reason.
-func (s *APIChatMutePostReqApplicationJSON) SetReason(val OptNilString) {
-	s.Reason = val
-}
-
-// SetClientId sets the value of ClientId.
-func (s *APIChatMutePostReqApplicationJSON) SetClientId(val OptInt32) {
-	s.ClientId = val
-}
-
-// SetUnMuteClientId sets the value of UnMuteClientId.
-func (s *APIChatMutePostReqApplicationJSON) SetUnMuteClientId(val OptInt32) {
-	s.UnMuteClientId = val
-}
-
-// SetTimestamp sets the value of Timestamp.
-func (s *APIChatMutePostReqApplicationJSON) SetTimestamp(val OptDateTime) {
-	s.Timestamp = val
-}
-
-// SetExpires sets the value of Expires.
-func (s *APIChatMutePostReqApplicationJSON) SetExpires(val OptDateTime) {
-	s.Expires = val
-}
-
-// SetStatus sets the value of Status.
-func (s *APIChatMutePostReqApplicationJSON) SetStatus(val OptAPIChatMutePostReqApplicationJSONStatus) {
-	s.Status = val
-}
-
-type APIChatMutePostReqApplicationJSONStatus int32
-
-const (
-	APIChatMutePostReqApplicationJSONStatus0  APIChatMutePostReqApplicationJSONStatus = 0
-	APIChatMutePostReqApplicationJSONStatus1  APIChatMutePostReqApplicationJSONStatus = 1
-	APIChatMutePostReqApplicationJSONStatus2  APIChatMutePostReqApplicationJSONStatus = 2
-	APIChatMutePostReqApplicationJSONStatus4  APIChatMutePostReqApplicationJSONStatus = 4
-	APIChatMutePostReqApplicationJSONStatus8  APIChatMutePostReqApplicationJSONStatus = 8
-	APIChatMutePostReqApplicationJSONStatus16 APIChatMutePostReqApplicationJSONStatus = 16
-)
-
-type APIChatSendPostOKApplicationJSON struct {
-	// The uuid of the sender.
-	UUID OptNilString `json:"uuid"`
-	// If available the name of the sender.
-	Name OptNilString `json:"name"`
-	// What color/prefix the sender has, if empty the color will be white and message should be gray.
-	Prefix OptNilString `json:"prefix"`
-	// Content of the message.
-	Message OptNilString `json:"message"`
-	// What client software sent this message.
-	ClientName OptNilString `json:"clientName"`
-}
-
-// GetUUID returns the value of UUID.
-func (s *APIChatSendPostOKApplicationJSON) GetUUID() OptNilString {
-	return s.UUID
-}
-
-// GetName returns the value of Name.
-func (s *APIChatSendPostOKApplicationJSON) GetName() OptNilString {
-	return s.Name
-}
-
-// GetPrefix returns the value of Prefix.
-func (s *APIChatSendPostOKApplicationJSON) GetPrefix() OptNilString {
-	return s.Prefix
-}
-
-// GetMessage returns the value of Message.
-func (s *APIChatSendPostOKApplicationJSON) GetMessage() OptNilString {
-	return s.Message
-}
-
-// GetClientName returns the value of ClientName.
-func (s *APIChatSendPostOKApplicationJSON) GetClientName() OptNilString {
-	return s.ClientName
-}
-
-// SetUUID sets the value of UUID.
-func (s *APIChatSendPostOKApplicationJSON) SetUUID(val OptNilString) {
-	s.UUID = val
-}
-
-// SetName sets the value of Name.
-func (s *APIChatSendPostOKApplicationJSON) SetName(val OptNilString) {
-	s.Name = val
-}
-
-// SetPrefix sets the value of Prefix.
-func (s *APIChatSendPostOKApplicationJSON) SetPrefix(val OptNilString) {
-	s.Prefix = val
-}
-
-// SetMessage sets the value of Message.
-func (s *APIChatSendPostOKApplicationJSON) SetMessage(val OptNilString) {
-	s.Message = val
-}
-
-// SetClientName sets the value of ClientName.
-func (s *APIChatSendPostOKApplicationJSON) SetClientName(val OptNilString) {
-	s.ClientName = val
-}
-
-type APIChatSendPostReqApplicationJSON struct {
-	// The uuid of the sender.
-	UUID OptNilString `json:"uuid"`
-	// If available the name of the sender.
-	Name OptNilString `json:"name"`
-	// What color/prefix the sender has, if empty the color will be white and message should be gray.
-	Prefix OptNilString `json:"prefix"`
-	// Content of the message.
-	Message OptNilString `json:"message"`
-	// What client software sent this message.
-	ClientName OptNilString `json:"clientName"`
-}
-
-// GetUUID returns the value of UUID.
-func (s *APIChatSendPostReqApplicationJSON) GetUUID() OptNilString {
-	return s.UUID
-}
-
-// GetName returns the value of Name.
-func (s *APIChatSendPostReqApplicationJSON) GetName() OptNilString {
-	return s.Name
-}
-
-// GetPrefix returns the value of Prefix.
-func (s *APIChatSendPostReqApplicationJSON) GetPrefix() OptNilString {
-	return s.Prefix
-}
-
-// GetMessage returns the value of Message.
-func (s *APIChatSendPostReqApplicationJSON) GetMessage() OptNilString {
-	return s.Message
-}
-
-// GetClientName returns the value of ClientName.
-func (s *APIChatSendPostReqApplicationJSON) GetClientName() OptNilString {
-	return s.ClientName
-}
-
-// SetUUID sets the value of UUID.
-func (s *APIChatSendPostReqApplicationJSON) SetUUID(val OptNilString) {
-	s.UUID = val
-}
-
-// SetName sets the value of Name.
-func (s *APIChatSendPostReqApplicationJSON) SetName(val OptNilString) {
-	s.Name = val
-}
-
-// SetPrefix sets the value of Prefix.
-func (s *APIChatSendPostReqApplicationJSON) SetPrefix(val OptNilString) {
-	s.Prefix = val
-}
-
-// SetMessage sets the value of Message.
-func (s *APIChatSendPostReqApplicationJSON) SetMessage(val OptNilString) {
-	s.Message = val
-}
-
-// SetClientName sets the value of ClientName.
-func (s *APIChatSendPostReqApplicationJSON) SetClientName(val OptNilString) {
-	s.ClientName = val
-}
-
-// NewOptAPIChatInternalClientPostOKApplicationJSONClient returns new OptAPIChatInternalClientPostOKApplicationJSONClient with value set to v.
-func NewOptAPIChatInternalClientPostOKApplicationJSONClient(v APIChatInternalClientPostOKApplicationJSONClient) OptAPIChatInternalClientPostOKApplicationJSONClient {
-	return OptAPIChatInternalClientPostOKApplicationJSONClient{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptAPIChatInternalClientPostOKApplicationJSONClient is optional APIChatInternalClientPostOKApplicationJSONClient.
-type OptAPIChatInternalClientPostOKApplicationJSONClient struct {
-	Value APIChatInternalClientPostOKApplicationJSONClient
-	Set   bool
-}
-
-// IsSet returns true if OptAPIChatInternalClientPostOKApplicationJSONClient was set.
-func (o OptAPIChatInternalClientPostOKApplicationJSONClient) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptAPIChatInternalClientPostOKApplicationJSONClient) Reset() {
-	var v APIChatInternalClientPostOKApplicationJSONClient
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptAPIChatInternalClientPostOKApplicationJSONClient) SetTo(v APIChatInternalClientPostOKApplicationJSONClient) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptAPIChatInternalClientPostOKApplicationJSONClient) Get() (v APIChatInternalClientPostOKApplicationJSONClient, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptAPIChatInternalClientPostOKApplicationJSONClient) Or(d APIChatInternalClientPostOKApplicationJSONClient) APIChatInternalClientPostOKApplicationJSONClient {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptAPIChatMutePostOKApplicationJSONStatus returns new OptAPIChatMutePostOKApplicationJSONStatus with value set to v.
-func NewOptAPIChatMutePostOKApplicationJSONStatus(v APIChatMutePostOKApplicationJSONStatus) OptAPIChatMutePostOKApplicationJSONStatus {
-	return OptAPIChatMutePostOKApplicationJSONStatus{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptAPIChatMutePostOKApplicationJSONStatus is optional APIChatMutePostOKApplicationJSONStatus.
-type OptAPIChatMutePostOKApplicationJSONStatus struct {
-	Value APIChatMutePostOKApplicationJSONStatus
-	Set   bool
-}
-
-// IsSet returns true if OptAPIChatMutePostOKApplicationJSONStatus was set.
-func (o OptAPIChatMutePostOKApplicationJSONStatus) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptAPIChatMutePostOKApplicationJSONStatus) Reset() {
-	var v APIChatMutePostOKApplicationJSONStatus
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptAPIChatMutePostOKApplicationJSONStatus) SetTo(v APIChatMutePostOKApplicationJSONStatus) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptAPIChatMutePostOKApplicationJSONStatus) Get() (v APIChatMutePostOKApplicationJSONStatus, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptAPIChatMutePostOKApplicationJSONStatus) Or(d APIChatMutePostOKApplicationJSONStatus) APIChatMutePostOKApplicationJSONStatus {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptAPIChatMutePostReqApplicationJSONStatus returns new OptAPIChatMutePostReqApplicationJSONStatus with value set to v.
-func NewOptAPIChatMutePostReqApplicationJSONStatus(v APIChatMutePostReqApplicationJSONStatus) OptAPIChatMutePostReqApplicationJSONStatus {
-	return OptAPIChatMutePostReqApplicationJSONStatus{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptAPIChatMutePostReqApplicationJSONStatus is optional APIChatMutePostReqApplicationJSONStatus.
-type OptAPIChatMutePostReqApplicationJSONStatus struct {
-	Value APIChatMutePostReqApplicationJSONStatus
-	Set   bool
-}
-
-// IsSet returns true if OptAPIChatMutePostReqApplicationJSONStatus was set.
-func (o OptAPIChatMutePostReqApplicationJSONStatus) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptAPIChatMutePostReqApplicationJSONStatus) Reset() {
-	var v APIChatMutePostReqApplicationJSONStatus
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptAPIChatMutePostReqApplicationJSONStatus) SetTo(v APIChatMutePostReqApplicationJSONStatus) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptAPIChatMutePostReqApplicationJSONStatus) Get() (v APIChatMutePostReqApplicationJSONStatus, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptAPIChatMutePostReqApplicationJSONStatus) Or(d APIChatMutePostReqApplicationJSONStatus) APIChatMutePostReqApplicationJSONStatus {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
 
 // NewOptDateTime returns new OptDateTime with value set to v.
 func NewOptDateTime(v time.Time) OptDateTime {
@@ -879,6 +429,52 @@ func (o OptInt32) Get() (v int32, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt32) Or(d int32) int32 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptMuteStatus returns new OptMuteStatus with value set to v.
+func NewOptMuteStatus(v MuteStatus) OptMuteStatus {
+	return OptMuteStatus{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptMuteStatus is optional MuteStatus.
+type OptMuteStatus struct {
+	Value MuteStatus
+	Set   bool
+}
+
+// IsSet returns true if OptMuteStatus was set.
+func (o OptMuteStatus) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptMuteStatus) Reset() {
+	var v MuteStatus
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptMuteStatus) SetTo(v MuteStatus) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptMuteStatus) Get() (v MuteStatus, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptMuteStatus) Or(d MuteStatus) MuteStatus {
 	if v, ok := o.Get(); ok {
 		return v
 	}

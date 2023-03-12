@@ -17,9 +17,9 @@ import (
 	"github.com/Coflnet/coflnet-bot/pkg/discord"
 	"github.com/bwmarrin/discordgo"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slog"
-	"google.golang.org/grpc/attributes"
 )
 
 const (
@@ -216,8 +216,8 @@ func (d *DiscordHandler) SendMessageToIngameChat(ctx context.Context, message *m
 
 	iconUrl := fmt.Sprintf("https://crafatar.com/avatars/%s", message.UUID)
 	url := os.Getenv("CHAT_WEBHOOK")
-    span.SetAttributes(attributes.String("iconUr", iconUrl))
-    span.SetAttributes(attributes.String("url", url))
+    span.SetAttributes(attribute.String("iconUr", iconUrl))
+    span.SetAttributes(attribute.String("url", url))
 
 	msg := message.Message
 	data := &WebhookRequest{
@@ -234,7 +234,7 @@ func (d *DiscordHandler) SendMessageToIngameChat(ctx context.Context, message *m
 	}
 
     response, err := http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
-    span.SetAttributes(attributes.Int("status", response.StatusCode))
+    span.SetAttributes(attribute.Int("status", response.StatusCode))
 
 	if err != nil {
         slog.Error("error when sending webhook request", err)

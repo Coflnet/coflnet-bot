@@ -66,7 +66,7 @@ func (s *Server) handleAPIChatInternalClientPostRequest(args [0]string, w http.R
 		}
 	}()
 
-	var response *APIChatInternalClientPostOKApplicationJSON
+	var response *ErrorResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:       ctx,
@@ -78,9 +78,9 @@ func (s *Server) handleAPIChatInternalClientPostRequest(args [0]string, w http.R
 		}
 
 		type (
-			Request  = *APIChatInternalClientPostReqApplicationJSON
+			Request  = *ClientThing
 			Params   = struct{}
-			Response = *APIChatInternalClientPostOKApplicationJSON
+			Response = *ErrorResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -141,43 +141,24 @@ func (s *Server) handleAPIChatMuteDeleteRequest(args [0]string, w http.ResponseW
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, otelAttrs...)
 		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "APIChatMuteDelete",
-			ID:   "",
-		}
+		err error
 	)
-	request, close, err := s.decodeAPIChatMuteDeleteRequest(r)
-	if err != nil {
-		err = &ogenerrors.DecodeRequestError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		recordError("DecodeRequest", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	defer func() {
-		if err := close(); err != nil {
-			recordError("CloseRequest", err)
-		}
-	}()
 
-	var response *APIChatMuteDeleteOKApplicationJSON
+	var response APIChatMuteDeleteRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:       ctx,
 			OperationName: "APIChatMuteDelete",
 			OperationID:   "",
-			Body:          request,
+			Body:          nil,
 			Params:        middleware.Parameters{},
 			Raw:           r,
 		}
 
 		type (
-			Request  = *APIChatMuteDeleteReqApplicationJSON
+			Request  = struct{}
 			Params   = struct{}
-			Response = *APIChatMuteDeleteOKApplicationJSON
+			Response = APIChatMuteDeleteRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -188,12 +169,12 @@ func (s *Server) handleAPIChatMuteDeleteRequest(args [0]string, w http.ResponseW
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.APIChatMuteDelete(ctx, request)
+				response, err = s.h.APIChatMuteDelete(ctx)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.APIChatMuteDelete(ctx, request)
+		response, err = s.h.APIChatMuteDelete(ctx)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -260,7 +241,7 @@ func (s *Server) handleAPIChatMutePostRequest(args [0]string, w http.ResponseWri
 		}
 	}()
 
-	var response *APIChatMutePostOKApplicationJSON
+	var response APIChatMutePostRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:       ctx,
@@ -272,9 +253,9 @@ func (s *Server) handleAPIChatMutePostRequest(args [0]string, w http.ResponseWri
 		}
 
 		type (
-			Request  = *APIChatMutePostReqApplicationJSON
+			Request  = *Mute
 			Params   = struct{}
-			Response = *APIChatMutePostOKApplicationJSON
+			Response = APIChatMutePostRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -357,7 +338,7 @@ func (s *Server) handleAPIChatSendPostRequest(args [0]string, w http.ResponseWri
 		}
 	}()
 
-	var response *APIChatSendPostOKApplicationJSON
+	var response APIChatSendPostRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:       ctx,
@@ -369,9 +350,9 @@ func (s *Server) handleAPIChatSendPostRequest(args [0]string, w http.ResponseWri
 		}
 
 		type (
-			Request  = *APIChatSendPostReqApplicationJSON
+			Request  = *ChatMessage
 			Params   = struct{}
-			Response = *APIChatSendPostOKApplicationJSON
+			Response = APIChatSendPostRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,

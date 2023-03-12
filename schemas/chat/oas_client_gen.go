@@ -61,13 +61,13 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 // Create a nw Client.
 //
 // POST /api/Chat/internal/client
-func (c *Client) APIChatInternalClientPost(ctx context.Context, request *APIChatInternalClientPostReqApplicationJSON) (*APIChatInternalClientPostOKApplicationJSON, error) {
+func (c *Client) APIChatInternalClientPost(ctx context.Context, request *ClientThing) (*ErrorResponse, error) {
 	res, err := c.sendAPIChatInternalClientPost(ctx, request)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendAPIChatInternalClientPost(ctx context.Context, request *APIChatInternalClientPostReqApplicationJSON) (res *APIChatInternalClientPostOKApplicationJSON, err error) {
+func (c *Client) sendAPIChatInternalClientPost(ctx context.Context, request *ClientThing) (res *ErrorResponse, err error) {
 	var otelAttrs []attribute.KeyValue
 	// Validate request before sending.
 	if err := func() error {
@@ -138,23 +138,14 @@ func (c *Client) sendAPIChatInternalClientPost(ctx context.Context, request *API
 // Create a new mute for an user.
 //
 // DELETE /api/Chat/mute
-func (c *Client) APIChatMuteDelete(ctx context.Context, request *APIChatMuteDeleteReqApplicationJSON) (*APIChatMuteDeleteOKApplicationJSON, error) {
-	res, err := c.sendAPIChatMuteDelete(ctx, request)
+func (c *Client) APIChatMuteDelete(ctx context.Context) (APIChatMuteDeleteRes, error) {
+	res, err := c.sendAPIChatMuteDelete(ctx)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendAPIChatMuteDelete(ctx context.Context, request *APIChatMuteDeleteReqApplicationJSON) (res *APIChatMuteDeleteOKApplicationJSON, err error) {
+func (c *Client) sendAPIChatMuteDelete(ctx context.Context) (res APIChatMuteDeleteRes, err error) {
 	var otelAttrs []attribute.KeyValue
-	// Validate request before sending.
-	if err := func() error {
-		if err := request.Validate(); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return res, errors.Wrap(err, "validate")
-	}
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -190,9 +181,6 @@ func (c *Client) sendAPIChatMuteDelete(ctx context.Context, request *APIChatMute
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeAPIChatMuteDeleteRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
@@ -215,13 +203,13 @@ func (c *Client) sendAPIChatMuteDelete(ctx context.Context, request *APIChatMute
 // Create a new mute for an user.
 //
 // POST /api/Chat/mute
-func (c *Client) APIChatMutePost(ctx context.Context, request *APIChatMutePostReqApplicationJSON) (*APIChatMutePostOKApplicationJSON, error) {
+func (c *Client) APIChatMutePost(ctx context.Context, request *Mute) (APIChatMutePostRes, error) {
 	res, err := c.sendAPIChatMutePost(ctx, request)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendAPIChatMutePost(ctx context.Context, request *APIChatMutePostReqApplicationJSON) (res *APIChatMutePostOKApplicationJSON, err error) {
+func (c *Client) sendAPIChatMutePost(ctx context.Context, request *Mute) (res APIChatMutePostRes, err error) {
 	var otelAttrs []attribute.KeyValue
 	// Validate request before sending.
 	if err := func() error {
@@ -292,13 +280,13 @@ func (c *Client) sendAPIChatMutePost(ctx context.Context, request *APIChatMutePo
 // Tracks a flip.
 //
 // POST /api/Chat/send
-func (c *Client) APIChatSendPost(ctx context.Context, request *APIChatSendPostReqApplicationJSON) (*APIChatSendPostOKApplicationJSON, error) {
+func (c *Client) APIChatSendPost(ctx context.Context, request *ChatMessage) (APIChatSendPostRes, error) {
 	res, err := c.sendAPIChatSendPost(ctx, request)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendAPIChatSendPost(ctx context.Context, request *APIChatSendPostReqApplicationJSON) (res *APIChatSendPostOKApplicationJSON, err error) {
+func (c *Client) sendAPIChatSendPost(ctx context.Context, request *ChatMessage) (res APIChatSendPostRes, err error) {
 	var otelAttrs []attribute.KeyValue
 	// Validate request before sending.
 	if err := func() error {

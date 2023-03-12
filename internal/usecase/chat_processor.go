@@ -204,7 +204,7 @@ func (p *ChatProcessor) processRedisMessage(ctx context.Context, msg *redisgo.Me
 
 	err = p.discordHandler.SendMessageToIngameChat(ctx, message)
 	if err != nil {
-		log.Error().Err(err).Msgf("could not send message to discord, message: %s", msg.Payload)
+        slog.Error(fmt.Sprintf("could not send message to discord, message: %s", msg.Payload), err)
 		return err
 	}
 
@@ -244,7 +244,7 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 
 	user := users[0]
 
-	err = p.coflnetChatClient.SendMessage(ctx, &chat.APIChatSendPostReqApplicationJSON{
+	err = p.coflnetChatClient.SendMessage(ctx, &chat.ChatMessage{
 		Message: chat.OptNilString{
 			Null:  false,
 			Value: msg.Content,
@@ -265,6 +265,8 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 		return err
 	}
 
+    slog.Info("a message was sent to chat api")
+    span.SetAttributes(attribute.Bool("message_sent", true))
 	return nil
 }
 

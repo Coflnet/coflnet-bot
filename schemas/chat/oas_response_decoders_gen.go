@@ -14,10 +14,10 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func decodeAPIChatInternalClientPostResponse(resp *http.Response) (res *APIChatInternalClientPostOKApplicationJSON, err error) {
+func decodeAPIChatInternalClientPostResponse(resp *http.Response) (res *ErrorResponse, err error) {
 	switch resp.StatusCode {
-	case 200:
-		// Code 200.
+	case 500:
+		// Code 500.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -30,7 +30,7 @@ func decodeAPIChatInternalClientPostResponse(resp *http.Response) (res *APIChatI
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response APIChatInternalClientPostOKApplicationJSON
+			var response ErrorResponse
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -55,10 +55,10 @@ func decodeAPIChatInternalClientPostResponse(resp *http.Response) (res *APIChatI
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIChatMuteDeleteResponse(resp *http.Response) (res *APIChatMuteDeleteOKApplicationJSON, err error) {
+func decodeAPIChatMuteDeleteResponse(resp *http.Response) (res APIChatMuteDeleteRes, err error) {
 	switch resp.StatusCode {
-	case 200:
-		// Code 200.
+	case 400:
+		// Code 400.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -71,7 +71,42 @@ func decodeAPIChatMuteDeleteResponse(resp *http.Response) (res *APIChatMuteDelet
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response APIChatMuteDeleteOKApplicationJSON
+			var response APIChatMuteDeleteApplicationJSONBadRequest
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 500:
+		// Code 500.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatMuteDeleteApplicationJSONInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -96,10 +131,10 @@ func decodeAPIChatMuteDeleteResponse(resp *http.Response) (res *APIChatMuteDelet
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIChatMutePostResponse(resp *http.Response) (res *APIChatMutePostOKApplicationJSON, err error) {
+func decodeAPIChatMutePostResponse(resp *http.Response) (res APIChatMutePostRes, err error) {
 	switch resp.StatusCode {
-	case 200:
-		// Code 200.
+	case 400:
+		// Code 400.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -112,7 +147,42 @@ func decodeAPIChatMutePostResponse(resp *http.Response) (res *APIChatMutePostOKA
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response APIChatMutePostOKApplicationJSON
+			var response APIChatMutePostApplicationJSONBadRequest
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 500:
+		// Code 500.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatMutePostApplicationJSONInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -137,10 +207,10 @@ func decodeAPIChatMutePostResponse(resp *http.Response) (res *APIChatMutePostOKA
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIChatSendPostResponse(resp *http.Response) (res *APIChatSendPostOKApplicationJSON, err error) {
+func decodeAPIChatSendPostResponse(resp *http.Response) (res APIChatSendPostRes, err error) {
 	switch resp.StatusCode {
-	case 200:
-		// Code 200.
+	case 400:
+		// Code 400.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -153,7 +223,42 @@ func decodeAPIChatSendPostResponse(resp *http.Response) (res *APIChatSendPostOKA
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response APIChatSendPostOKApplicationJSON
+			var response APIChatSendPostApplicationJSONBadRequest
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 500:
+		// Code 500.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatSendPostApplicationJSONInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

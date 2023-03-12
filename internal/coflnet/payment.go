@@ -25,7 +25,7 @@ type PaymentApi struct {
     paymentClient *payments.Client
 }
 
-func NewPaymentApi() (*PaymentApi, error) {
+func NewPaymentClient() (*PaymentApi, error) {
     var err error
     r := &PaymentApi{}
 

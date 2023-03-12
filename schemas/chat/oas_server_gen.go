@@ -13,25 +13,25 @@ type Handler interface {
 	// Create a nw Client.
 	//
 	// POST /api/Chat/internal/client
-	APIChatInternalClientPost(ctx context.Context, req *APIChatInternalClientPostReqApplicationJSON) (*APIChatInternalClientPostOKApplicationJSON, error)
+	APIChatInternalClientPost(ctx context.Context, req *ClientThing) (*ErrorResponse, error)
 	// APIChatMuteDelete implements DELETE /api/Chat/mute operation.
 	//
 	// Create a new mute for an user.
 	//
 	// DELETE /api/Chat/mute
-	APIChatMuteDelete(ctx context.Context, req *APIChatMuteDeleteReqApplicationJSON) (*APIChatMuteDeleteOKApplicationJSON, error)
+	APIChatMuteDelete(ctx context.Context) (APIChatMuteDeleteRes, error)
 	// APIChatMutePost implements POST /api/Chat/mute operation.
 	//
 	// Create a new mute for an user.
 	//
 	// POST /api/Chat/mute
-	APIChatMutePost(ctx context.Context, req *APIChatMutePostReqApplicationJSON) (*APIChatMutePostOKApplicationJSON, error)
+	APIChatMutePost(ctx context.Context, req *Mute) (APIChatMutePostRes, error)
 	// APIChatSendPost implements POST /api/Chat/send operation.
 	//
 	// Tracks a flip.
 	//
 	// POST /api/Chat/send
-	APIChatSendPost(ctx context.Context, req *APIChatSendPostReqApplicationJSON) (*APIChatSendPostOKApplicationJSON, error)
+	APIChatSendPost(ctx context.Context, req *ChatMessage) (APIChatSendPostRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

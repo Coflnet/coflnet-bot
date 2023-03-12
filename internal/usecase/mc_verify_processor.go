@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/segmentio/kafka-go"
 	"github.com/vmihailenco/msgpack"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slog"
 )
@@ -98,8 +98,10 @@ func (p *McVerifyProcessor) StartProcessing() error {
 }
 
 func (p *McVerifyProcessor) processMessage(ctx context.Context, msg *kafka.Message) error {
-    _, span := p.tracer.Start(ctx, "process-mc-verify-message")
+    ctx, span := p.tracer.Start(ctx, "process-mc-verify-message")
     defer span.End()
+    span.SetAttributes(attribute.Int64("offset", msg.Offset))
+    span.SetAttributes(attribute.String("key", string(msg.Key)))
 
 
     var verificationMessage McVerifyMessageContent
@@ -122,8 +124,6 @@ func (p *McVerifyProcessor) processMessage(ctx context.Context, msg *kafka.Messa
         slog.Error("failed to refresh user id", err)
         span.RecordError(err)
     }
-
-    span.AddEvent(fmt.Sprintf("refreshed user with id %s", id))
 
     return nil
 }

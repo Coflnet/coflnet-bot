@@ -11,95 +11,374 @@ import (
 	"github.com/ogen-go/ogen/json"
 )
 
-// Encode implements json.Marshaler.
-func (s *APIChatInternalClientPostOKApplicationJSON) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
+// Encode encodes APIChatMuteDeleteApplicationJSONBadRequest as json.
+func (s *APIChatMuteDeleteApplicationJSONBadRequest) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
 }
 
-// encodeFields encodes fields.
-func (s *APIChatInternalClientPostOKApplicationJSON) encodeFields(e *jx.Encoder) {
-	{
-		if s.Client.Set {
-			e.FieldStart("client")
-			s.Client.Encode(e)
-		}
-	}
-	{
-		if s.ApiKey.Set {
-			e.FieldStart("apiKey")
-			s.ApiKey.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfAPIChatInternalClientPostOKApplicationJSON = [2]string{
-	0: "client",
-	1: "apiKey",
-}
-
-// Decode decodes APIChatInternalClientPostOKApplicationJSON from json.
-func (s *APIChatInternalClientPostOKApplicationJSON) Decode(d *jx.Decoder) error {
+// Decode decodes APIChatMuteDeleteApplicationJSONBadRequest from json.
+func (s *APIChatMuteDeleteApplicationJSONBadRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode APIChatInternalClientPostOKApplicationJSON to nil")
+		return errors.New("invalid: unable to decode APIChatMuteDeleteApplicationJSONBadRequest to nil")
 	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "client":
-			if err := func() error {
-				s.Client.Reset()
-				if err := s.Client.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"client\"")
-			}
-		case "apiKey":
-			if err := func() error {
-				s.ApiKey.Reset()
-				if err := s.ApiKey.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"apiKey\"")
-			}
-		default:
-			return errors.Errorf("unexpected field %q", k)
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
 		}
 		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode APIChatInternalClientPostOKApplicationJSON")
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
 	}
-
+	*s = APIChatMuteDeleteApplicationJSONBadRequest(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *APIChatInternalClientPostOKApplicationJSON) MarshalJSON() ([]byte, error) {
+func (s *APIChatMuteDeleteApplicationJSONBadRequest) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIChatInternalClientPostOKApplicationJSON) UnmarshalJSON(data []byte) error {
+func (s *APIChatMuteDeleteApplicationJSONBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMuteDeleteApplicationJSONInternalServerError as json.
+func (s *APIChatMuteDeleteApplicationJSONInternalServerError) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMuteDeleteApplicationJSONInternalServerError from json.
+func (s *APIChatMuteDeleteApplicationJSONInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMuteDeleteApplicationJSONInternalServerError to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMuteDeleteApplicationJSONInternalServerError(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMuteDeleteApplicationJSONInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMuteDeleteApplicationJSONInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMutePostApplicationJSONBadRequest as json.
+func (s *APIChatMutePostApplicationJSONBadRequest) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMutePostApplicationJSONBadRequest from json.
+func (s *APIChatMutePostApplicationJSONBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMutePostApplicationJSONBadRequest to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMutePostApplicationJSONBadRequest(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMutePostApplicationJSONBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMutePostApplicationJSONBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMutePostApplicationJSONInternalServerError as json.
+func (s *APIChatMutePostApplicationJSONInternalServerError) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMutePostApplicationJSONInternalServerError from json.
+func (s *APIChatMutePostApplicationJSONInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMutePostApplicationJSONInternalServerError to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMutePostApplicationJSONInternalServerError(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMutePostApplicationJSONInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMutePostApplicationJSONInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatSendPostApplicationJSONBadRequest as json.
+func (s *APIChatSendPostApplicationJSONBadRequest) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatSendPostApplicationJSONBadRequest from json.
+func (s *APIChatSendPostApplicationJSONBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatSendPostApplicationJSONBadRequest to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatSendPostApplicationJSONBadRequest(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatSendPostApplicationJSONBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatSendPostApplicationJSONBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatSendPostApplicationJSONInternalServerError as json.
+func (s *APIChatSendPostApplicationJSONInternalServerError) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatSendPostApplicationJSONInternalServerError from json.
+func (s *APIChatSendPostApplicationJSONInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatSendPostApplicationJSONInternalServerError to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatSendPostApplicationJSONInternalServerError(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatSendPostApplicationJSONInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatSendPostApplicationJSONInternalServerError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) Encode(e *jx.Encoder) {
+func (s *ChatMessage) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) encodeFields(e *jx.Encoder) {
+func (s *ChatMessage) encodeFields(e *jx.Encoder) {
+	{
+		if s.UUID.Set {
+			e.FieldStart("uuid")
+			s.UUID.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("name")
+			s.Name.Encode(e)
+		}
+	}
+	{
+		if s.Prefix.Set {
+			e.FieldStart("prefix")
+			s.Prefix.Encode(e)
+		}
+	}
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+	{
+		if s.ClientName.Set {
+			e.FieldStart("clientName")
+			s.ClientName.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfChatMessage = [5]string{
+	0: "uuid",
+	1: "name",
+	2: "prefix",
+	3: "message",
+	4: "clientName",
+}
+
+// Decode decodes ChatMessage from json.
+func (s *ChatMessage) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChatMessage to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "uuid":
+			if err := func() error {
+				s.UUID.Reset()
+				if err := s.UUID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"uuid\"")
+			}
+		case "name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
+			}
+		case "prefix":
+			if err := func() error {
+				s.Prefix.Reset()
+				if err := s.Prefix.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"prefix\"")
+			}
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "clientName":
+			if err := func() error {
+				s.ClientName.Reset()
+				if err := s.ClientName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"clientName\"")
+			}
+		default:
+			return errors.Errorf("unexpected field %q", k)
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ChatMessage")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ChatMessage) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChatMessage) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ClientThing) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ClientThing) encodeFields(e *jx.Encoder) {
 	{
 		if s.Name.Set {
 			e.FieldStart("name")
@@ -138,7 +417,7 @@ func (s *APIChatInternalClientPostOKApplicationJSONClient) encodeFields(e *jx.En
 	}
 }
 
-var jsonFieldsNameOfAPIChatInternalClientPostOKApplicationJSONClient = [6]string{
+var jsonFieldsNameOfClientThing = [6]string{
 	0: "name",
 	1: "quota",
 	2: "contact",
@@ -147,10 +426,10 @@ var jsonFieldsNameOfAPIChatInternalClientPostOKApplicationJSONClient = [6]string
 	5: "created",
 }
 
-// Decode decodes APIChatInternalClientPostOKApplicationJSONClient from json.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) Decode(d *jx.Decoder) error {
+// Decode decodes ClientThing from json.
+func (s *ClientThing) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode APIChatInternalClientPostOKApplicationJSONClient to nil")
+		return errors.New("invalid: unable to decode ClientThing to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -220,376 +499,131 @@ func (s *APIChatInternalClientPostOKApplicationJSONClient) Decode(d *jx.Decoder)
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode APIChatInternalClientPostOKApplicationJSONClient")
+		return errors.Wrap(err, "decode ClientThing")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) MarshalJSON() ([]byte, error) {
+func (s *ClientThing) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIChatInternalClientPostOKApplicationJSONClient) UnmarshalJSON(data []byte) error {
+func (s *ClientThing) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *APIChatInternalClientPostReqApplicationJSON) Encode(e *jx.Encoder) {
+func (s *ErrorResponse) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *APIChatInternalClientPostReqApplicationJSON) encodeFields(e *jx.Encoder) {
+func (s *ErrorResponse) encodeFields(e *jx.Encoder) {
 	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
+		if s.Slug.Set {
+			e.FieldStart("slug")
+			s.Slug.Encode(e)
 		}
 	}
 	{
-		if s.Quota.Set {
-			e.FieldStart("quota")
-			s.Quota.Encode(e)
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
 		}
 	}
 	{
-		if s.Contact.Set {
-			e.FieldStart("contact")
-			s.Contact.Encode(e)
-		}
-	}
-	{
-		if s.WebHook.Set {
-			e.FieldStart("webHook")
-			s.WebHook.Encode(e)
-		}
-	}
-	{
-		if s.WebhookAuth.Set {
-			e.FieldStart("webhookAuth")
-			s.WebhookAuth.Encode(e)
-		}
-	}
-	{
-		if s.Created.Set {
-			e.FieldStart("created")
-			s.Created.Encode(e, json.EncodeDateTime)
+		if s.Trace.Set {
+			e.FieldStart("trace")
+			s.Trace.Encode(e)
 		}
 	}
 }
 
-var jsonFieldsNameOfAPIChatInternalClientPostReqApplicationJSON = [6]string{
-	0: "name",
-	1: "quota",
-	2: "contact",
-	3: "webHook",
-	4: "webhookAuth",
-	5: "created",
+var jsonFieldsNameOfErrorResponse = [3]string{
+	0: "slug",
+	1: "message",
+	2: "trace",
 }
 
-// Decode decodes APIChatInternalClientPostReqApplicationJSON from json.
-func (s *APIChatInternalClientPostReqApplicationJSON) Decode(d *jx.Decoder) error {
+// Decode decodes ErrorResponse from json.
+func (s *ErrorResponse) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode APIChatInternalClientPostReqApplicationJSON to nil")
+		return errors.New("invalid: unable to decode ErrorResponse to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "name":
+		case "slug":
 			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
+				s.Slug.Reset()
+				if err := s.Slug.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
+				return errors.Wrap(err, "decode field \"slug\"")
 			}
-		case "quota":
+		case "message":
 			if err := func() error {
-				s.Quota.Reset()
-				if err := s.Quota.Decode(d); err != nil {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"quota\"")
+				return errors.Wrap(err, "decode field \"message\"")
 			}
-		case "contact":
+		case "trace":
 			if err := func() error {
-				s.Contact.Reset()
-				if err := s.Contact.Decode(d); err != nil {
+				s.Trace.Reset()
+				if err := s.Trace.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"contact\"")
-			}
-		case "webHook":
-			if err := func() error {
-				s.WebHook.Reset()
-				if err := s.WebHook.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"webHook\"")
-			}
-		case "webhookAuth":
-			if err := func() error {
-				s.WebhookAuth.Reset()
-				if err := s.WebhookAuth.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"webhookAuth\"")
-			}
-		case "created":
-			if err := func() error {
-				s.Created.Reset()
-				if err := s.Created.Decode(d, json.DecodeDateTime); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"created\"")
+				return errors.Wrap(err, "decode field \"trace\"")
 			}
 		default:
 			return errors.Errorf("unexpected field %q", k)
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode APIChatInternalClientPostReqApplicationJSON")
+		return errors.Wrap(err, "decode ErrorResponse")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *APIChatInternalClientPostReqApplicationJSON) MarshalJSON() ([]byte, error) {
+func (s *ErrorResponse) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIChatInternalClientPostReqApplicationJSON) UnmarshalJSON(data []byte) error {
+func (s *ErrorResponse) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *APIChatMuteDeleteOKApplicationJSON) Encode(e *jx.Encoder) {
+func (s *Mute) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *APIChatMuteDeleteOKApplicationJSON) encodeFields(e *jx.Encoder) {
-	{
-		if s.UUID.Set {
-			e.FieldStart("uuid")
-			s.UUID.Encode(e)
-		}
-	}
-	{
-		if s.UnMuter.Set {
-			e.FieldStart("unMuter")
-			s.UnMuter.Encode(e)
-		}
-	}
-	{
-		if s.Reason.Set {
-			e.FieldStart("reason")
-			s.Reason.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfAPIChatMuteDeleteOKApplicationJSON = [3]string{
-	0: "uuid",
-	1: "unMuter",
-	2: "reason",
-}
-
-// Decode decodes APIChatMuteDeleteOKApplicationJSON from json.
-func (s *APIChatMuteDeleteOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode APIChatMuteDeleteOKApplicationJSON to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "uuid":
-			if err := func() error {
-				s.UUID.Reset()
-				if err := s.UUID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"uuid\"")
-			}
-		case "unMuter":
-			if err := func() error {
-				s.UnMuter.Reset()
-				if err := s.UnMuter.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"unMuter\"")
-			}
-		case "reason":
-			if err := func() error {
-				s.Reason.Reset()
-				if err := s.Reason.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"reason\"")
-			}
-		default:
-			return errors.Errorf("unexpected field %q", k)
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode APIChatMuteDeleteOKApplicationJSON")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *APIChatMuteDeleteOKApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIChatMuteDeleteOKApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *APIChatMuteDeleteReqApplicationJSON) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *APIChatMuteDeleteReqApplicationJSON) encodeFields(e *jx.Encoder) {
-	{
-		if s.UUID.Set {
-			e.FieldStart("uuid")
-			s.UUID.Encode(e)
-		}
-	}
-	{
-		if s.UnMuter.Set {
-			e.FieldStart("unMuter")
-			s.UnMuter.Encode(e)
-		}
-	}
-	{
-		if s.Reason.Set {
-			e.FieldStart("reason")
-			s.Reason.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfAPIChatMuteDeleteReqApplicationJSON = [3]string{
-	0: "uuid",
-	1: "unMuter",
-	2: "reason",
-}
-
-// Decode decodes APIChatMuteDeleteReqApplicationJSON from json.
-func (s *APIChatMuteDeleteReqApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode APIChatMuteDeleteReqApplicationJSON to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "uuid":
-			if err := func() error {
-				s.UUID.Reset()
-				if err := s.UUID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"uuid\"")
-			}
-		case "unMuter":
-			if err := func() error {
-				s.UnMuter.Reset()
-				if err := s.UnMuter.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"unMuter\"")
-			}
-		case "reason":
-			if err := func() error {
-				s.Reason.Reset()
-				if err := s.Reason.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"reason\"")
-			}
-		default:
-			return errors.Errorf("unexpected field %q", k)
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode APIChatMuteDeleteReqApplicationJSON")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *APIChatMuteDeleteReqApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIChatMuteDeleteReqApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *APIChatMutePostOKApplicationJSON) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *APIChatMutePostOKApplicationJSON) encodeFields(e *jx.Encoder) {
+func (s *Mute) encodeFields(e *jx.Encoder) {
 	{
 		if s.UUID.Set {
 			e.FieldStart("uuid")
@@ -652,7 +686,7 @@ func (s *APIChatMutePostOKApplicationJSON) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfAPIChatMutePostOKApplicationJSON = [10]string{
+var jsonFieldsNameOfMute = [10]string{
 	0: "uuid",
 	1: "muter",
 	2: "unMuter",
@@ -665,10 +699,10 @@ var jsonFieldsNameOfAPIChatMutePostOKApplicationJSON = [10]string{
 	9: "status",
 }
 
-// Decode decodes APIChatMutePostOKApplicationJSON from json.
-func (s *APIChatMutePostOKApplicationJSON) Decode(d *jx.Decoder) error {
+// Decode decodes Mute from json.
+func (s *Mute) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode APIChatMutePostOKApplicationJSON to nil")
+		return errors.New("invalid: unable to decode Mute to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -778,662 +812,53 @@ func (s *APIChatMutePostOKApplicationJSON) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode APIChatMutePostOKApplicationJSON")
+		return errors.Wrap(err, "decode Mute")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *APIChatMutePostOKApplicationJSON) MarshalJSON() ([]byte, error) {
+func (s *Mute) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIChatMutePostOKApplicationJSON) UnmarshalJSON(data []byte) error {
+func (s *Mute) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes APIChatMutePostOKApplicationJSONStatus as json.
-func (s APIChatMutePostOKApplicationJSONStatus) Encode(e *jx.Encoder) {
+// Encode encodes MuteStatus as json.
+func (s MuteStatus) Encode(e *jx.Encoder) {
 	e.Int32(int32(s))
 }
 
-// Decode decodes APIChatMutePostOKApplicationJSONStatus from json.
-func (s *APIChatMutePostOKApplicationJSONStatus) Decode(d *jx.Decoder) error {
+// Decode decodes MuteStatus from json.
+func (s *MuteStatus) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode APIChatMutePostOKApplicationJSONStatus to nil")
+		return errors.New("invalid: unable to decode MuteStatus to nil")
 	}
 	v, err := d.Int32()
 	if err != nil {
 		return err
 	}
-	*s = APIChatMutePostOKApplicationJSONStatus(v)
+	*s = MuteStatus(v)
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s APIChatMutePostOKApplicationJSONStatus) MarshalJSON() ([]byte, error) {
+func (s MuteStatus) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIChatMutePostOKApplicationJSONStatus) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *APIChatMutePostReqApplicationJSON) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *APIChatMutePostReqApplicationJSON) encodeFields(e *jx.Encoder) {
-	{
-		if s.UUID.Set {
-			e.FieldStart("uuid")
-			s.UUID.Encode(e)
-		}
-	}
-	{
-		if s.Muter.Set {
-			e.FieldStart("muter")
-			s.Muter.Encode(e)
-		}
-	}
-	{
-		if s.UnMuter.Set {
-			e.FieldStart("unMuter")
-			s.UnMuter.Encode(e)
-		}
-	}
-	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
-	}
-	{
-		if s.Reason.Set {
-			e.FieldStart("reason")
-			s.Reason.Encode(e)
-		}
-	}
-	{
-		if s.ClientId.Set {
-			e.FieldStart("clientId")
-			s.ClientId.Encode(e)
-		}
-	}
-	{
-		if s.UnMuteClientId.Set {
-			e.FieldStart("unMuteClientId")
-			s.UnMuteClientId.Encode(e)
-		}
-	}
-	{
-		if s.Timestamp.Set {
-			e.FieldStart("timestamp")
-			s.Timestamp.Encode(e, json.EncodeDateTime)
-		}
-	}
-	{
-		if s.Expires.Set {
-			e.FieldStart("expires")
-			s.Expires.Encode(e, json.EncodeDateTime)
-		}
-	}
-	{
-		if s.Status.Set {
-			e.FieldStart("status")
-			s.Status.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfAPIChatMutePostReqApplicationJSON = [10]string{
-	0: "uuid",
-	1: "muter",
-	2: "unMuter",
-	3: "message",
-	4: "reason",
-	5: "clientId",
-	6: "unMuteClientId",
-	7: "timestamp",
-	8: "expires",
-	9: "status",
-}
-
-// Decode decodes APIChatMutePostReqApplicationJSON from json.
-func (s *APIChatMutePostReqApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode APIChatMutePostReqApplicationJSON to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "uuid":
-			if err := func() error {
-				s.UUID.Reset()
-				if err := s.UUID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"uuid\"")
-			}
-		case "muter":
-			if err := func() error {
-				s.Muter.Reset()
-				if err := s.Muter.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"muter\"")
-			}
-		case "unMuter":
-			if err := func() error {
-				s.UnMuter.Reset()
-				if err := s.UnMuter.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"unMuter\"")
-			}
-		case "message":
-			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"message\"")
-			}
-		case "reason":
-			if err := func() error {
-				s.Reason.Reset()
-				if err := s.Reason.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"reason\"")
-			}
-		case "clientId":
-			if err := func() error {
-				s.ClientId.Reset()
-				if err := s.ClientId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"clientId\"")
-			}
-		case "unMuteClientId":
-			if err := func() error {
-				s.UnMuteClientId.Reset()
-				if err := s.UnMuteClientId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"unMuteClientId\"")
-			}
-		case "timestamp":
-			if err := func() error {
-				s.Timestamp.Reset()
-				if err := s.Timestamp.Decode(d, json.DecodeDateTime); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"timestamp\"")
-			}
-		case "expires":
-			if err := func() error {
-				s.Expires.Reset()
-				if err := s.Expires.Decode(d, json.DecodeDateTime); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"expires\"")
-			}
-		case "status":
-			if err := func() error {
-				s.Status.Reset()
-				if err := s.Status.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"status\"")
-			}
-		default:
-			return errors.Errorf("unexpected field %q", k)
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode APIChatMutePostReqApplicationJSON")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *APIChatMutePostReqApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIChatMutePostReqApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes APIChatMutePostReqApplicationJSONStatus as json.
-func (s APIChatMutePostReqApplicationJSONStatus) Encode(e *jx.Encoder) {
-	e.Int32(int32(s))
-}
-
-// Decode decodes APIChatMutePostReqApplicationJSONStatus from json.
-func (s *APIChatMutePostReqApplicationJSONStatus) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode APIChatMutePostReqApplicationJSONStatus to nil")
-	}
-	v, err := d.Int32()
-	if err != nil {
-		return err
-	}
-	*s = APIChatMutePostReqApplicationJSONStatus(v)
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s APIChatMutePostReqApplicationJSONStatus) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIChatMutePostReqApplicationJSONStatus) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *APIChatSendPostOKApplicationJSON) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *APIChatSendPostOKApplicationJSON) encodeFields(e *jx.Encoder) {
-	{
-		if s.UUID.Set {
-			e.FieldStart("uuid")
-			s.UUID.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.Prefix.Set {
-			e.FieldStart("prefix")
-			s.Prefix.Encode(e)
-		}
-	}
-	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
-	}
-	{
-		if s.ClientName.Set {
-			e.FieldStart("clientName")
-			s.ClientName.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfAPIChatSendPostOKApplicationJSON = [5]string{
-	0: "uuid",
-	1: "name",
-	2: "prefix",
-	3: "message",
-	4: "clientName",
-}
-
-// Decode decodes APIChatSendPostOKApplicationJSON from json.
-func (s *APIChatSendPostOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode APIChatSendPostOKApplicationJSON to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "uuid":
-			if err := func() error {
-				s.UUID.Reset()
-				if err := s.UUID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"uuid\"")
-			}
-		case "name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
-			}
-		case "prefix":
-			if err := func() error {
-				s.Prefix.Reset()
-				if err := s.Prefix.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"prefix\"")
-			}
-		case "message":
-			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"message\"")
-			}
-		case "clientName":
-			if err := func() error {
-				s.ClientName.Reset()
-				if err := s.ClientName.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"clientName\"")
-			}
-		default:
-			return errors.Errorf("unexpected field %q", k)
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode APIChatSendPostOKApplicationJSON")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *APIChatSendPostOKApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIChatSendPostOKApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *APIChatSendPostReqApplicationJSON) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *APIChatSendPostReqApplicationJSON) encodeFields(e *jx.Encoder) {
-	{
-		if s.UUID.Set {
-			e.FieldStart("uuid")
-			s.UUID.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.Prefix.Set {
-			e.FieldStart("prefix")
-			s.Prefix.Encode(e)
-		}
-	}
-	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
-	}
-	{
-		if s.ClientName.Set {
-			e.FieldStart("clientName")
-			s.ClientName.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfAPIChatSendPostReqApplicationJSON = [5]string{
-	0: "uuid",
-	1: "name",
-	2: "prefix",
-	3: "message",
-	4: "clientName",
-}
-
-// Decode decodes APIChatSendPostReqApplicationJSON from json.
-func (s *APIChatSendPostReqApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode APIChatSendPostReqApplicationJSON to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "uuid":
-			if err := func() error {
-				s.UUID.Reset()
-				if err := s.UUID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"uuid\"")
-			}
-		case "name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
-			}
-		case "prefix":
-			if err := func() error {
-				s.Prefix.Reset()
-				if err := s.Prefix.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"prefix\"")
-			}
-		case "message":
-			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"message\"")
-			}
-		case "clientName":
-			if err := func() error {
-				s.ClientName.Reset()
-				if err := s.ClientName.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"clientName\"")
-			}
-		default:
-			return errors.Errorf("unexpected field %q", k)
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode APIChatSendPostReqApplicationJSON")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *APIChatSendPostReqApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIChatSendPostReqApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes APIChatInternalClientPostOKApplicationJSONClient as json.
-func (o OptAPIChatInternalClientPostOKApplicationJSONClient) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes APIChatInternalClientPostOKApplicationJSONClient from json.
-func (o *OptAPIChatInternalClientPostOKApplicationJSONClient) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptAPIChatInternalClientPostOKApplicationJSONClient to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptAPIChatInternalClientPostOKApplicationJSONClient) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptAPIChatInternalClientPostOKApplicationJSONClient) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes APIChatMutePostOKApplicationJSONStatus as json.
-func (o OptAPIChatMutePostOKApplicationJSONStatus) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Int32(int32(o.Value))
-}
-
-// Decode decodes APIChatMutePostOKApplicationJSONStatus from json.
-func (o *OptAPIChatMutePostOKApplicationJSONStatus) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptAPIChatMutePostOKApplicationJSONStatus to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptAPIChatMutePostOKApplicationJSONStatus) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptAPIChatMutePostOKApplicationJSONStatus) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes APIChatMutePostReqApplicationJSONStatus as json.
-func (o OptAPIChatMutePostReqApplicationJSONStatus) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Int32(int32(o.Value))
-}
-
-// Decode decodes APIChatMutePostReqApplicationJSONStatus from json.
-func (o *OptAPIChatMutePostReqApplicationJSONStatus) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptAPIChatMutePostReqApplicationJSONStatus to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptAPIChatMutePostReqApplicationJSONStatus) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptAPIChatMutePostReqApplicationJSONStatus) UnmarshalJSON(data []byte) error {
+func (s *MuteStatus) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1504,6 +929,39 @@ func (s OptInt32) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptInt32) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes MuteStatus as json.
+func (o OptMuteStatus) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Int32(int32(o.Value))
+}
+
+// Decode decodes MuteStatus from json.
+func (o *OptMuteStatus) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptMuteStatus to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptMuteStatus) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptMuteStatus) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

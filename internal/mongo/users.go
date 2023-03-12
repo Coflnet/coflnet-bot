@@ -90,8 +90,9 @@ func UsersByDiscordAccount(ctx context.Context, user *discordgo.User) ([]*model.
 }
 
 func UserById(ctx context.Context, id int) (*model.User, error) {
-    _, span := tracer.Start(ctx, "user-by-id")
+    ctx, span := tracer.Start(ctx, "user-by-id")
     defer span.End()
+    span.SetAttributes(attribute.Int("search-user-id", id))
 
     filter := bson.M{"user_id" : id}
 
