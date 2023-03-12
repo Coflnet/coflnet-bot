@@ -3,6 +3,7 @@ package coflnet
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -80,7 +81,7 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg chat.APIChatSendPostReq) 
     }
 }
 
-func (a *ChatApi) MuteUser(ctx context.Context, mute chat.APIChatMutePostReq) (*chat.Mute, error) {
+func (a *ChatApi) MuteUser(ctx context.Context, mute *chat.APIChatMutePostTextJSON) (*chat.Mute, error) {
     ctx, span := a.tracer.Start(ctx, "mute-user")
     defer span.End()
 
@@ -89,6 +90,7 @@ func (a *ChatApi) MuteUser(ctx context.Context, mute chat.APIChatMutePostReq) (*
         return nil, errors.New("chat api client not initialized")
     }
 
+    slog.Info(fmt.Sprintf("sending mute request to chat api for user %s", mute.UUID.Value))
     response, err := a.apiClient.APIChatMutePost(ctx, mute)
 
     if err != nil {

@@ -143,7 +143,7 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
     }
 
 
-    slog.Info(fmt.Sprintf("Muting %s for %s; Muter: %s", user, reason, muter))
+    slog.Info(fmt.Sprintf("muting %s for %s; Muter: %s", user, reason, muter))
     mute, err := m.chatApi.MuteUser(ctx, &chat.APIChatMutePostTextJSON{
         Muter: chat.NewOptNilString(muter),
         Reason: chat.NewOptNilString(reason),
@@ -164,6 +164,7 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
         return
     }
 
+    slog.Info(fmt.Sprintf("mute was sent successfully, trace: %s", span.SpanContext().TraceID()))
     err = discord.SendMessageToMutesChannel(fmt.Sprintf("%s muted %s", muter, user))
     if err != nil {
         slog.Error("failed to send message to mutes channel", err)
