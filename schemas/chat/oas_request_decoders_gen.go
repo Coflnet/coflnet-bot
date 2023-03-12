@@ -16,7 +16,7 @@ import (
 )
 
 func (s *Server) decodeAPIChatInternalClientPostRequest(r *http.Request) (
-	req *ClientThing,
+	req APIChatInternalClientPostReq,
 	close func() error,
 	rerr error,
 ) {
@@ -35,6 +35,7 @@ func (s *Server) decodeAPIChatInternalClientPostRequest(r *http.Request) (
 			rerr = multierr.Append(rerr, close())
 		}
 	}()
+	req = &APIChatInternalClientPostReqEmptyBody{}
 	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
 		return req, close, nil
 	}
@@ -58,7 +59,48 @@ func (s *Server) decodeAPIChatInternalClientPostRequest(r *http.Request) (
 
 		d := jx.DecodeBytes(buf)
 
-		var request ClientThing
+		var request APIChatInternalClientPostApplicationJSON
+		if err := func() error {
+			if err := request.Decode(d); err != nil {
+				return err
+			}
+			if err := d.Skip(); err != io.EOF {
+				return errors.New("unexpected trailing data")
+			}
+			return nil
+		}(); err != nil {
+			err = &ogenerrors.DecodeBodyError{
+				ContentType: ct,
+				Body:        buf,
+				Err:         err,
+			}
+			return req, close, err
+		}
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "validate")
+		}
+		return &request, close, nil
+	case ct == "text/json":
+		if r.ContentLength == 0 {
+			return req, close, nil
+		}
+		buf, err := io.ReadAll(r.Body)
+		if err != nil {
+			return req, close, err
+		}
+
+		if len(buf) == 0 {
+			return req, close, nil
+		}
+
+		d := jx.DecodeBytes(buf)
+
+		var request APIChatInternalClientPostTextJSON
 		if err := func() error {
 			if err := request.Decode(d); err != nil {
 				return err
@@ -90,7 +132,7 @@ func (s *Server) decodeAPIChatInternalClientPostRequest(r *http.Request) (
 }
 
 func (s *Server) decodeAPIChatMuteDeleteRequest(r *http.Request) (
-	req *UnMute,
+	req APIChatMuteDeleteReq,
 	close func() error,
 	rerr error,
 ) {
@@ -109,6 +151,7 @@ func (s *Server) decodeAPIChatMuteDeleteRequest(r *http.Request) (
 			rerr = multierr.Append(rerr, close())
 		}
 	}()
+	req = &APIChatMuteDeleteReqEmptyBody{}
 	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
 		return req, close, nil
 	}
@@ -132,7 +175,48 @@ func (s *Server) decodeAPIChatMuteDeleteRequest(r *http.Request) (
 
 		d := jx.DecodeBytes(buf)
 
-		var request UnMute
+		var request APIChatMuteDeleteApplicationJSON
+		if err := func() error {
+			if err := request.Decode(d); err != nil {
+				return err
+			}
+			if err := d.Skip(); err != io.EOF {
+				return errors.New("unexpected trailing data")
+			}
+			return nil
+		}(); err != nil {
+			err = &ogenerrors.DecodeBodyError{
+				ContentType: ct,
+				Body:        buf,
+				Err:         err,
+			}
+			return req, close, err
+		}
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "validate")
+		}
+		return &request, close, nil
+	case ct == "text/json":
+		if r.ContentLength == 0 {
+			return req, close, nil
+		}
+		buf, err := io.ReadAll(r.Body)
+		if err != nil {
+			return req, close, err
+		}
+
+		if len(buf) == 0 {
+			return req, close, nil
+		}
+
+		d := jx.DecodeBytes(buf)
+
+		var request APIChatMuteDeleteTextJSON
 		if err := func() error {
 			if err := request.Decode(d); err != nil {
 				return err
@@ -164,7 +248,7 @@ func (s *Server) decodeAPIChatMuteDeleteRequest(r *http.Request) (
 }
 
 func (s *Server) decodeAPIChatMutePostRequest(r *http.Request) (
-	req *Mute,
+	req APIChatMutePostReq,
 	close func() error,
 	rerr error,
 ) {
@@ -183,6 +267,7 @@ func (s *Server) decodeAPIChatMutePostRequest(r *http.Request) (
 			rerr = multierr.Append(rerr, close())
 		}
 	}()
+	req = &APIChatMutePostReqEmptyBody{}
 	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
 		return req, close, nil
 	}
@@ -206,7 +291,48 @@ func (s *Server) decodeAPIChatMutePostRequest(r *http.Request) (
 
 		d := jx.DecodeBytes(buf)
 
-		var request Mute
+		var request APIChatMutePostApplicationJSON
+		if err := func() error {
+			if err := request.Decode(d); err != nil {
+				return err
+			}
+			if err := d.Skip(); err != io.EOF {
+				return errors.New("unexpected trailing data")
+			}
+			return nil
+		}(); err != nil {
+			err = &ogenerrors.DecodeBodyError{
+				ContentType: ct,
+				Body:        buf,
+				Err:         err,
+			}
+			return req, close, err
+		}
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "validate")
+		}
+		return &request, close, nil
+	case ct == "text/json":
+		if r.ContentLength == 0 {
+			return req, close, nil
+		}
+		buf, err := io.ReadAll(r.Body)
+		if err != nil {
+			return req, close, err
+		}
+
+		if len(buf) == 0 {
+			return req, close, nil
+		}
+
+		d := jx.DecodeBytes(buf)
+
+		var request APIChatMutePostTextJSON
 		if err := func() error {
 			if err := request.Decode(d); err != nil {
 				return err
@@ -238,7 +364,7 @@ func (s *Server) decodeAPIChatMutePostRequest(r *http.Request) (
 }
 
 func (s *Server) decodeAPIChatSendPostRequest(r *http.Request) (
-	req *ChatMessage,
+	req APIChatSendPostReq,
 	close func() error,
 	rerr error,
 ) {
@@ -257,6 +383,7 @@ func (s *Server) decodeAPIChatSendPostRequest(r *http.Request) (
 			rerr = multierr.Append(rerr, close())
 		}
 	}()
+	req = &APIChatSendPostReqEmptyBody{}
 	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
 		return req, close, nil
 	}
@@ -280,7 +407,48 @@ func (s *Server) decodeAPIChatSendPostRequest(r *http.Request) (
 
 		d := jx.DecodeBytes(buf)
 
-		var request ChatMessage
+		var request APIChatSendPostApplicationJSON
+		if err := func() error {
+			if err := request.Decode(d); err != nil {
+				return err
+			}
+			if err := d.Skip(); err != io.EOF {
+				return errors.New("unexpected trailing data")
+			}
+			return nil
+		}(); err != nil {
+			err = &ogenerrors.DecodeBodyError{
+				ContentType: ct,
+				Body:        buf,
+				Err:         err,
+			}
+			return req, close, err
+		}
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "validate")
+		}
+		return &request, close, nil
+	case ct == "text/json":
+		if r.ContentLength == 0 {
+			return req, close, nil
+		}
+		buf, err := io.ReadAll(r.Body)
+		if err != nil {
+			return req, close, err
+		}
+
+		if len(buf) == 0 {
+			return req, close, nil
+		}
+
+		d := jx.DecodeBytes(buf)
+
+		var request APIChatSendPostTextJSON
 		if err := func() error {
 			if err := request.Decode(d); err != nil {
 				return err

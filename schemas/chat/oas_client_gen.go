@@ -61,22 +61,38 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 // Create a nw Client.
 //
 // POST /api/Chat/internal/client
-func (c *Client) APIChatInternalClientPost(ctx context.Context, request *ClientThing) (APIChatInternalClientPostRes, error) {
+func (c *Client) APIChatInternalClientPost(ctx context.Context, request APIChatInternalClientPostReq) (APIChatInternalClientPostRes, error) {
 	res, err := c.sendAPIChatInternalClientPost(ctx, request)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendAPIChatInternalClientPost(ctx context.Context, request *ClientThing) (res APIChatInternalClientPostRes, err error) {
+func (c *Client) sendAPIChatInternalClientPost(ctx context.Context, request APIChatInternalClientPostReq) (res APIChatInternalClientPostRes, err error) {
 	var otelAttrs []attribute.KeyValue
 	// Validate request before sending.
-	if err := func() error {
-		if err := request.Validate(); err != nil {
-			return err
+	switch request := request.(type) {
+	case *APIChatInternalClientPostReqEmptyBody:
+		// Validation is not needed for the empty body type.
+	case *APIChatInternalClientPostApplicationJSON:
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "validate")
 		}
-		return nil
-	}(); err != nil {
-		return res, errors.Wrap(err, "validate")
+	case *APIChatInternalClientPostTextJSON:
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "validate")
+		}
+	default:
+		return res, errors.Errorf("unexpected request type: %T", request)
 	}
 
 	// Run stopwatch.
@@ -138,22 +154,38 @@ func (c *Client) sendAPIChatInternalClientPost(ctx context.Context, request *Cli
 // Create a new mute for an user.
 //
 // DELETE /api/Chat/mute
-func (c *Client) APIChatMuteDelete(ctx context.Context, request *UnMute) (APIChatMuteDeleteRes, error) {
+func (c *Client) APIChatMuteDelete(ctx context.Context, request APIChatMuteDeleteReq) (APIChatMuteDeleteRes, error) {
 	res, err := c.sendAPIChatMuteDelete(ctx, request)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendAPIChatMuteDelete(ctx context.Context, request *UnMute) (res APIChatMuteDeleteRes, err error) {
+func (c *Client) sendAPIChatMuteDelete(ctx context.Context, request APIChatMuteDeleteReq) (res APIChatMuteDeleteRes, err error) {
 	var otelAttrs []attribute.KeyValue
 	// Validate request before sending.
-	if err := func() error {
-		if err := request.Validate(); err != nil {
-			return err
+	switch request := request.(type) {
+	case *APIChatMuteDeleteReqEmptyBody:
+		// Validation is not needed for the empty body type.
+	case *APIChatMuteDeleteApplicationJSON:
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "validate")
 		}
-		return nil
-	}(); err != nil {
-		return res, errors.Wrap(err, "validate")
+	case *APIChatMuteDeleteTextJSON:
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "validate")
+		}
+	default:
+		return res, errors.Errorf("unexpected request type: %T", request)
 	}
 
 	// Run stopwatch.
@@ -215,22 +247,38 @@ func (c *Client) sendAPIChatMuteDelete(ctx context.Context, request *UnMute) (re
 // Create a new mute for an user.
 //
 // POST /api/Chat/mute
-func (c *Client) APIChatMutePost(ctx context.Context, request *Mute) (APIChatMutePostRes, error) {
+func (c *Client) APIChatMutePost(ctx context.Context, request APIChatMutePostReq) (APIChatMutePostRes, error) {
 	res, err := c.sendAPIChatMutePost(ctx, request)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendAPIChatMutePost(ctx context.Context, request *Mute) (res APIChatMutePostRes, err error) {
+func (c *Client) sendAPIChatMutePost(ctx context.Context, request APIChatMutePostReq) (res APIChatMutePostRes, err error) {
 	var otelAttrs []attribute.KeyValue
 	// Validate request before sending.
-	if err := func() error {
-		if err := request.Validate(); err != nil {
-			return err
+	switch request := request.(type) {
+	case *APIChatMutePostReqEmptyBody:
+		// Validation is not needed for the empty body type.
+	case *APIChatMutePostApplicationJSON:
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "validate")
 		}
-		return nil
-	}(); err != nil {
-		return res, errors.Wrap(err, "validate")
+	case *APIChatMutePostTextJSON:
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "validate")
+		}
+	default:
+		return res, errors.Errorf("unexpected request type: %T", request)
 	}
 
 	// Run stopwatch.
@@ -292,22 +340,38 @@ func (c *Client) sendAPIChatMutePost(ctx context.Context, request *Mute) (res AP
 // Tracks a flip.
 //
 // POST /api/Chat/send
-func (c *Client) APIChatSendPost(ctx context.Context, request *ChatMessage) (APIChatSendPostRes, error) {
+func (c *Client) APIChatSendPost(ctx context.Context, request APIChatSendPostReq) (APIChatSendPostRes, error) {
 	res, err := c.sendAPIChatSendPost(ctx, request)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendAPIChatSendPost(ctx context.Context, request *ChatMessage) (res APIChatSendPostRes, err error) {
+func (c *Client) sendAPIChatSendPost(ctx context.Context, request APIChatSendPostReq) (res APIChatSendPostRes, err error) {
 	var otelAttrs []attribute.KeyValue
 	// Validate request before sending.
-	if err := func() error {
-		if err := request.Validate(); err != nil {
-			return err
+	switch request := request.(type) {
+	case *APIChatSendPostReqEmptyBody:
+		// Validation is not needed for the empty body type.
+	case *APIChatSendPostApplicationJSON:
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "validate")
 		}
-		return nil
-	}(); err != nil {
-		return res, errors.Wrap(err, "validate")
+	case *APIChatSendPostTextJSON:
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "validate")
+		}
+	default:
+		return res, errors.Errorf("unexpected request type: %T", request)
 	}
 
 	// Run stopwatch.

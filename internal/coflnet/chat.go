@@ -40,19 +40,12 @@ func NewChatClient() (*ChatApi, error) {
     return instance, err
 }
 
-func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.ChatMessage) error {
+func (r *ChatApi) SendMessage(ctx context.Context, msg chat.APIChatSendPostReq) (*chat.ChatMessage, error) {
     ctx, span := r.tracer.Start(ctx, "send-message-to-chat-api")
     defer span.End()
 
-    if msg.Message.IsSet() {
-        span.SetAttributes(attribute.String("message", msg.Message.Value))
-    }
-    if msg.Name.IsSet() {
-        span.SetAttributes(attribute.String("sender", msg.Name.Value))
-    }
-
     if r.apiClient == nil {
-        return errors.New("chat api client not initialized")
+        return nil, errors.New("chat api client not initialized")
     }
 
     response, err := r.apiClient.APIChatSendPost(ctx, msg)
@@ -60,35 +53,37 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.ChatMessage) error 
     if err != nil {
         slog.Error("error sending message to chat api", err)
         span.RecordError(err)
-        return err
+        return nil, err
     }
 
-    switch response.(type) {
-    case *chat.ChatMessage:
+    switch r := response.(type) {
+    case *chat.APIChatSendPostApplicationJSONOK:
+        msg :=  chat.ChatMessage(*r)
         slog.Info("message sent successfully sent to chat api")
         span.SetAttributes(attribute.Bool("success", true))
-        return nil
+        return &msg, nil
     case *chat.APIChatSendPostApplicationJSONBadRequest:
         err := errors.New("bad request")
         slog.Error("error sending message to chat api, bad request", err)
         span.RecordError(err)
-        return err
+        return nil, err
     case *chat.APIChatSendPostApplicationJSONInternalServerError:
         err := errors.New("internal server error")
         slog.Error("error sending message to chat api, internal server error", err)
         span.RecordError(err)
-        return err
+        return nil, err
     default:
         err = errors.New("unknown response")
         slog.Error("error sending message to chat api, unknown response", err)
         span.RecordError(err)
-        return err
+        return nil, err
     }
 }
 
-func (a *ChatApi) MuteUser(ctx context.Context, mute *chat.Mute) (*chat.Mute, error) {
+func (a *ChatApi) MuteUser(ctx context.Context, mute chat.APIChatMutePostReq) (*chat.Mute, error) {
     ctx, span := a.tracer.Start(ctx, "mute-user")
     defer span.End()
+
 
     if a.apiClient == nil {
         return nil, errors.New("chat api client not initialized")
@@ -102,11 +97,12 @@ func (a *ChatApi) MuteUser(ctx context.Context, mute *chat.Mute) (*chat.Mute, er
         return nil, err
     }
 
-    switch mute := response.(type) {
-    case *chat.Mute:
-        slog.Info("user muted successfully")
+    switch r := response.(type) {
+    case *chat.APIChatMutePostApplicationJSONOK:
+        mute := chat.Mute(*r)
+        slog.Info("user muted successfully until %s", mute.Expires.Value)
         span.SetAttributes(attribute.Bool("success", true))
-        return mute, nil
+        return &mute, nil
     case *chat.APIChatMutePostApplicationJSONBadRequest:
         err := errors.New("bad request")
         slog.Error("error muting user, bad request", err)

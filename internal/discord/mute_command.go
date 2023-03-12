@@ -144,23 +144,11 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
 
 
     slog.Info(fmt.Sprintf("Muting %s for %s; Muter: %s", user, reason, muter))
-    mute, err := m.chatApi.MuteUser(ctx, &chat.Mute{
-        Muter: chat.OptNilString{
-            Value: muter,
-            Null: false,
-        },
-        Reason: chat.OptNilString{
-            Value: reason,
-            Null: false,
-        },
-        Message: chat.OptNilString{
-            Value: message,
-            Null: false,
-        },
-        UUID: chat.OptNilString{
-            Value: userUUID,
-            Null: false,
-        },
+    mute, err := m.chatApi.MuteUser(ctx, &chat.APIChatMutePostTextJSON{
+        Muter: chat.NewOptNilString(muter),
+        Reason: chat.NewOptNilString(reason),
+        Message: chat.NewOptNilString(message),
+        UUID: chat.NewOptNilString(userUUID),
     })
 
     if err != nil {

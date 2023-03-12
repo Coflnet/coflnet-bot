@@ -78,7 +78,7 @@ func (s *Server) handleAPIChatInternalClientPostRequest(args [0]string, w http.R
 		}
 
 		type (
-			Request  = *ClientThing
+			Request  = APIChatInternalClientPostReq
 			Params   = struct{}
 			Response = APIChatInternalClientPostRes
 		)
@@ -175,7 +175,7 @@ func (s *Server) handleAPIChatMuteDeleteRequest(args [0]string, w http.ResponseW
 		}
 
 		type (
-			Request  = *UnMute
+			Request  = APIChatMuteDeleteReq
 			Params   = struct{}
 			Response = APIChatMuteDeleteRes
 		)
@@ -272,7 +272,7 @@ func (s *Server) handleAPIChatMutePostRequest(args [0]string, w http.ResponseWri
 		}
 
 		type (
-			Request  = *Mute
+			Request  = APIChatMutePostReq
 			Params   = struct{}
 			Response = APIChatMutePostRes
 		)
@@ -369,7 +369,7 @@ func (s *Server) handleAPIChatSendPostRequest(args [0]string, w http.ResponseWri
 		}
 
 		type (
-			Request  = *ChatMessage
+			Request  = APIChatSendPostReq
 			Params   = struct{}
 			Response = APIChatSendPostRes
 		)

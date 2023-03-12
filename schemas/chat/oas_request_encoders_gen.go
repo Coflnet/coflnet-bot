@@ -6,63 +6,132 @@ import (
 	"bytes"
 	"net/http"
 
+	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
 
 	ht "github.com/ogen-go/ogen/http"
 )
 
 func encodeAPIChatInternalClientPostRequest(
-	req *ClientThing,
+	req APIChatInternalClientPostReq,
 	r *http.Request,
 ) error {
-	const contentType = "application/json"
-	e := jx.GetEncoder()
-	{
-		req.Encode(e)
+	switch req := req.(type) {
+	case *APIChatInternalClientPostReqEmptyBody:
+		// Empty body case.
+		return nil
+	case *APIChatInternalClientPostApplicationJSON:
+		const contentType = "application/json"
+		e := jx.GetEncoder()
+		{
+			req.Encode(e)
+		}
+		encoded := e.Bytes()
+		ht.SetBody(r, bytes.NewReader(encoded), contentType)
+		return nil
+	case *APIChatInternalClientPostTextJSON:
+		const contentType = "text/json"
+		e := jx.GetEncoder()
+		{
+			req.Encode(e)
+		}
+		encoded := e.Bytes()
+		ht.SetBody(r, bytes.NewReader(encoded), contentType)
+		return nil
+	default:
+		return errors.Errorf("unexpected request type: %T", req)
 	}
-	encoded := e.Bytes()
-	ht.SetBody(r, bytes.NewReader(encoded), contentType)
-	return nil
 }
 
 func encodeAPIChatMuteDeleteRequest(
-	req *UnMute,
+	req APIChatMuteDeleteReq,
 	r *http.Request,
 ) error {
-	const contentType = "application/json"
-	e := jx.GetEncoder()
-	{
-		req.Encode(e)
+	switch req := req.(type) {
+	case *APIChatMuteDeleteReqEmptyBody:
+		// Empty body case.
+		return nil
+	case *APIChatMuteDeleteApplicationJSON:
+		const contentType = "application/json"
+		e := jx.GetEncoder()
+		{
+			req.Encode(e)
+		}
+		encoded := e.Bytes()
+		ht.SetBody(r, bytes.NewReader(encoded), contentType)
+		return nil
+	case *APIChatMuteDeleteTextJSON:
+		const contentType = "text/json"
+		e := jx.GetEncoder()
+		{
+			req.Encode(e)
+		}
+		encoded := e.Bytes()
+		ht.SetBody(r, bytes.NewReader(encoded), contentType)
+		return nil
+	default:
+		return errors.Errorf("unexpected request type: %T", req)
 	}
-	encoded := e.Bytes()
-	ht.SetBody(r, bytes.NewReader(encoded), contentType)
-	return nil
 }
 
 func encodeAPIChatMutePostRequest(
-	req *Mute,
+	req APIChatMutePostReq,
 	r *http.Request,
 ) error {
-	const contentType = "application/json"
-	e := jx.GetEncoder()
-	{
-		req.Encode(e)
+	switch req := req.(type) {
+	case *APIChatMutePostReqEmptyBody:
+		// Empty body case.
+		return nil
+	case *APIChatMutePostApplicationJSON:
+		const contentType = "application/json"
+		e := jx.GetEncoder()
+		{
+			req.Encode(e)
+		}
+		encoded := e.Bytes()
+		ht.SetBody(r, bytes.NewReader(encoded), contentType)
+		return nil
+	case *APIChatMutePostTextJSON:
+		const contentType = "text/json"
+		e := jx.GetEncoder()
+		{
+			req.Encode(e)
+		}
+		encoded := e.Bytes()
+		ht.SetBody(r, bytes.NewReader(encoded), contentType)
+		return nil
+	default:
+		return errors.Errorf("unexpected request type: %T", req)
 	}
-	encoded := e.Bytes()
-	ht.SetBody(r, bytes.NewReader(encoded), contentType)
-	return nil
 }
 
 func encodeAPIChatSendPostRequest(
-	req *ChatMessage,
+	req APIChatSendPostReq,
 	r *http.Request,
 ) error {
-	const contentType = "application/json"
-	e := jx.GetEncoder()
-	{
-		req.Encode(e)
+	switch req := req.(type) {
+	case *APIChatSendPostReqEmptyBody:
+		// Empty body case.
+		return nil
+	case *APIChatSendPostApplicationJSON:
+		const contentType = "application/json"
+		e := jx.GetEncoder()
+		{
+			req.Encode(e)
+		}
+		encoded := e.Bytes()
+		ht.SetBody(r, bytes.NewReader(encoded), contentType)
+		return nil
+	case *APIChatSendPostTextJSON:
+		const contentType = "text/json"
+		e := jx.GetEncoder()
+		{
+			req.Encode(e)
+		}
+		encoded := e.Bytes()
+		ht.SetBody(r, bytes.NewReader(encoded), contentType)
+		return nil
+	default:
+		return errors.Errorf("unexpected request type: %T", req)
 	}
-	encoded := e.Bytes()
-	ht.SetBody(r, bytes.NewReader(encoded), contentType)
-	return nil
 }

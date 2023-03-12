@@ -30,7 +30,32 @@ func decodeAPIChatInternalClientPostResponse(resp *http.Response) (res APIChatIn
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CientCreationResponse
+			var response APIChatInternalClientPostApplicationJSONOK
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		case ct == "text/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatInternalClientPostTextJSONOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -65,7 +90,32 @@ func decodeAPIChatInternalClientPostResponse(resp *http.Response) (res APIChatIn
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ErrorResponse
+			var response APIChatInternalClientPostApplicationJSONInternalServerError
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		case ct == "text/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatInternalClientPostTextJSONInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -106,7 +156,32 @@ func decodeAPIChatMuteDeleteResponse(resp *http.Response) (res APIChatMuteDelete
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response UnMute
+			var response APIChatMuteDeleteApplicationJSONOK
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		case ct == "text/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatMuteDeleteTextJSONOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -159,6 +234,31 @@ func decodeAPIChatMuteDeleteResponse(resp *http.Response) (res APIChatMuteDelete
 				return res, err
 			}
 			return &response, nil
+		case ct == "text/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatMuteDeleteTextJSONBadRequest
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -177,6 +277,31 @@ func decodeAPIChatMuteDeleteResponse(resp *http.Response) (res APIChatMuteDelete
 			d := jx.DecodeBytes(buf)
 
 			var response APIChatMuteDeleteApplicationJSONInternalServerError
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		case ct == "text/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatMuteDeleteTextJSONInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -217,7 +342,32 @@ func decodeAPIChatMutePostResponse(resp *http.Response) (res APIChatMutePostRes,
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Mute
+			var response APIChatMutePostApplicationJSONOK
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		case ct == "text/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatMutePostTextJSONOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -270,6 +420,31 @@ func decodeAPIChatMutePostResponse(resp *http.Response) (res APIChatMutePostRes,
 				return res, err
 			}
 			return &response, nil
+		case ct == "text/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatMutePostTextJSONBadRequest
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -288,6 +463,31 @@ func decodeAPIChatMutePostResponse(resp *http.Response) (res APIChatMutePostRes,
 			d := jx.DecodeBytes(buf)
 
 			var response APIChatMutePostApplicationJSONInternalServerError
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		case ct == "text/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatMutePostTextJSONInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -328,7 +528,32 @@ func decodeAPIChatSendPostResponse(resp *http.Response) (res APIChatSendPostRes,
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChatMessage
+			var response APIChatSendPostApplicationJSONOK
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		case ct == "text/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatSendPostTextJSONOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -381,6 +606,31 @@ func decodeAPIChatSendPostResponse(resp *http.Response) (res APIChatSendPostRes,
 				return res, err
 			}
 			return &response, nil
+		case ct == "text/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatSendPostTextJSONBadRequest
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -399,6 +649,31 @@ func decodeAPIChatSendPostResponse(resp *http.Response) (res APIChatSendPostRes,
 			d := jx.DecodeBytes(buf)
 
 			var response APIChatSendPostApplicationJSONInternalServerError
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		case ct == "text/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response APIChatSendPostTextJSONInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

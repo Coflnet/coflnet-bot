@@ -13,7 +13,7 @@ import (
 
 func encodeAPIChatInternalClientPostResponse(response APIChatInternalClientPostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *CientCreationResponse:
+	case *APIChatInternalClientPostApplicationJSONOK:
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -25,8 +25,32 @@ func encodeAPIChatInternalClientPostResponse(response APIChatInternalClientPostR
 		}
 		return nil
 
-	case *ErrorResponse:
+	case *APIChatInternalClientPostTextJSONOK:
+		w.Header().Set("Content-Type", "text/json")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	case *APIChatInternalClientPostApplicationJSONInternalServerError:
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	case *APIChatInternalClientPostTextJSONInternalServerError:
+		w.Header().Set("Content-Type", "text/json")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
 
@@ -44,8 +68,20 @@ func encodeAPIChatInternalClientPostResponse(response APIChatInternalClientPostR
 
 func encodeAPIChatMuteDeleteResponse(response APIChatMuteDeleteRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *UnMute:
+	case *APIChatMuteDeleteApplicationJSONOK:
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	case *APIChatMuteDeleteTextJSONOK:
+		w.Header().Set("Content-Type", "text/json")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
 
@@ -68,8 +104,32 @@ func encodeAPIChatMuteDeleteResponse(response APIChatMuteDeleteRes, w http.Respo
 		}
 		return nil
 
+	case *APIChatMuteDeleteTextJSONBadRequest:
+		w.Header().Set("Content-Type", "text/json")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
 	case *APIChatMuteDeleteApplicationJSONInternalServerError:
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	case *APIChatMuteDeleteTextJSONInternalServerError:
+		w.Header().Set("Content-Type", "text/json")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
 
@@ -87,8 +147,20 @@ func encodeAPIChatMuteDeleteResponse(response APIChatMuteDeleteRes, w http.Respo
 
 func encodeAPIChatMutePostResponse(response APIChatMutePostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *Mute:
+	case *APIChatMutePostApplicationJSONOK:
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	case *APIChatMutePostTextJSONOK:
+		w.Header().Set("Content-Type", "text/json")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
 
@@ -111,8 +183,32 @@ func encodeAPIChatMutePostResponse(response APIChatMutePostRes, w http.ResponseW
 		}
 		return nil
 
+	case *APIChatMutePostTextJSONBadRequest:
+		w.Header().Set("Content-Type", "text/json")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
 	case *APIChatMutePostApplicationJSONInternalServerError:
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	case *APIChatMutePostTextJSONInternalServerError:
+		w.Header().Set("Content-Type", "text/json")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
 
@@ -130,8 +226,20 @@ func encodeAPIChatMutePostResponse(response APIChatMutePostRes, w http.ResponseW
 
 func encodeAPIChatSendPostResponse(response APIChatSendPostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *ChatMessage:
+	case *APIChatSendPostApplicationJSONOK:
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	case *APIChatSendPostTextJSONOK:
+		w.Header().Set("Content-Type", "text/json")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
 
@@ -154,8 +262,32 @@ func encodeAPIChatSendPostResponse(response APIChatSendPostRes, w http.ResponseW
 		}
 		return nil
 
+	case *APIChatSendPostTextJSONBadRequest:
+		w.Header().Set("Content-Type", "text/json")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
 	case *APIChatSendPostApplicationJSONInternalServerError:
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	case *APIChatSendPostTextJSONInternalServerError:
+		w.Header().Set("Content-Type", "text/json")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
 

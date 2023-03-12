@@ -244,18 +244,15 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 
 	user := users[0]
 
-	err = p.coflnetChatClient.SendMessage(ctx, &chat.ChatMessage{
+    _, err = p.coflnetChatClient.SendMessage(ctx, &chat.APIChatSendPostTextJSON{
 		Message: chat.OptNilString{
-			Null:  false,
 			Value: msg.Content,
 		},
 		UUID: chat.OptNilString{
-			Null:  false,
 			Value: user.UUID(),
 		},
 		ClientName: chat.OptNilString{
 			Value: coflDiscordClientName,
-			Null:  false,
 		},
 	})
 

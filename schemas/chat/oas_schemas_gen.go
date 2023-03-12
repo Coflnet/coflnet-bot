@@ -6,6 +6,38 @@ import (
 	"time"
 )
 
+type APIChatInternalClientPostApplicationJSON ClientThing
+
+func (*APIChatInternalClientPostApplicationJSON) aPIChatInternalClientPostReq() {}
+
+type APIChatInternalClientPostApplicationJSONInternalServerError ErrorResponse
+
+func (*APIChatInternalClientPostApplicationJSONInternalServerError) aPIChatInternalClientPostRes() {}
+
+type APIChatInternalClientPostApplicationJSONOK CientCreationResponse
+
+func (*APIChatInternalClientPostApplicationJSONOK) aPIChatInternalClientPostRes() {}
+
+type APIChatInternalClientPostReqEmptyBody struct{}
+
+func (*APIChatInternalClientPostReqEmptyBody) aPIChatInternalClientPostReq() {}
+
+type APIChatInternalClientPostTextJSON ClientThing
+
+func (*APIChatInternalClientPostTextJSON) aPIChatInternalClientPostReq() {}
+
+type APIChatInternalClientPostTextJSONInternalServerError ErrorResponse
+
+func (*APIChatInternalClientPostTextJSONInternalServerError) aPIChatInternalClientPostRes() {}
+
+type APIChatInternalClientPostTextJSONOK CientCreationResponse
+
+func (*APIChatInternalClientPostTextJSONOK) aPIChatInternalClientPostRes() {}
+
+type APIChatMuteDeleteApplicationJSON UnMute
+
+func (*APIChatMuteDeleteApplicationJSON) aPIChatMuteDeleteReq() {}
+
 type APIChatMuteDeleteApplicationJSONBadRequest ErrorResponse
 
 func (*APIChatMuteDeleteApplicationJSONBadRequest) aPIChatMuteDeleteRes() {}
@@ -13,6 +45,34 @@ func (*APIChatMuteDeleteApplicationJSONBadRequest) aPIChatMuteDeleteRes() {}
 type APIChatMuteDeleteApplicationJSONInternalServerError ErrorResponse
 
 func (*APIChatMuteDeleteApplicationJSONInternalServerError) aPIChatMuteDeleteRes() {}
+
+type APIChatMuteDeleteApplicationJSONOK UnMute
+
+func (*APIChatMuteDeleteApplicationJSONOK) aPIChatMuteDeleteRes() {}
+
+type APIChatMuteDeleteReqEmptyBody struct{}
+
+func (*APIChatMuteDeleteReqEmptyBody) aPIChatMuteDeleteReq() {}
+
+type APIChatMuteDeleteTextJSON UnMute
+
+func (*APIChatMuteDeleteTextJSON) aPIChatMuteDeleteReq() {}
+
+type APIChatMuteDeleteTextJSONBadRequest ErrorResponse
+
+func (*APIChatMuteDeleteTextJSONBadRequest) aPIChatMuteDeleteRes() {}
+
+type APIChatMuteDeleteTextJSONInternalServerError ErrorResponse
+
+func (*APIChatMuteDeleteTextJSONInternalServerError) aPIChatMuteDeleteRes() {}
+
+type APIChatMuteDeleteTextJSONOK UnMute
+
+func (*APIChatMuteDeleteTextJSONOK) aPIChatMuteDeleteRes() {}
+
+type APIChatMutePostApplicationJSON Mute
+
+func (*APIChatMutePostApplicationJSON) aPIChatMutePostReq() {}
 
 type APIChatMutePostApplicationJSONBadRequest ErrorResponse
 
@@ -22,6 +82,34 @@ type APIChatMutePostApplicationJSONInternalServerError ErrorResponse
 
 func (*APIChatMutePostApplicationJSONInternalServerError) aPIChatMutePostRes() {}
 
+type APIChatMutePostApplicationJSONOK Mute
+
+func (*APIChatMutePostApplicationJSONOK) aPIChatMutePostRes() {}
+
+type APIChatMutePostReqEmptyBody struct{}
+
+func (*APIChatMutePostReqEmptyBody) aPIChatMutePostReq() {}
+
+type APIChatMutePostTextJSON Mute
+
+func (*APIChatMutePostTextJSON) aPIChatMutePostReq() {}
+
+type APIChatMutePostTextJSONBadRequest ErrorResponse
+
+func (*APIChatMutePostTextJSONBadRequest) aPIChatMutePostRes() {}
+
+type APIChatMutePostTextJSONInternalServerError ErrorResponse
+
+func (*APIChatMutePostTextJSONInternalServerError) aPIChatMutePostRes() {}
+
+type APIChatMutePostTextJSONOK Mute
+
+func (*APIChatMutePostTextJSONOK) aPIChatMutePostRes() {}
+
+type APIChatSendPostApplicationJSON ChatMessage
+
+func (*APIChatSendPostApplicationJSON) aPIChatSendPostReq() {}
+
 type APIChatSendPostApplicationJSONBadRequest ErrorResponse
 
 func (*APIChatSendPostApplicationJSONBadRequest) aPIChatSendPostRes() {}
@@ -29,6 +117,30 @@ func (*APIChatSendPostApplicationJSONBadRequest) aPIChatSendPostRes() {}
 type APIChatSendPostApplicationJSONInternalServerError ErrorResponse
 
 func (*APIChatSendPostApplicationJSONInternalServerError) aPIChatSendPostRes() {}
+
+type APIChatSendPostApplicationJSONOK ChatMessage
+
+func (*APIChatSendPostApplicationJSONOK) aPIChatSendPostRes() {}
+
+type APIChatSendPostReqEmptyBody struct{}
+
+func (*APIChatSendPostReqEmptyBody) aPIChatSendPostReq() {}
+
+type APIChatSendPostTextJSON ChatMessage
+
+func (*APIChatSendPostTextJSON) aPIChatSendPostReq() {}
+
+type APIChatSendPostTextJSONBadRequest ErrorResponse
+
+func (*APIChatSendPostTextJSONBadRequest) aPIChatSendPostRes() {}
+
+type APIChatSendPostTextJSONInternalServerError ErrorResponse
+
+func (*APIChatSendPostTextJSONInternalServerError) aPIChatSendPostRes() {}
+
+type APIChatSendPostTextJSONOK ChatMessage
+
+func (*APIChatSendPostTextJSONOK) aPIChatSendPostRes() {}
 
 // Ref: #/components/schemas/ChatMessage
 type ChatMessage struct {
@@ -94,8 +206,6 @@ func (s *ChatMessage) SetClientName(val OptNilString) {
 	s.ClientName = val
 }
 
-func (*ChatMessage) aPIChatSendPostRes() {}
-
 // Contains the client and its api key (only place where the api key is visible).
 // Ref: #/components/schemas/CientCreationResponse
 type CientCreationResponse struct {
@@ -122,8 +232,6 @@ func (s *CientCreationResponse) SetClient(val OptClientThing) {
 func (s *CientCreationResponse) SetApiKey(val OptNilString) {
 	s.ApiKey = val
 }
-
-func (*CientCreationResponse) aPIChatInternalClientPostRes() {}
 
 // Client software capeable of sending messages.
 // Ref: #/components/schemas/ClientThing
@@ -238,8 +346,6 @@ func (s *ErrorResponse) SetMessage(val OptNilString) {
 func (s *ErrorResponse) SetTrace(val OptNilString) {
 	s.Trace = val
 }
-
-func (*ErrorResponse) aPIChatInternalClientPostRes() {}
 
 // Ref: #/components/schemas/Mute
 type Mute struct {
@@ -363,8 +469,6 @@ func (s *Mute) SetExpires(val OptDateTime) {
 func (s *Mute) SetStatus(val OptMuteStatus) {
 	s.Status = val
 }
-
-func (*Mute) aPIChatMutePostRes() {}
 
 // Ref: #/components/schemas/MuteStatus
 type MuteStatus int32
@@ -656,5 +760,3 @@ func (s *UnMute) SetUnMuter(val OptNilString) {
 func (s *UnMute) SetReason(val OptNilString) {
 	s.Reason = val
 }
-
-func (*UnMute) aPIChatMuteDeleteRes() {}

@@ -18,7 +18,7 @@ var _ Handler = UnimplementedHandler{}
 // Create a nw Client.
 //
 // POST /api/Chat/internal/client
-func (UnimplementedHandler) APIChatInternalClientPost(ctx context.Context, req *ClientThing) (r APIChatInternalClientPostRes, _ error) {
+func (UnimplementedHandler) APIChatInternalClientPost(ctx context.Context, req APIChatInternalClientPostReq) (r APIChatInternalClientPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -27,7 +27,7 @@ func (UnimplementedHandler) APIChatInternalClientPost(ctx context.Context, req *
 // Create a new mute for an user.
 //
 // DELETE /api/Chat/mute
-func (UnimplementedHandler) APIChatMuteDelete(ctx context.Context, req *UnMute) (r APIChatMuteDeleteRes, _ error) {
+func (UnimplementedHandler) APIChatMuteDelete(ctx context.Context, req APIChatMuteDeleteReq) (r APIChatMuteDeleteRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -36,7 +36,7 @@ func (UnimplementedHandler) APIChatMuteDelete(ctx context.Context, req *UnMute) 
 // Create a new mute for an user.
 //
 // POST /api/Chat/mute
-func (UnimplementedHandler) APIChatMutePost(ctx context.Context, req *Mute) (r APIChatMutePostRes, _ error) {
+func (UnimplementedHandler) APIChatMutePost(ctx context.Context, req APIChatMutePostReq) (r APIChatMutePostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -45,6 +45,6 @@ func (UnimplementedHandler) APIChatMutePost(ctx context.Context, req *Mute) (r A
 // Tracks a flip.
 //
 // POST /api/Chat/send
-func (UnimplementedHandler) APIChatSendPost(ctx context.Context, req *ChatMessage) (r APIChatSendPostRes, _ error) {
+func (UnimplementedHandler) APIChatSendPost(ctx context.Context, req APIChatSendPostReq) (r APIChatSendPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

@@ -8,6 +8,102 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
+func (s *APIChatInternalClientPostApplicationJSON) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatInternalClientPostApplicationJSONOK) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatInternalClientPostTextJSON) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatInternalClientPostTextJSONOK) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatMuteDeleteApplicationJSON) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatMuteDeleteApplicationJSONOK) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatMuteDeleteTextJSON) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatMuteDeleteTextJSONOK) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatMutePostApplicationJSON) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatMutePostApplicationJSONOK) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatMutePostTextJSON) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatMutePostTextJSONOK) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatSendPostApplicationJSON) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatSendPostApplicationJSONOK) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatSendPostTextJSON) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+func (s *APIChatSendPostTextJSONOK) Validate() error {
+	if err := s.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
 func (s *ChatMessage) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {

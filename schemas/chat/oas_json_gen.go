@@ -11,6 +11,272 @@ import (
 	"github.com/ogen-go/ogen/json"
 )
 
+// Encode encodes APIChatInternalClientPostApplicationJSON as json.
+func (s *APIChatInternalClientPostApplicationJSON) Encode(e *jx.Encoder) {
+	unwrapped := (*ClientThing)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatInternalClientPostApplicationJSON from json.
+func (s *APIChatInternalClientPostApplicationJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatInternalClientPostApplicationJSON to nil")
+	}
+	var unwrapped ClientThing
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatInternalClientPostApplicationJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatInternalClientPostApplicationJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatInternalClientPostApplicationJSON) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatInternalClientPostApplicationJSONInternalServerError as json.
+func (s *APIChatInternalClientPostApplicationJSONInternalServerError) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatInternalClientPostApplicationJSONInternalServerError from json.
+func (s *APIChatInternalClientPostApplicationJSONInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatInternalClientPostApplicationJSONInternalServerError to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatInternalClientPostApplicationJSONInternalServerError(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatInternalClientPostApplicationJSONInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatInternalClientPostApplicationJSONInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatInternalClientPostApplicationJSONOK as json.
+func (s *APIChatInternalClientPostApplicationJSONOK) Encode(e *jx.Encoder) {
+	unwrapped := (*CientCreationResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatInternalClientPostApplicationJSONOK from json.
+func (s *APIChatInternalClientPostApplicationJSONOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatInternalClientPostApplicationJSONOK to nil")
+	}
+	var unwrapped CientCreationResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatInternalClientPostApplicationJSONOK(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatInternalClientPostApplicationJSONOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatInternalClientPostApplicationJSONOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatInternalClientPostTextJSON as json.
+func (s *APIChatInternalClientPostTextJSON) Encode(e *jx.Encoder) {
+	unwrapped := (*ClientThing)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatInternalClientPostTextJSON from json.
+func (s *APIChatInternalClientPostTextJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatInternalClientPostTextJSON to nil")
+	}
+	var unwrapped ClientThing
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatInternalClientPostTextJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatInternalClientPostTextJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatInternalClientPostTextJSON) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatInternalClientPostTextJSONInternalServerError as json.
+func (s *APIChatInternalClientPostTextJSONInternalServerError) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatInternalClientPostTextJSONInternalServerError from json.
+func (s *APIChatInternalClientPostTextJSONInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatInternalClientPostTextJSONInternalServerError to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatInternalClientPostTextJSONInternalServerError(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatInternalClientPostTextJSONInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatInternalClientPostTextJSONInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatInternalClientPostTextJSONOK as json.
+func (s *APIChatInternalClientPostTextJSONOK) Encode(e *jx.Encoder) {
+	unwrapped := (*CientCreationResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatInternalClientPostTextJSONOK from json.
+func (s *APIChatInternalClientPostTextJSONOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatInternalClientPostTextJSONOK to nil")
+	}
+	var unwrapped CientCreationResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatInternalClientPostTextJSONOK(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatInternalClientPostTextJSONOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatInternalClientPostTextJSONOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMuteDeleteApplicationJSON as json.
+func (s *APIChatMuteDeleteApplicationJSON) Encode(e *jx.Encoder) {
+	unwrapped := (*UnMute)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMuteDeleteApplicationJSON from json.
+func (s *APIChatMuteDeleteApplicationJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMuteDeleteApplicationJSON to nil")
+	}
+	var unwrapped UnMute
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMuteDeleteApplicationJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMuteDeleteApplicationJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMuteDeleteApplicationJSON) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes APIChatMuteDeleteApplicationJSONBadRequest as json.
 func (s *APIChatMuteDeleteApplicationJSONBadRequest) Encode(e *jx.Encoder) {
 	unwrapped := (*ErrorResponse)(s)
@@ -83,6 +349,234 @@ func (s *APIChatMuteDeleteApplicationJSONInternalServerError) MarshalJSON() ([]b
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *APIChatMuteDeleteApplicationJSONInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMuteDeleteApplicationJSONOK as json.
+func (s *APIChatMuteDeleteApplicationJSONOK) Encode(e *jx.Encoder) {
+	unwrapped := (*UnMute)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMuteDeleteApplicationJSONOK from json.
+func (s *APIChatMuteDeleteApplicationJSONOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMuteDeleteApplicationJSONOK to nil")
+	}
+	var unwrapped UnMute
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMuteDeleteApplicationJSONOK(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMuteDeleteApplicationJSONOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMuteDeleteApplicationJSONOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMuteDeleteTextJSON as json.
+func (s *APIChatMuteDeleteTextJSON) Encode(e *jx.Encoder) {
+	unwrapped := (*UnMute)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMuteDeleteTextJSON from json.
+func (s *APIChatMuteDeleteTextJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMuteDeleteTextJSON to nil")
+	}
+	var unwrapped UnMute
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMuteDeleteTextJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMuteDeleteTextJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMuteDeleteTextJSON) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMuteDeleteTextJSONBadRequest as json.
+func (s *APIChatMuteDeleteTextJSONBadRequest) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMuteDeleteTextJSONBadRequest from json.
+func (s *APIChatMuteDeleteTextJSONBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMuteDeleteTextJSONBadRequest to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMuteDeleteTextJSONBadRequest(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMuteDeleteTextJSONBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMuteDeleteTextJSONBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMuteDeleteTextJSONInternalServerError as json.
+func (s *APIChatMuteDeleteTextJSONInternalServerError) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMuteDeleteTextJSONInternalServerError from json.
+func (s *APIChatMuteDeleteTextJSONInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMuteDeleteTextJSONInternalServerError to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMuteDeleteTextJSONInternalServerError(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMuteDeleteTextJSONInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMuteDeleteTextJSONInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMuteDeleteTextJSONOK as json.
+func (s *APIChatMuteDeleteTextJSONOK) Encode(e *jx.Encoder) {
+	unwrapped := (*UnMute)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMuteDeleteTextJSONOK from json.
+func (s *APIChatMuteDeleteTextJSONOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMuteDeleteTextJSONOK to nil")
+	}
+	var unwrapped UnMute
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMuteDeleteTextJSONOK(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMuteDeleteTextJSONOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMuteDeleteTextJSONOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMutePostApplicationJSON as json.
+func (s *APIChatMutePostApplicationJSON) Encode(e *jx.Encoder) {
+	unwrapped := (*Mute)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMutePostApplicationJSON from json.
+func (s *APIChatMutePostApplicationJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMutePostApplicationJSON to nil")
+	}
+	var unwrapped Mute
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMutePostApplicationJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMutePostApplicationJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMutePostApplicationJSON) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -163,6 +657,234 @@ func (s *APIChatMutePostApplicationJSONInternalServerError) UnmarshalJSON(data [
 	return s.Decode(d)
 }
 
+// Encode encodes APIChatMutePostApplicationJSONOK as json.
+func (s *APIChatMutePostApplicationJSONOK) Encode(e *jx.Encoder) {
+	unwrapped := (*Mute)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMutePostApplicationJSONOK from json.
+func (s *APIChatMutePostApplicationJSONOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMutePostApplicationJSONOK to nil")
+	}
+	var unwrapped Mute
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMutePostApplicationJSONOK(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMutePostApplicationJSONOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMutePostApplicationJSONOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMutePostTextJSON as json.
+func (s *APIChatMutePostTextJSON) Encode(e *jx.Encoder) {
+	unwrapped := (*Mute)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMutePostTextJSON from json.
+func (s *APIChatMutePostTextJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMutePostTextJSON to nil")
+	}
+	var unwrapped Mute
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMutePostTextJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMutePostTextJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMutePostTextJSON) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMutePostTextJSONBadRequest as json.
+func (s *APIChatMutePostTextJSONBadRequest) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMutePostTextJSONBadRequest from json.
+func (s *APIChatMutePostTextJSONBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMutePostTextJSONBadRequest to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMutePostTextJSONBadRequest(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMutePostTextJSONBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMutePostTextJSONBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMutePostTextJSONInternalServerError as json.
+func (s *APIChatMutePostTextJSONInternalServerError) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMutePostTextJSONInternalServerError from json.
+func (s *APIChatMutePostTextJSONInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMutePostTextJSONInternalServerError to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMutePostTextJSONInternalServerError(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMutePostTextJSONInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMutePostTextJSONInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatMutePostTextJSONOK as json.
+func (s *APIChatMutePostTextJSONOK) Encode(e *jx.Encoder) {
+	unwrapped := (*Mute)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatMutePostTextJSONOK from json.
+func (s *APIChatMutePostTextJSONOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatMutePostTextJSONOK to nil")
+	}
+	var unwrapped Mute
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatMutePostTextJSONOK(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatMutePostTextJSONOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatMutePostTextJSONOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatSendPostApplicationJSON as json.
+func (s *APIChatSendPostApplicationJSON) Encode(e *jx.Encoder) {
+	unwrapped := (*ChatMessage)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatSendPostApplicationJSON from json.
+func (s *APIChatSendPostApplicationJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatSendPostApplicationJSON to nil")
+	}
+	var unwrapped ChatMessage
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatSendPostApplicationJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatSendPostApplicationJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatSendPostApplicationJSON) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes APIChatSendPostApplicationJSONBadRequest as json.
 func (s *APIChatSendPostApplicationJSONBadRequest) Encode(e *jx.Encoder) {
 	unwrapped := (*ErrorResponse)(s)
@@ -235,6 +957,196 @@ func (s *APIChatSendPostApplicationJSONInternalServerError) MarshalJSON() ([]byt
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *APIChatSendPostApplicationJSONInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatSendPostApplicationJSONOK as json.
+func (s *APIChatSendPostApplicationJSONOK) Encode(e *jx.Encoder) {
+	unwrapped := (*ChatMessage)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatSendPostApplicationJSONOK from json.
+func (s *APIChatSendPostApplicationJSONOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatSendPostApplicationJSONOK to nil")
+	}
+	var unwrapped ChatMessage
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatSendPostApplicationJSONOK(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatSendPostApplicationJSONOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatSendPostApplicationJSONOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatSendPostTextJSON as json.
+func (s *APIChatSendPostTextJSON) Encode(e *jx.Encoder) {
+	unwrapped := (*ChatMessage)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatSendPostTextJSON from json.
+func (s *APIChatSendPostTextJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatSendPostTextJSON to nil")
+	}
+	var unwrapped ChatMessage
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatSendPostTextJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatSendPostTextJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatSendPostTextJSON) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatSendPostTextJSONBadRequest as json.
+func (s *APIChatSendPostTextJSONBadRequest) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatSendPostTextJSONBadRequest from json.
+func (s *APIChatSendPostTextJSONBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatSendPostTextJSONBadRequest to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatSendPostTextJSONBadRequest(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatSendPostTextJSONBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatSendPostTextJSONBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatSendPostTextJSONInternalServerError as json.
+func (s *APIChatSendPostTextJSONInternalServerError) Encode(e *jx.Encoder) {
+	unwrapped := (*ErrorResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatSendPostTextJSONInternalServerError from json.
+func (s *APIChatSendPostTextJSONInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatSendPostTextJSONInternalServerError to nil")
+	}
+	var unwrapped ErrorResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatSendPostTextJSONInternalServerError(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatSendPostTextJSONInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatSendPostTextJSONInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APIChatSendPostTextJSONOK as json.
+func (s *APIChatSendPostTextJSONOK) Encode(e *jx.Encoder) {
+	unwrapped := (*ChatMessage)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APIChatSendPostTextJSONOK from json.
+func (s *APIChatSendPostTextJSONOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APIChatSendPostTextJSONOK to nil")
+	}
+	var unwrapped ChatMessage
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APIChatSendPostTextJSONOK(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APIChatSendPostTextJSONOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APIChatSendPostTextJSONOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
