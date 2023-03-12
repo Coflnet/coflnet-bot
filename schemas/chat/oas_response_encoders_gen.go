@@ -11,21 +11,51 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func encodeAPIChatInternalClientPostResponse(response *ErrorResponse, w http.ResponseWriter, span trace.Span) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-	span.SetStatus(codes.Error, http.StatusText(500))
+func encodeAPIChatInternalClientPostResponse(response APIChatInternalClientPostRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *CientCreationResponse:
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
 
-	e := jx.GetEncoder()
-	response.Encode(e)
-	if _, err := e.WriteTo(w); err != nil {
-		return errors.Wrap(err, "write")
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	case *ErrorResponse:
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
 	}
-	return nil
 }
 
 func encodeAPIChatMuteDeleteResponse(response APIChatMuteDeleteRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
+	case *UnMute:
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
 	case *APIChatMuteDeleteApplicationJSONBadRequest:
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(400)
@@ -57,6 +87,18 @@ func encodeAPIChatMuteDeleteResponse(response APIChatMuteDeleteRes, w http.Respo
 
 func encodeAPIChatMutePostResponse(response APIChatMutePostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
+	case *Mute:
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
 	case *APIChatMutePostApplicationJSONBadRequest:
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(400)
@@ -88,6 +130,18 @@ func encodeAPIChatMutePostResponse(response APIChatMutePostRes, w http.ResponseW
 
 func encodeAPIChatSendPostResponse(response APIChatSendPostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
+	case *ChatMessage:
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := jx.GetEncoder()
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
 	case *APIChatSendPostApplicationJSONBadRequest:
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(400)

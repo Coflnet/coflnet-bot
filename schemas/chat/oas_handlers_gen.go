@@ -66,7 +66,7 @@ func (s *Server) handleAPIChatInternalClientPostRequest(args [0]string, w http.R
 		}
 	}()
 
-	var response *ErrorResponse
+	var response APIChatInternalClientPostRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:       ctx,
@@ -80,7 +80,7 @@ func (s *Server) handleAPIChatInternalClientPostRequest(args [0]string, w http.R
 		type (
 			Request  = *ClientThing
 			Params   = struct{}
-			Response = *ErrorResponse
+			Response = APIChatInternalClientPostRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -141,8 +141,27 @@ func (s *Server) handleAPIChatMuteDeleteRequest(args [0]string, w http.ResponseW
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, otelAttrs...)
 		}
-		err error
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "APIChatMuteDelete",
+			ID:   "",
+		}
 	)
+	request, close, err := s.decodeAPIChatMuteDeleteRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
 
 	var response APIChatMuteDeleteRes
 	if m := s.cfg.Middleware; m != nil {
@@ -150,13 +169,13 @@ func (s *Server) handleAPIChatMuteDeleteRequest(args [0]string, w http.ResponseW
 			Context:       ctx,
 			OperationName: "APIChatMuteDelete",
 			OperationID:   "",
-			Body:          nil,
+			Body:          request,
 			Params:        middleware.Parameters{},
 			Raw:           r,
 		}
 
 		type (
-			Request  = struct{}
+			Request  = *UnMute
 			Params   = struct{}
 			Response = APIChatMuteDeleteRes
 		)
@@ -169,12 +188,12 @@ func (s *Server) handleAPIChatMuteDeleteRequest(args [0]string, w http.ResponseW
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.APIChatMuteDelete(ctx)
+				response, err = s.h.APIChatMuteDelete(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.APIChatMuteDelete(ctx)
+		response, err = s.h.APIChatMuteDelete(ctx, request)
 	}
 	if err != nil {
 		recordError("Internal", err)

@@ -13,13 +13,13 @@ type Handler interface {
 	// Create a nw Client.
 	//
 	// POST /api/Chat/internal/client
-	APIChatInternalClientPost(ctx context.Context, req *ClientThing) (*ErrorResponse, error)
+	APIChatInternalClientPost(ctx context.Context, req *ClientThing) (APIChatInternalClientPostRes, error)
 	// APIChatMuteDelete implements DELETE /api/Chat/mute operation.
 	//
 	// Create a new mute for an user.
 	//
 	// DELETE /api/Chat/mute
-	APIChatMuteDelete(ctx context.Context) (APIChatMuteDeleteRes, error)
+	APIChatMuteDelete(ctx context.Context, req *UnMute) (APIChatMuteDeleteRes, error)
 	// APIChatMutePost implements POST /api/Chat/mute operation.
 	//
 	// Create a new mute for an user.

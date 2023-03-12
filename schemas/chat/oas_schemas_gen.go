@@ -94,6 +94,37 @@ func (s *ChatMessage) SetClientName(val OptNilString) {
 	s.ClientName = val
 }
 
+func (*ChatMessage) aPIChatSendPostRes() {}
+
+// Contains the client and its api key (only place where the api key is visible).
+// Ref: #/components/schemas/CientCreationResponse
+type CientCreationResponse struct {
+	Client OptClientThing `json:"client"`
+	ApiKey OptNilString   `json:"apiKey"`
+}
+
+// GetClient returns the value of Client.
+func (s *CientCreationResponse) GetClient() OptClientThing {
+	return s.Client
+}
+
+// GetApiKey returns the value of ApiKey.
+func (s *CientCreationResponse) GetApiKey() OptNilString {
+	return s.ApiKey
+}
+
+// SetClient sets the value of Client.
+func (s *CientCreationResponse) SetClient(val OptClientThing) {
+	s.Client = val
+}
+
+// SetApiKey sets the value of ApiKey.
+func (s *CientCreationResponse) SetApiKey(val OptNilString) {
+	s.ApiKey = val
+}
+
+func (*CientCreationResponse) aPIChatInternalClientPostRes() {}
+
 // Client software capeable of sending messages.
 // Ref: #/components/schemas/ClientThing
 type ClientThing struct {
@@ -207,6 +238,8 @@ func (s *ErrorResponse) SetMessage(val OptNilString) {
 func (s *ErrorResponse) SetTrace(val OptNilString) {
 	s.Trace = val
 }
+
+func (*ErrorResponse) aPIChatInternalClientPostRes() {}
 
 // Ref: #/components/schemas/Mute
 type Mute struct {
@@ -331,6 +364,8 @@ func (s *Mute) SetStatus(val OptMuteStatus) {
 	s.Status = val
 }
 
+func (*Mute) aPIChatMutePostRes() {}
+
 // Ref: #/components/schemas/MuteStatus
 type MuteStatus int32
 
@@ -342,6 +377,52 @@ const (
 	MuteStatus8  MuteStatus = 8
 	MuteStatus16 MuteStatus = 16
 )
+
+// NewOptClientThing returns new OptClientThing with value set to v.
+func NewOptClientThing(v ClientThing) OptClientThing {
+	return OptClientThing{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptClientThing is optional ClientThing.
+type OptClientThing struct {
+	Value ClientThing
+	Set   bool
+}
+
+// IsSet returns true if OptClientThing was set.
+func (o OptClientThing) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptClientThing) Reset() {
+	var v ClientThing
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptClientThing) SetTo(v ClientThing) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptClientThing) Get() (v ClientThing, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptClientThing) Or(d ClientThing) ClientThing {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
 
 // NewOptDateTime returns new OptDateTime with value set to v.
 func NewOptDateTime(v time.Time) OptDateTime {
@@ -535,3 +616,45 @@ func (o OptNilString) Or(d string) string {
 	}
 	return d
 }
+
+// Ref: #/components/schemas/UnMute
+type UnMute struct {
+	// Uuid of the target user.
+	UUID OptNilString `json:"uuid"`
+	// Uuid of user performing the mute.
+	UnMuter OptNilString `json:"unMuter"`
+	// Internal reason.
+	Reason OptNilString `json:"reason"`
+}
+
+// GetUUID returns the value of UUID.
+func (s *UnMute) GetUUID() OptNilString {
+	return s.UUID
+}
+
+// GetUnMuter returns the value of UnMuter.
+func (s *UnMute) GetUnMuter() OptNilString {
+	return s.UnMuter
+}
+
+// GetReason returns the value of Reason.
+func (s *UnMute) GetReason() OptNilString {
+	return s.Reason
+}
+
+// SetUUID sets the value of UUID.
+func (s *UnMute) SetUUID(val OptNilString) {
+	s.UUID = val
+}
+
+// SetUnMuter sets the value of UnMuter.
+func (s *UnMute) SetUnMuter(val OptNilString) {
+	s.UnMuter = val
+}
+
+// SetReason sets the value of Reason.
+func (s *UnMute) SetReason(val OptNilString) {
+	s.Reason = val
+}
+
+func (*UnMute) aPIChatMuteDeleteRes() {}

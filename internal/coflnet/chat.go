@@ -55,7 +55,7 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.ChatMessage) error 
         return errors.New("chat api client not initialized")
     }
 
-    _, err := r.apiClient.APIChatSendPost(ctx, msg)
+    response, err := r.apiClient.APIChatSendPost(ctx, msg)
 
     if err != nil {
         slog.Error("error sending message to chat api", err)
@@ -63,23 +63,64 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.ChatMessage) error 
         return err
     }
 
-    return nil
+    switch response.(type) {
+    case *chat.ChatMessage:
+        slog.Info("message sent successfully sent to chat api")
+        span.SetAttributes(attribute.Bool("success", true))
+        return nil
+    case *chat.APIChatSendPostApplicationJSONBadRequest:
+        err := errors.New("bad request")
+        slog.Error("error sending message to chat api, bad request", err)
+        span.RecordError(err)
+        return err
+    case *chat.APIChatSendPostApplicationJSONInternalServerError:
+        err := errors.New("internal server error")
+        slog.Error("error sending message to chat api, internal server error", err)
+        span.RecordError(err)
+        return err
+    default:
+        err = errors.New("unknown response")
+        slog.Error("error sending message to chat api, unknown response", err)
+        span.RecordError(err)
+        return err
+    }
 }
 
-func (a *ChatApi) MuteUser(ctx context.Context, mute *chat.Mute) error {
+func (a *ChatApi) MuteUser(ctx context.Context, mute *chat.Mute) (*chat.Mute, error) {
     ctx, span := a.tracer.Start(ctx, "mute-user")
     defer span.End()
 
     if a.apiClient == nil {
-        return errors.New("chat api client not initialized")
+        return nil, errors.New("chat api client not initialized")
     }
 
-    return errors.New("muting users is currently not supported, sorry")
+    response, err := a.apiClient.APIChatMutePost(ctx, mute)
 
-    // _, err := a.apiClient.APIChatMutePost(ctx, mute)
-    // if err != nil {
-    //     span.RecordError(err)
-    //     return err
-    // }
-    // return err
+    if err != nil {
+        slog.Error("error muting user", err)
+        span.RecordError(err)
+        return nil, err
+    }
+
+    switch mute := response.(type) {
+    case *chat.Mute:
+        slog.Info("user muted successfully")
+        span.SetAttributes(attribute.Bool("success", true))
+        return mute, nil
+    case *chat.APIChatMutePostApplicationJSONBadRequest:
+        err := errors.New("bad request")
+        slog.Error("error muting user, bad request", err)
+        span.RecordError(err)
+        return nil, err
+    case *chat.APIChatMutePostApplicationJSONInternalServerError:
+        err := errors.New("internal server error")
+        slog.Error("error muting user, internal server error", err)
+        span.RecordError(err)
+        return nil, err
+    default:
+        err = errors.New("unknown response")
+        slog.Error("error muting user, unknown response", err)
+        span.RecordError(err)
+        return nil, err
+    }
 }

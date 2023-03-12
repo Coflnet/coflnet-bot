@@ -18,7 +18,7 @@ var _ Handler = UnimplementedHandler{}
 // Create a nw Client.
 //
 // POST /api/Chat/internal/client
-func (UnimplementedHandler) APIChatInternalClientPost(ctx context.Context, req *ClientThing) (r *ErrorResponse, _ error) {
+func (UnimplementedHandler) APIChatInternalClientPost(ctx context.Context, req *ClientThing) (r APIChatInternalClientPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -27,7 +27,7 @@ func (UnimplementedHandler) APIChatInternalClientPost(ctx context.Context, req *
 // Create a new mute for an user.
 //
 // DELETE /api/Chat/mute
-func (UnimplementedHandler) APIChatMuteDelete(ctx context.Context) (r APIChatMuteDeleteRes, _ error) {
+func (UnimplementedHandler) APIChatMuteDelete(ctx context.Context, req *UnMute) (r APIChatMuteDeleteRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

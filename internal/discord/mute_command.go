@@ -144,7 +144,7 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
 
 
     slog.Info(fmt.Sprintf("Muting %s for %s; Muter: %s", user, reason, muter))
-    err = m.chatApi.MuteUser(ctx, &chat.Mute{
+    mute, err := m.chatApi.MuteUser(ctx, &chat.Mute{
         Muter: chat.OptNilString{
             Value: muter,
             Null: false,
@@ -187,7 +187,7 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
     err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
         Type: discordgo.InteractionResponseChannelMessageWithSource,
         Data: &discordgo.InteractionResponseData{
-            Content: fmt.Sprintf("Muted %ss", user,),
+            Content: fmt.Sprintf("%s muted %s until %s", mute.Muter.Value, mute.UUID.Value, mute.Expires.Value),
             AllowedMentions: &discordgo.MessageAllowedMentions{},
         },
     })

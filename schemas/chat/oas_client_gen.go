@@ -61,13 +61,13 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 // Create a nw Client.
 //
 // POST /api/Chat/internal/client
-func (c *Client) APIChatInternalClientPost(ctx context.Context, request *ClientThing) (*ErrorResponse, error) {
+func (c *Client) APIChatInternalClientPost(ctx context.Context, request *ClientThing) (APIChatInternalClientPostRes, error) {
 	res, err := c.sendAPIChatInternalClientPost(ctx, request)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendAPIChatInternalClientPost(ctx context.Context, request *ClientThing) (res *ErrorResponse, err error) {
+func (c *Client) sendAPIChatInternalClientPost(ctx context.Context, request *ClientThing) (res APIChatInternalClientPostRes, err error) {
 	var otelAttrs []attribute.KeyValue
 	// Validate request before sending.
 	if err := func() error {
@@ -138,14 +138,23 @@ func (c *Client) sendAPIChatInternalClientPost(ctx context.Context, request *Cli
 // Create a new mute for an user.
 //
 // DELETE /api/Chat/mute
-func (c *Client) APIChatMuteDelete(ctx context.Context) (APIChatMuteDeleteRes, error) {
-	res, err := c.sendAPIChatMuteDelete(ctx)
+func (c *Client) APIChatMuteDelete(ctx context.Context, request *UnMute) (APIChatMuteDeleteRes, error) {
+	res, err := c.sendAPIChatMuteDelete(ctx, request)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendAPIChatMuteDelete(ctx context.Context) (res APIChatMuteDeleteRes, err error) {
+func (c *Client) sendAPIChatMuteDelete(ctx context.Context, request *UnMute) (res APIChatMuteDeleteRes, err error) {
 	var otelAttrs []attribute.KeyValue
+	// Validate request before sending.
+	if err := func() error {
+		if err := request.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return res, errors.Wrap(err, "validate")
+	}
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -180,6 +189,9 @@ func (c *Client) sendAPIChatMuteDelete(ctx context.Context) (res APIChatMuteDele
 	r, err := ht.NewRequest(ctx, "DELETE", u, nil)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeAPIChatMuteDeleteRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
 	}
 
 	stage = "SendRequest"
