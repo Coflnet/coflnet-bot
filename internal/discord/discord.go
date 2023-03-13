@@ -123,7 +123,7 @@ func (d *DiscordHandler) SendMessage(ctx context.Context, msg *DiscordMessage) e
     defer span.End()
     slog.Debug("sending a discord message")
 
-    if msg.Message == "" {
+    if msg == nil || msg.Message == "" {
 		return fmt.Errorf("no message is set")
 	}
 
