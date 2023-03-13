@@ -262,18 +262,12 @@ func (c *Client) sendAPIChatMutePost(ctx context.Context, request APIChatMutePos
 		// Validation is not needed for the empty body type.
 	case *APIChatMutePostApplicationJSON:
 		if err := func() error {
-			if err := request.Validate(); err != nil {
-				return err
-			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
 		}
 	case *APIChatMutePostTextJSON:
 		if err := func() error {
-			if err := request.Validate(); err != nil {
-				return err
-			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
@@ -358,18 +352,12 @@ func (c *Client) sendAPIChatSendPost(ctx context.Context, request APIChatSendPos
 		// Validation is not needed for the empty body type.
 	case *APIChatSendPostApplicationJSON:
 		if err := func() error {
-			if err := request.Validate(); err != nil {
-				return err
-			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
 		}
 	case *APIChatSendPostTextJSON:
 		if err := func() error {
-			if err := request.Validate(); err != nil {
-				return err
-			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
