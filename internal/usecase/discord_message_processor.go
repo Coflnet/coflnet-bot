@@ -50,11 +50,11 @@ func (p *DiscordMessageProcessor) StartProcessing() error {
 	semaphore := make(chan struct{}, 10)
 
 	for msg := range msgs {
+		semaphore <- struct{}{}
 		go func(msg *kafkago.Message) {
 			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
 
-			semaphore <- struct{}{}
 			defer func() { <-semaphore }()
 
             _, span := otel.Tracer(flipProcessorTracerName).Start(ctx, "process-discord-message-kafka-message")
@@ -98,6 +98,6 @@ func (p *DiscordMessageProcessor) processMessage(ctx context.Context, msg *kafka
         return err
     }
     
-    slog.Debug("processed discord kafka message %s", msg.Key)
+    slog.Info("send a message to discord %s", msg.Key)
 	return nil
 }

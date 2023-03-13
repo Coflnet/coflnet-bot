@@ -84,6 +84,7 @@ func startMessageProcessors() {
 		new(usecase.FlipProcessor),
         new(usecase.ChatProcessor),
         new(usecase.McVerifyProcessor),
+        new(usecase.DiscordMessageProcessor)
         
         // new(usecase.DiscordMessageProcessor),
 	}
