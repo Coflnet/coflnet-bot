@@ -84,7 +84,7 @@ func (p *DiscordMessageProcessor) processMessage(ctx context.Context, msg *kafka
 
     // deserialize message
 	var m *discord.DiscordMessage
-    err := json.Unmarshal(msg.Value, msg)
+    err := json.Unmarshal(msg.Value, &msg)
 	if err != nil {
         slog.Error("error unmarshalling message %s", err)
         span.RecordError(err)
