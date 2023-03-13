@@ -182,7 +182,7 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
         slog.Error("failed to mute user", err)
         span.RecordError(err)
         s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-            Type: discordgo.InteractionResponseChannelMessageWithSource,
+            Type: discordgo.InteractionResponseDeferredMessageUpdate,
             Data: &discordgo.InteractionResponseData{
                 Content: fmt.Sprintf("❌ failed to mute %s; error: id: %s, text: %s", user, err.Error(), span.SpanContext().TraceID()),
                 AllowedMentions: &discordgo.MessageAllowedMentions{},
@@ -199,6 +199,7 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
         return
     }
 
+    slog.Info("update response message")
     s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
         Type: discordgo.InteractionResponseUpdateMessage,
         Data: &discordgo.InteractionResponseData{
