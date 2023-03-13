@@ -198,6 +198,14 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
         span.RecordError(err)
         return
     }
+
+    s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+        Type: discordgo.InteractionResponseUpdateMessage,
+        Data: &discordgo.InteractionResponseData{
+            Content: fmt.Sprintf("✅ muted %s until %s", user, mute.Expires.Value),
+            AllowedMentions: &discordgo.MessageAllowedMentions{},
+        },
+    })
 }
 
 
