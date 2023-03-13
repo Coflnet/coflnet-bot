@@ -47,9 +47,9 @@ type DiscordHandler struct {
 }
 
 type DiscordMessage struct {
-	Message string
-	Channel string
-	Webhook string
+	Message string `json:"message"`
+	Channel string `json:"channel"`
+	Webhook string `json:"webhook"`
 }
 
 type WebhookRequest struct {

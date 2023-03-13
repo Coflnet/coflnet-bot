@@ -26,12 +26,13 @@ type DiscordMessageProcessor struct {
 }
 
 func (p *DiscordMessageProcessor) StartProcessing() error {
+    p.tracer = otel.Tracer(flipProcessorTracerName)
+
 	p.kafkaProcessor = &KafkaProcessor{
 		Host:          utils.KafkaHost(),
 		Topic:         utils.DiscordMessageTopic(),
 		ConsumerGroup: utils.DiscordMessageConsumerGroup(),
 	}
-    p.tracer = otel.Tracer(flipProcessorTracerName)
 
     var err error
     p.discordHandler, err = discord.NewDiscordHandler()
@@ -91,6 +92,7 @@ func (p *DiscordMessageProcessor) processMessage(ctx context.Context, msg *kafka
 	}
 
     // call discord
+    slog.Info("sending message to discord %v", m)
     err = p.discordHandler.SendMessage(ctx, m)
     if err != nil {
         slog.Error("error sending message to discord %s", err)
