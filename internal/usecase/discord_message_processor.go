@@ -28,8 +28,8 @@ type DiscordMessageProcessor struct {
 func (p *DiscordMessageProcessor) StartProcessing() error {
 	p.kafkaProcessor = &KafkaProcessor{
 		Host:          utils.KafkaHost(),
-		Topic:         utils.FlipSummaryTopic(),
-		ConsumerGroup: utils.FlipSummaryConsumerGrup(),
+		Topic:         utils.DiscordMessageTopic(),
+		ConsumerGroup: utils.DiscordMessageConsumerGroup(),
 	}
     p.tracer = otel.Tracer(flipProcessorTracerName)
 

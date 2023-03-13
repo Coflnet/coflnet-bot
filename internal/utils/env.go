@@ -140,3 +140,11 @@ func PaymentBaseUrl() string {
 func ApiBaseUrl() string {
     return getEnv("API_BASE_URL")
 }
+
+func DiscordMessageConsumerGroup() string {
+    return getEnv("DISCORD_MESSAGE_CONSUMER_GROUP")
+}
+
+func DiscordMessageTopic() string {
+    return getEnv("DISCORD_MESSAGE_TOPIC")
+}
