@@ -12,6 +12,7 @@ import (
 	"github.com/Coflnet/coflnet-bot/schemas/chat"
 	"github.com/bwmarrin/discordgo"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slog"
 )
@@ -172,20 +173,31 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
         return
     }
 
-    slog.Debug("sending response to mute command")
-    err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-        Type: discordgo.InteractionResponseChannelMessageWithSource,
-        Data: &discordgo.InteractionResponseData{
-            Content: fmt.Sprintf("%s muted %s until %s", mute.Muter.Value, mute.UUID.Value, mute.Expires.Value),
-            AllowedMentions: &discordgo.MessageAllowedMentions{},
-        },
-    })
+    go func() {
+        _, span := m.tracer.Start(ctx, "respond-to-mute-command")
+        defer span.End()
 
-    if err != nil {
-        slog.Error("failed to respond to mute command", err)
-        span.RecordError(err)
-        return
-    }
+        // set start time as attribute
+        span.SetAttributes(attribute.Int64("start-respond", time.Now().Unix()))
+
+        slog.Debug("sending response to mute command")
+        err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+            Type: discordgo.InteractionResponseChannelMessageWithSource,
+            Data: &discordgo.InteractionResponseData{
+                Content: fmt.Sprintf("%s muted %s until %s", mute.Muter.Value, mute.UUID.Value, mute.Expires.Value),
+                AllowedMentions: &discordgo.MessageAllowedMentions{},
+            },
+        })
+
+        if err != nil {
+            slog.Error("failed to respond to mute command", err)
+            span.RecordError(err)
+            return
+        }
+
+        slog.Info("successfully responded to mute command")
+        span.SetAttributes(attribute.Int64("end-respond", time.Now().Unix()))
+    }()
 }
 
 
