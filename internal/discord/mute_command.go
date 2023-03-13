@@ -143,6 +143,32 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
         return
     }
 
+    go func() {
+        _, span := m.tracer.Start(ctx, "respond-to-mute-command")
+        defer span.End()
+
+        // set start time as attribute
+        span.SetAttributes(attribute.Int64("start-respond", time.Now().Unix()))
+
+        slog.Debug("sending response to mute command")
+        err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+            Type: discordgo.InteractionResponseChannelMessageWithSource,
+            Data: &discordgo.InteractionResponseData{
+                Content: fmt.Sprintf("trying to mute %s", user),
+                AllowedMentions: &discordgo.MessageAllowedMentions{},
+            },
+        })
+
+        if err != nil {
+            slog.Error("failed to respond to mute command", err)
+            span.RecordError(err)
+            return
+        }
+
+        slog.Info("successfully responded to mute command")
+        span.SetAttributes(attribute.Int64("end-respond", time.Now().Unix()))
+    }()
+
 
     slog.Info(fmt.Sprintf("muting %s for %s; Muter: %s", user, reason, muter))
     mute, err := m.chatApi.MuteUser(ctx, &chat.APIChatMutePostTextJSON{
@@ -166,38 +192,12 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
     }
 
     slog.Info(fmt.Sprintf("mute was sent successfully, trace: %s", span.SpanContext().TraceID()))
-    err = discord.SendMessageToMutesChannel(fmt.Sprintf("%s muted %s", muter, user))
+    err = discord.SendMessageToMutesChannel(fmt.Sprintf("%s muted %s until %s", muter, user, mute.Expires.Value))
     if err != nil {
         slog.Error("failed to send message to mutes channel", err)
         span.RecordError(err)
         return
     }
-
-    go func() {
-        _, span := m.tracer.Start(ctx, "respond-to-mute-command")
-        defer span.End()
-
-        // set start time as attribute
-        span.SetAttributes(attribute.Int64("start-respond", time.Now().Unix()))
-
-        slog.Debug("sending response to mute command")
-        err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-            Type: discordgo.InteractionResponseChannelMessageWithSource,
-            Data: &discordgo.InteractionResponseData{
-                Content: fmt.Sprintf("%s muted %s until %s", mute.Muter.Value, mute.UUID.Value, mute.Expires.Value),
-                AllowedMentions: &discordgo.MessageAllowedMentions{},
-            },
-        })
-
-        if err != nil {
-            slog.Error("failed to respond to mute command", err)
-            span.RecordError(err)
-            return
-        }
-
-        slog.Info("successfully responded to mute command")
-        span.SetAttributes(attribute.Int64("end-respond", time.Now().Unix()))
-    }()
 }
 
 
