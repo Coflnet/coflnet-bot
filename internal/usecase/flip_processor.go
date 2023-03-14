@@ -3,12 +3,14 @@ package usecase
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/model"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
-	"github.com/rs/zerolog/log"
+    pubdiscord "github.com/Coflnet/coflnet-bot/pkg/discord"
 	kafkago "github.com/segmentio/kafka-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -23,6 +25,7 @@ const (
 type FlipProcessor struct {
 	kafkaProcessor *KafkaProcessor
     tracer trace.Tracer
+    discordHandler *discord.DiscordHandler
 }
 
 func (p *FlipProcessor) StartProcessing() error {
@@ -33,7 +36,14 @@ func (p *FlipProcessor) StartProcessing() error {
 	}
     p.tracer = otel.Tracer(flipProcessorTracerName)
 
-	err := p.kafkaProcessor.Init()
+    var err error
+    p.discordHandler, err = discord.NewDiscordHandler()
+    if err != nil {
+        slog.Error("error initializing discord handler", err)
+        return err
+    }
+
+	err = p.kafkaProcessor.Init()
 	if err != nil {
 		return err
 	}
@@ -75,8 +85,7 @@ func (p *FlipProcessor) StartProcessing() error {
 		}(msg)
 	}
 
-	log.Panic().Msgf("kafka processor for topic %s stopped", p.kafkaProcessor.Topic)
-	return nil
+	return errors.New("flip processor kafka channel closed")
 }
 
 func (p *FlipProcessor) processMessage(ctx context.Context, msg *kafkago.Message) error {
@@ -92,6 +101,12 @@ func (p *FlipProcessor) processMessage(ctx context.Context, msg *kafkago.Message
     span.SetAttributes(attribute.Int("profit", flip.Profit))
 
     if flip.Profit > 10_000_000 {
+
+        err = p.discordHandler.SendMessage(ctx, &discord.DiscordMessage{
+            Message: fmt.Sprintf("flip with profit %d", flip.Profit),
+            Channel: pubdiscord.FlipChannel,
+        })
+
         slog.Info(fmt.Sprintf("flip with profit %d", flip.Profit))
         return nil
     }

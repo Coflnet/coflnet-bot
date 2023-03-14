@@ -23,6 +23,7 @@ const (
 	CiSuccessChannel   = "ci-success"
 	CiFailureChannel   = "ci-failure"
 	FeedbackChannel    = "feedback"
+    FlipChannel       = "flip"
 )
 
 func SendMessageToFeedback(msg string) error {

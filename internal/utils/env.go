@@ -99,6 +99,10 @@ func FeedbackWebhook() string {
 	return getEnv("DISCORD_FEEDBACK_WEBHOOK")
 }
 
+func FlipWebhook() string {
+    return getEnv("FLIP_WEBHOOK")
+}
+
 func getEnv(e string) string {
 	v := os.Getenv(e)
 	if v == "" {
