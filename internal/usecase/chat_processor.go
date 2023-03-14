@@ -258,7 +258,7 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
         return err
     }
 
-    slog.Info(fmt.Sprintf("sending discord message to chat api, message: %s", msg.Content))
+    slog.Info(fmt.Sprintf("sending discord message from %s(%s) to chat api, message: %s", msg.Author, user.UUID(), msg.Content))
     _, err = p.coflnetChatClient.SendMessage(ctx, &chat.APIChatSendPostTextJSON{
 		Message: chat.OptNilString{
 			Value: msg.Content,
