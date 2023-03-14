@@ -5,8 +5,8 @@ package chat
 import (
 	"context"
 	"net/url"
+	"os"
 	"time"
-    "os"
 
 	"github.com/go-faster/errors"
 	"go.opentelemetry.io/otel/attribute"

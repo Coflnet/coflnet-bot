@@ -27,6 +27,7 @@ func (d *DiscordHandler) RegisterCommands() error {
 
 	customCommands := []DiscordCommand{
 		CreateMuteCommand(),
+        CreateUnmuteCommand(),
 	}
 
 	// convert the custom commands into discordgo commands
