@@ -259,7 +259,7 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
     }
 
     slog.Info(fmt.Sprintf("sending discord message from %s(%s) to chat api, message: %s", msg.Author, user.UUID(), msg.Content))
-    _, err = p.coflnetChatClient.SendMessage(ctx, &chat.APIChatSendPostTextJSON{
+    param := &chat.APIChatSendPostTextJSON{
 		Message: chat.OptNilString{
 			Value: msg.Content,
 		},
@@ -272,7 +272,10 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
         Name: chat.OptNilString{
             Value: user.Username(),
         },
-	})
+	}
+    j, _ := param.MarshalJSON()
+    fmt.Println(string(j))
+    _, err = p.coflnetChatClient.SendMessage(ctx, param)
 
 	if err != nil {
 		slog.Error("error sending discord message to chat api", err)
