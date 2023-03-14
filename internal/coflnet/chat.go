@@ -41,7 +41,7 @@ func NewChatClient() (*ChatApi, error) {
     return instance, err
 }
 
-func (r *ChatApi) SendMessage(ctx context.Context, msg chat.APIChatSendPostReq) (*chat.ChatMessage, error) {
+func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.APIChatSendPostTextJSON) (*chat.ChatMessage, error) {
     ctx, span := r.tracer.Start(ctx, "send-message-to-chat-api")
     defer span.End()
 

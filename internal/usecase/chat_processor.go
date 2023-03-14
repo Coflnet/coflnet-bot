@@ -262,15 +262,19 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
     param := &chat.APIChatSendPostTextJSON{
 		Message: chat.OptNilString{
 			Value: msg.Content,
+            Set: true,
 		},
 		UUID: chat.OptNilString{
 			Value: user.UUID(),
+            Set: true,
 		},
 		ClientName: chat.OptNilString{
 			Value: coflDiscordClientName,
+            Set: true,
 		},
         Name: chat.OptNilString{
             Value: user.Username(),
+            Set: true,
         },
 	}
     j, _ := param.MarshalJSON()
