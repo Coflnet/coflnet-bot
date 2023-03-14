@@ -80,7 +80,7 @@ func (r *ChatProcessor) StartRedisChatProcessor() error {
 
 	for msg := range msgs {
 
-		go func(msg redisgo.Message) {
+		go func(msg *redisgo.Message) {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 
@@ -90,7 +90,7 @@ func (r *ChatProcessor) StartRedisChatProcessor() error {
 			span.SetAttributes(attribute.String("message", msg.Payload))
 			span.SetAttributes(attribute.String("channel", msg.Channel))
 
-			err := r.processRedisMessage(ctx, &msg)
+			err := r.processRedisMessage(ctx, msg)
 			if err != nil {
 				span.RecordError(err)
 				log.Error().Err(err).Msg("error processing message")

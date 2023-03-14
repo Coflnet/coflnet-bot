@@ -6,7 +6,6 @@ import (
 
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/go-redis/redis/v8"
-	"github.com/rs/zerolog/log"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slog"
@@ -35,28 +34,30 @@ func NewRedisHandler() *RedisHandler {
 		DB:       0,  // use default DB
 	})
 
+    slog.Info(fmt.Sprintf("use redis host %s", utils.RedisHost()))
+
 	return r
 }
 
-func (r *RedisHandler) ReceiveChatPubSubMessage(ctx context.Context) <-chan redis.Message {
-	ch := make(chan redis.Message)
+func (r *RedisHandler) ReceiveChatPubSubMessage(ctx context.Context) <-chan *redis.Message {
+	ch := make(chan *redis.Message, 100)
 
 	go func() {
+        defer panic("redis receive stopped")
 		defer close(ch)
 
+        slog.Info(fmt.Sprintf("start listening for chat messages on channel %s", utils.RedisChatPubSubChannel()))
 		pubsub := r.rdb.Subscribe(ctx, utils.RedisChatPubSubChannel())
 		defer pubsub.Close()
 
 		for {
 			msg, err := pubsub.ReceiveMessage(ctx)
 			if err != nil {
-				log.Error().Err(err).Msg("failed to receive message")
+				slog.Error("failed to receive message", err)
 				continue
 			}
-
             slog.Debug(fmt.Sprintf("receive message: %s", msg.Payload))
-
-			ch <- *msg
+			ch <- msg
 		}
 	}()
 
