@@ -17,7 +17,6 @@ import (
 	"github.com/Coflnet/coflnet-bot/schemas/chat"
 	"github.com/bwmarrin/discordgo"
 	redisgo "github.com/go-redis/redis/v8"
-	"github.com/rs/zerolog/log"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -53,18 +52,22 @@ func (r *ChatProcessor) init() error {
 func (r *ChatProcessor) StartProcessing() error {
 
 	if err := r.init(); err != nil {
+        slog.Error("error initializing chat processor", err)
 		return err
 	}
 
 	var oneDone = make(chan error)
+    slog.Info("starting chat processor")
 
 	go func() {
+        slog.Info("starting redis chat processor")
 		err := r.StartRedisChatProcessor()
 		slog.Error("redis chat processor stopped", err)
 		oneDone <- err
 	}()
 
 	go func() {
+        slog.Info("starting discord chat processor")
 		err := r.StartDiscordChatProcessor()
 		slog.Error("discord chat processor stopped", err)
 		oneDone <- err
@@ -93,7 +96,7 @@ func (r *ChatProcessor) StartRedisChatProcessor() error {
 			err := r.processRedisMessage(ctx, msg)
 			if err != nil {
 				span.RecordError(err)
-				log.Error().Err(err).Msg("error processing message")
+				slog.Error("error processing message", err)
 			}
 		}(msg)
 	}
@@ -123,7 +126,7 @@ func (r *ChatProcessor) StartDiscordChatProcessor() error {
 			err := r.processDiscordMessage(ctx, &msg)
 			if err != nil {
 				span.RecordError(err)
-				log.Error().Err(err).Msg("error processing message")
+				slog.Error("error processing message", err)
 			}
 		}(msg)
 	}
