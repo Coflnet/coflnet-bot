@@ -53,14 +53,6 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg chat.APIChatSendPostReq) 
     response, err := r.apiClient.APIChatSendPost(ctx, msg)
 
     if err != nil {
-        // if err is ogenerrors.DecodeBodyError
-        if e, ok := err.(*ogenerrors.DecodeBodyError); ok {
-            slog.Error("error sending message to chat api", e.Err)
-            slog.Warn("body", e.Body)
-            slog.Warn("content type", e.ContentType)
-        } else {
-            slog.Debug("no decode body error")
-        }
         slog.Error("error sending message to chat api", err)
         span.RecordError(err)
         return nil, err
@@ -72,14 +64,14 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg chat.APIChatSendPostReq) 
         slog.Info("message sent successfully sent to chat api")
         span.SetAttributes(attribute.Bool("success", true))
         return &msg, nil
-    case *chat.APIChatSendPostApplicationJSONBadRequest:
-        err := errors.New("bad request")
-        slog.Error("error sending message to chat api, bad request", err)
+    case *chat.APIChatSendPostTextJSONInternalServerError:
+        err := errors.New("internal server error")
+        slog.Error("error sending message to chat api, internal server error" + r.Message.Value, err)
         span.RecordError(err)
         return nil, err
-    case *chat.APIChatSendPostApplicationJSONInternalServerError:
-        err := errors.New("internal server error")
-        slog.Error("error sending message to chat api, internal server error", err)
+    case *chat.APIChatSendPostTextJSONBadRequest:
+        err := errors.New("bad request")
+        slog.Error(fmt.Sprintf("message: %s", r.Message.Value), err)
         span.RecordError(err)
         return nil, err
     default:
