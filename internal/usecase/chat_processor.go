@@ -50,6 +50,7 @@ func (r *ChatProcessor) init() error {
 }
 
 func (r *ChatProcessor) StartProcessing() error {
+    slog.Info("starting chat processor")
 
 	if err := r.init(); err != nil {
         slog.Error("error initializing chat processor", err)
@@ -57,7 +58,6 @@ func (r *ChatProcessor) StartProcessing() error {
 	}
 
 	var oneDone = make(chan error)
-    slog.Info("starting chat processor")
 
 	go func() {
         slog.Info("starting redis chat processor")

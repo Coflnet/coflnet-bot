@@ -38,10 +38,12 @@ func main() {
 	}
 	defer mongo.CloseConnection()
 
-	// start the kafka message processors
-	go startMessageProcessors()
+	// start the message processors
+    slog.Info("start message processors")
+    startMessageProcessors()
 
 	// wait for interrupt
+    slog.Info("waiting for interrupt")
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
@@ -85,8 +87,6 @@ func startMessageProcessors() {
         new(usecase.ChatProcessor),
         new(usecase.McVerifyProcessor),
         new(usecase.DiscordMessageProcessor),
-        
-        // new(usecase.DiscordMessageProcessor),
 	}
 
 	for _, p := range processors {
