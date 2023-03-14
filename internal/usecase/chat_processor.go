@@ -269,6 +269,9 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 		ClientName: chat.OptNilString{
 			Value: coflDiscordClientName,
 		},
+        Name: chat.OptNilString{
+            Value: user.Username(),
+        },
 	})
 
 	if err != nil {
