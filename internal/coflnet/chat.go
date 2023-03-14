@@ -12,6 +12,7 @@ import (
 
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/Coflnet/coflnet-bot/schemas/chat"
+	"github.com/ogen-go/ogen/ogenerrors"
 )
 
 const (
@@ -52,6 +53,14 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg chat.APIChatSendPostReq) 
     response, err := r.apiClient.APIChatSendPost(ctx, msg)
 
     if err != nil {
+        // if err is ogenerrors.DecodeBodyError
+        if e, ok := err.(*ogenerrors.DecodeBodyError); ok {
+            slog.Error("error sending message to chat api", e.Err)
+            slog.Warn("body", e.Body)
+            slog.Warn("content type", e.ContentType)
+        } else {
+            slog.Debug("no decode body error")
+        }
         slog.Error("error sending message to chat api", err)
         span.RecordError(err)
         return nil, err
