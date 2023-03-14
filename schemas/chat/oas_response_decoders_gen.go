@@ -514,6 +514,8 @@ func decodeAPIChatMutePostResponse(resp *http.Response) (res APIChatMutePostRes,
 }
 
 func decodeAPIChatSendPostResponse(resp *http.Response) (res APIChatSendPostRes, err error) {
+    buf, _ := io.ReadAll(resp.Body)
+    fmt.Println(fmt.Sprintf("%d : %s", resp.StatusCode, string(buf)))
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
