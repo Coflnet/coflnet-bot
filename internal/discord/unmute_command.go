@@ -68,6 +68,12 @@ func (m *UnmuteCommand) CreateCommand() *discordgo.ApplicationCommand {
                 Type:        discordgo.ApplicationCommandOptionString,
                 Required:    true,
             },
+            {
+                Name:        "reason",
+                Description: "Reason for the unmute",
+                Type:        discordgo.ApplicationCommandOptionString,
+                Required:    true,
+            },
         },
     }
 }
