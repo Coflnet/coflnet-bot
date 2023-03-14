@@ -8,7 +8,6 @@ import (
 
 	"github.com/Coflnet/coflnet-bot/internal/coflnet"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
-	"github.com/Coflnet/coflnet-bot/pkg/discord"
 	"github.com/Coflnet/coflnet-bot/schemas/chat"
 	"github.com/bwmarrin/discordgo"
 	"go.opentelemetry.io/otel"
