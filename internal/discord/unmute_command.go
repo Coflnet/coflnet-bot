@@ -153,7 +153,7 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
 
 
     slog.Info(fmt.Sprintf("unmuting %s for %s; Muter: %s", user, reason, i.Member.User.Username))
-    mute, err := m.chatApi.UnmuteUser(ctx, &chat.APIChatMuteDeleteTextJSON{
+    _, err = m.chatApi.UnmuteUser(ctx, &chat.APIChatMuteDeleteTextJSON{
         UUID: chat.OptNilString{
             Value: userUUID,
             Set: true,
