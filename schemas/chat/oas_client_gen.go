@@ -169,18 +169,12 @@ func (c *Client) sendAPIChatMuteDelete(ctx context.Context, request APIChatMuteD
 		// Validation is not needed for the empty body type.
 	case *APIChatMuteDeleteApplicationJSON:
 		if err := func() error {
-			if err := request.Validate(); err != nil {
-				return err
-			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
 		}
 	case *APIChatMuteDeleteTextJSON:
 		if err := func() error {
-			if err := request.Validate(); err != nil {
-				return err
-			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")

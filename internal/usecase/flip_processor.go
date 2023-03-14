@@ -88,9 +88,12 @@ func (p *FlipProcessor) processMessage(ctx context.Context, msg *kafkago.Message
     if err != nil {
         return err
     }
-
     span.SetAttributes(attribute.Int("profit", flip.Profit))
-    slog.Debug(fmt.Sprintf("processing flip %s", flip.Buy.UUID))
+
+    if flip.Profit > 10_000_000 {
+        slog.Info(fmt.Sprintf("flip with profit %d", flip.Profit))
+        return nil
+    }
 
 
 	return nil

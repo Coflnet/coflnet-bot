@@ -191,14 +191,6 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
         return
     }
 
-    slog.Info(fmt.Sprintf("mute was sent successfully, trace: %s", span.SpanContext().TraceID()))
-    err = discord.SendMessageToMutesChannel(fmt.Sprintf("%s muted %s until %s", muter, user, mute.Expires.Value))
-    if err != nil {
-        slog.Error("failed to send message to mutes channel", err)
-        span.RecordError(err)
-        return
-    }
-
     slog.Info("update response message")
     s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
         Type: discordgo.InteractionResponseUpdateMessage,

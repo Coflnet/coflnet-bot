@@ -183,14 +183,6 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
         return
     }
 
-    slog.Info(fmt.Sprintf("unmute was sent successfully, trace: %s", span.SpanContext().TraceID()))
-    err = discord.SendMessageToMutesChannel(fmt.Sprintf("%s unmuted %s", i.User.Username, user))
-    if err != nil {
-        slog.Error("failed to send message to mutes channel", err)
-        span.RecordError(err)
-        return
-    }
-
     slog.Info("update response message")
     s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
         Type: discordgo.InteractionResponseUpdateMessage,
