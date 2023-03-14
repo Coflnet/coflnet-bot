@@ -530,7 +530,7 @@ func decodeAPIChatSendPostResponse(resp *http.Response) (res APIChatSendPostRes,
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
-            fmt.Println(fmt.Sprintf("%d : %s", resp.StatusCode, string(buf)))
+            fmt.Println(fmt.Sprintf("%d : %s : %s", resp.StatusCode, resp.Header["Content-Type"], string(buf)))
 
 			var response APIChatSendPostApplicationJSONOK
 			if err := func() error {
