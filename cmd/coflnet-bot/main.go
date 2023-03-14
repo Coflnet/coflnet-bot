@@ -72,6 +72,8 @@ func tracerProvider() (*tracesdk.TracerProvider, error) {
 	tp := tracesdk.NewTracerProvider(
 		// Always be sure to batch in production.
 		tracesdk.WithBatcher(exp),
+        // sampling
+        tracesdk.WithSampler(tracesdk.ParentBased(tracesdk.TraceIDRatioBased(0.1))),
 		// Record information about this application in a Resource.
 		tracesdk.WithResource(resource.NewWithAttributes(
 			semconv.SchemaURL,

@@ -98,7 +98,17 @@ func (p *FlipProcessor) processMessage(ctx context.Context, msg *kafkago.Message
     if err != nil {
         return err
     }
+
     span.SetAttributes(attribute.Int("profit", flip.Profit))
+    span.SetAttributes(attribute.String("end", flip.Sell.End.Format(time.RFC3339)))
+
+
+    // if sell end is older than 24 hours ignore
+    if flip.Sell.End.Unix() < time.Now().Add(-24*time.Hour).Unix() {
+        span.AddEvent("skip-flip-because-it-is-old")
+        slog.Info(fmt.Sprintf("skip flip because it is old"))
+        return nil
+    }
 
     if flip.Profit > 10_000_000 {
 
