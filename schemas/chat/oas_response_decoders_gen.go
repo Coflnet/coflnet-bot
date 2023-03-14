@@ -527,8 +527,8 @@ func decodeAPIChatSendPostResponse(resp *http.Response) (res APIChatSendPostRes,
 			if err != nil {
 				return res, err
 			}
-            fmt.Println(fmt.Sprintf("%d : %s", resp.StatusCode, string(buf)))
 			d := jx.DecodeBytes(buf)
+            fmt.Println(fmt.Sprintf("%d : %s", resp.StatusCode, string(buf)))
 
 			var response APIChatSendPostApplicationJSONOK
 			if err := func() error {
@@ -554,6 +554,7 @@ func decodeAPIChatSendPostResponse(resp *http.Response) (res APIChatSendPostRes,
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
+            fmt.Println(fmt.Sprintf("%d : %s", resp.StatusCode, string(buf)))
 
 			var response APIChatSendPostTextJSONOK
 			if err := func() error {
@@ -574,6 +575,8 @@ func decodeAPIChatSendPostResponse(resp *http.Response) (res APIChatSendPostRes,
 			}
 			return &response, nil
 		default:
+            buf, _ := io.ReadAll(resp.Body)
+            fmt.Println(fmt.Sprintf("%d : %s", resp.StatusCode, string(buf)))
 			return res, validate.InvalidContentType(ct)
 		}
 	case 400:
