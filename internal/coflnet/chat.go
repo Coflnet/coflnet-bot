@@ -12,7 +12,6 @@ import (
 
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/Coflnet/coflnet-bot/schemas/chat"
-	"github.com/ogen-go/ogen/ogenerrors"
 )
 
 const (
@@ -66,7 +65,7 @@ func (r *ChatApi) SendMessage(ctx context.Context, msg chat.APIChatSendPostReq) 
         return &msg, nil
     case *chat.APIChatSendPostTextJSONInternalServerError:
         err := errors.New("internal server error")
-        slog.Error("error sending message to chat api, internal server error" + r.Message.Value, err)
+        slog.Error("error sending message to chat api, internal server error", err)
         span.RecordError(err)
         return nil, err
     case *chat.APIChatSendPostTextJSONBadRequest:

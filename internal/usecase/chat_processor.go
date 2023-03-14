@@ -235,7 +235,7 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 	}
 
 	if len(users) >= 2 {
-		err := errors.New("more than one user found for discord account even after filtering for preferred users")
+        err := errors.New(fmt.Sprintf("more than one user found for discord account even after filtering for preferred users, error: %s", span.SpanContext().TraceID()))
 		slog.Warn("error searching user for chat message", err)
 		span.RecordError(err)
 		return err
@@ -250,6 +250,13 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 	}
 
 	user := users[0]
+
+    if user.UUID() == "" {
+        err := errors.New(fmt.Sprintf("user has no uuid, can not forward the message, error: %s", span.SpanContext().TraceID()))
+        slog.Warn(fmt.Sprintf("no uuid found for user"), err)
+        span.RecordError(err)
+        return err
+    }
 
     slog.Info(fmt.Sprintf("sending discord message to chat api, message: %s", msg.Content))
     _, err = p.coflnetChatClient.SendMessage(ctx, &chat.APIChatSendPostTextJSON{
