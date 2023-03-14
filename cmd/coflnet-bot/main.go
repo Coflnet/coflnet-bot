@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
@@ -95,5 +96,7 @@ func startMessageProcessors() {
             slog.Error("error in message processor", err)
             panic(err)
 		}(p)
+
+        time.Sleep(time.Second * 1)
 	}
 }

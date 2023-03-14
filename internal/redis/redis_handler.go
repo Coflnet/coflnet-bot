@@ -35,7 +35,6 @@ func NewRedisHandler() *RedisHandler {
 	})
 
     slog.Info(fmt.Sprintf("use redis host %s", utils.RedisHost()))
-
 	return r
 }
 

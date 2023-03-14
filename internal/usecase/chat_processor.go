@@ -56,7 +56,8 @@ func (r *ChatProcessor) StartProcessing() error {
         slog.Error("error initializing chat processor", err)
 		return err
 	}
-
+    
+    slog.Info("starting chat processor goroutines")
 	var oneDone = make(chan error)
 
 	go func() {
@@ -79,8 +80,11 @@ func (r *ChatProcessor) StartProcessing() error {
 
 func (r *ChatProcessor) StartRedisChatProcessor() error {
 	ctx := context.Background()
+
+    slog.Info("start receiving redis chat messages")
 	msgs := r.redisHandler.ReceiveChatPubSubMessage(ctx)
 
+    slog.Info("listening for redis chat messages")
 	for msg := range msgs {
 
 		go func(msg *redisgo.Message) {
