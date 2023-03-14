@@ -3,6 +3,7 @@
 package chat
 
 import (
+	"fmt"
 	"io"
 	"mime"
 	"net/http"
@@ -526,6 +527,7 @@ func decodeAPIChatSendPostResponse(resp *http.Response) (res APIChatSendPostRes,
 			if err != nil {
 				return res, err
 			}
+            fmt.Println(string(buf))
 			d := jx.DecodeBytes(buf)
 
 			var response APIChatSendPostApplicationJSONOK
