@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/model"
@@ -51,7 +52,7 @@ func (p *FlipProcessor) StartProcessing() error {
 			defer cancel()
 
 
-            _, span := otel.Tracer(flipProcessorTracerName).Start(ctx, "process-flipsummary-kafka-message")
+            ctx, span := otel.Tracer(flipProcessorTracerName).Start(ctx, "process-flipsummary-kafka-message")
             defer span.End()
 
 			err := p.processMessage(ctx, msg)
@@ -78,7 +79,7 @@ func (p *FlipProcessor) StartProcessing() error {
 }
 
 func (p *FlipProcessor) processMessage(ctx context.Context, msg *kafkago.Message) error {
-    _, span := otel.Tracer(flipProcessorTracerName).Start(ctx, "process-flipsummary")
+    ctx, span := otel.Tracer(flipProcessorTracerName).Start(ctx, "process-flipsummary")
     defer span.End()
 
 
@@ -89,7 +90,8 @@ func (p *FlipProcessor) processMessage(ctx context.Context, msg *kafkago.Message
     }
 
     span.SetAttributes(attribute.Int("profit", flip.Profit))
-    log.Debug().Msgf("processed a flip with a profit of %d", flip.Profit)
+    slog.Debug(fmt.Sprintf("processing flip %s", flip.Buy.UUID))
+
 
 	return nil
 }

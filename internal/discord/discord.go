@@ -10,7 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"regexp"
-	"sync"
+	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
@@ -28,7 +28,6 @@ const (
 
 var (
     instance *DiscordHandler
-    initMutex sync.Mutex
 )
 
 type Discord interface {
@@ -44,6 +43,7 @@ type DiscordHandler struct {
     messagesReceived chan discordgo.Message
 
     tracer trace.Tracer
+    initialized bool
 }
 
 type DiscordMessage struct {
@@ -66,15 +66,16 @@ type AllowedMentions struct {
 func NewDiscordHandler() (*DiscordHandler, error) {
 
     if instance != nil {
+        for !instance.initialized {
+            time.Sleep(100 * time.Millisecond)
+        }
         return instance, nil
     }
 
-    initMutex.Lock()
     slog.Info("creating new discord handler")
-
-
     instance := &DiscordHandler{
         tracer: otel.Tracer(discordHandlerTracerName),
+        initialized: false,
     }
 
     err := instance.initSession()
@@ -105,6 +106,8 @@ func (d *DiscordHandler) initSession() error {
 
         d.RegisterCommands()
         defer d.Close()
+
+        d.initialized = true
 
         sig := make(chan os.Signal, 1)
         signal.Notify(sig, os.Interrupt)
