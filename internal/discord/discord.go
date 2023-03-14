@@ -204,6 +204,8 @@ func (d *DiscordHandler) webhookForChannel(channel string) (string, error) {
 		return utils.FlipperRoleWebhook(), nil
 	case discord.FeedbackChannel:
 		return utils.FeedbackWebhook(), nil
+    case discord.FlipChannel:
+        return utils.FlipWebhook(), nil
 	}
 
 	return "", errors.New("no webhook found for channel")
