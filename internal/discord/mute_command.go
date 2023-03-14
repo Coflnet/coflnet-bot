@@ -92,7 +92,7 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
     defer span.End()
 
     // check if the user is at least mod 
-    if !utils.IsUserMod(i.Member.Roles) {
+    if !utils.IsUserHelper(i.Member.Roles) && !utils.IsUserMod(i.Member.Roles) {
         err := errors.New(fmt.Sprintf("User %s is not a mod", i.Member.User.Username))
         slog.Warn("failed to mute user", err)
         span.RecordError(err)
