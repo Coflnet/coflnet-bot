@@ -33,6 +33,7 @@ func UsersByDiscordId(ctx context.Context, id string) ([]*model.User, error) {
         }
         users = append(users, &u)
     }
+    span.SetAttributes(attribute.Int("found-users", len(users)))
 
     return users, nil
 }
@@ -60,6 +61,7 @@ func UsersByDiscordTag(ctx context.Context, tag string) ([]*model.User, error) {
         }
         users = append(users, &u)
     }
+    span.SetAttributes(attribute.Int("found-users", len(users)))
 
     return users, nil
 }

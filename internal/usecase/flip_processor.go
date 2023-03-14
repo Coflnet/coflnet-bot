@@ -43,6 +43,7 @@ func (p *FlipProcessor) StartProcessing() error {
 	msgs := p.kafkaProcessor.CollectMessages(ctx, 100)
 	semaphore := make(chan struct{}, 10)
 
+    slog.Info("starting to process flip summaries")
 	for msg := range msgs {
 		semaphore <- struct{}{}
 		go func(msg *kafkago.Message) {

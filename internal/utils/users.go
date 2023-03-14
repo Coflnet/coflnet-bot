@@ -9,5 +9,10 @@ func FilterUsersForPreferredUsers(userId string, users []*model.User) []*model.U
             filteredUsers = append(filteredUsers, user)
         }
     }
+
+    if len(filteredUsers) == 0 {
+        return users
+    }
+
     return filteredUsers
 }

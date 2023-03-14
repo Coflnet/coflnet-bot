@@ -232,13 +232,7 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 
 	if len(users) >= 2 {
 		users = utils.FilterUsersForPreferredUsers(msg.Author.ID, users)
-	}
-
-	if len(users) >= 2 {
-        err := errors.New(fmt.Sprintf("more than one user found for discord account even after filtering for preferred users, error: %s", span.SpanContext().TraceID()))
-		slog.Warn("error searching user for chat message", err)
-		span.RecordError(err)
-		return err
+        slog.Debug(fmt.Sprintf("found multiple users for discord account, after filtering preferred users remaining: %d", len(users)))
 	}
 
 	if len(users) == 0 {
@@ -249,7 +243,7 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 		return err
 	}
 
-	user := users[0]
+	user := users[len(users)-1]
 
     if user.UUID() == "" {
         err := errors.New(fmt.Sprintf("user has no uuid, can not forward the message, error: %s", span.SpanContext().TraceID()))
