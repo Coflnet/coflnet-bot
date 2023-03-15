@@ -42,6 +42,7 @@ func (b *baseCommand) createFollowupMessage(ctx context.Context, content string,
     defer span.End()
 
     msg, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+			Flags:   discordgo.MessageFlagsEphemeral,
 			Content: content,
 	})
 
