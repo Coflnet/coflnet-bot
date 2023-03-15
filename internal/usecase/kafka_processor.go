@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/rs/zerolog/log"
 	kafkago "github.com/segmentio/kafka-go"
 	"golang.org/x/exp/slog"
 )
