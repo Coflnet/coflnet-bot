@@ -11,11 +11,6 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-type DiscordCommand interface {
-	Name() string
-	CreateCommand() *discordgo.ApplicationCommand
-	HandleCommand(s *discordgo.Session, i *discordgo.InteractionCreate)
-}
 
 func (d *DiscordHandler) RegisterCommands() error {
     time.Sleep(time.Second * 10)

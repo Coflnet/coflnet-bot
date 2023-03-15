@@ -11,12 +11,12 @@ import (
 	"github.com/Coflnet/coflnet-bot/schemas/chat"
 	"github.com/bwmarrin/discordgo"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slog"
 )
 
 type UnmuteCommand struct {
+    baseCommand *baseCommand
     tracer trace.Tracer
     chatApi *coflnet.ChatApi
     clientApi *coflnet.ApiClient
@@ -37,6 +37,8 @@ func (m *UnmuteCommand) Name() string {
 }
 
 func (m *UnmuteCommand) Init() {
+
+    m.baseCommand = newBaseCommand()
 
     chatApi, err := coflnet.NewChatClient()
     if err != nil {
@@ -100,14 +102,16 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
         return
     }
 
-    // Access options in the order provided by the user.
-	options := i.ApplicationCommandData().Options
+    // respond to command
+    msg, err := m.baseCommand.createFollowupMessage(ctx, "⏳ unmute in progress", s, i)
+    if err != nil {
+        slog.Error("failed to create followup message", err)
+        span.RecordError(err)
+        return
+    }
 
-	// Or convert the slice into a map
-	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
-	for _, opt := range options {
-		optionMap[opt.Name] = opt
-	}
+    // parse the strange discord map to a normal map
+	optionMap := m.baseCommand.parseResponseOptions(i)
 
     // get the reason
     reason := optionMap["reason"].StringValue()
@@ -123,38 +127,12 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
         s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
             Type: discordgo.InteractionResponseChannelMessageWithSource,
             Data: &discordgo.InteractionResponseData{
-                Content: fmt.Sprintf("❌ failed to unmute %s, error: %s", user, span.SpanContext().TraceID()),
+                Content: fmt.Sprintf("❌ no uuid found for the user %s, check spelling. error: %s", user, span.SpanContext().TraceID()),
                 AllowedMentions: &discordgo.MessageAllowedMentions{},
             },
         })
         return
     }
-
-    go func() {
-        _, span := m.tracer.Start(ctx, "respond-to-unmute-command")
-        defer span.End()
-
-        // set start time as attribute
-        span.SetAttributes(attribute.Int64("start-respond", time.Now().Unix()))
-
-        slog.Debug("sending response to unmute command")
-        err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-            Type: discordgo.InteractionResponseChannelMessageWithSource,
-            Data: &discordgo.InteractionResponseData{
-                Content: fmt.Sprintf("trying to unmute %s", user),
-                AllowedMentions: &discordgo.MessageAllowedMentions{},
-            },
-        })
-
-        if err != nil {
-            slog.Error("failed to respond to unmute command", err)
-            span.RecordError(err)
-            return
-        }
-
-        slog.Info("successfully responded to unmute command")
-        span.SetAttributes(attribute.Int64("end-respond", time.Now().Unix()))
-    }()
 
 
     slog.Info(fmt.Sprintf("unmuting %s for %s; Muter: %s", user, reason, i.Member.User.Username))
@@ -182,14 +160,7 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
         return
     }
 
-    slog.Info("update response message")
-    s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-        Type: discordgo.InteractionResponseUpdateMessage,
-        Data: &discordgo.InteractionResponseData{
-            Content: fmt.Sprintf("✅ unmuted %s", user),
-            AllowedMentions: &discordgo.MessageAllowedMentions{},
-        },
-    })
+    slog.Info("update the followup message")    
+    m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("✅ %s unmuted", user), msg.ID, s, i)
 }
-
 
