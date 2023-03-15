@@ -50,8 +50,10 @@ func (p *FlipProcessor) StartProcessing() error {
 	defer p.kafkaProcessor.Close()
 
 	ctx := context.Background()
-	msgs := p.kafkaProcessor.CollectMessages(ctx, 100)
-	semaphore := make(chan struct{}, 10)
+
+    channelSize := 100
+	msgs := p.kafkaProcessor.CollectMessages(ctx, channelSize*3)
+	semaphore := make(chan struct{}, channelSize)
 
     slog.Info("starting to process flip summaries")
 	for msg := range msgs {
