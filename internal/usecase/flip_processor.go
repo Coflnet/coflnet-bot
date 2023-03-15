@@ -64,9 +64,10 @@ func (p *FlipProcessor) StartProcessing() error {
 			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
 
-
             ctx, span := otel.Tracer(flipProcessorTracerName).Start(ctx, "process-flipsummary-kafka-message")
             defer span.End()
+
+            slog.Debug("channel size: ", len(semaphore))
 
 			err := p.processMessage(ctx, msg)
 			if err != nil {
