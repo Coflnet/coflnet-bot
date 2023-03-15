@@ -221,6 +221,8 @@ func (c *Client) sendAPIChatMuteDelete(ctx context.Context, request APIChatMuteD
 		return res, errors.Wrap(err, "encode request")
 	}
 
+    r.Header.Set("authorization", os.Getenv("COFL_CHAT_API_KEY"))
+
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
