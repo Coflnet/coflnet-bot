@@ -86,6 +86,13 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
 	ctx, span := m.tracer.Start(ctx, "handle-unmute-command")
 	defer span.End()
 
+	// first fake response
+    if err := m.baseCommand.requestReceived(ctx, s, i); err != nil {
+        slog.Error("failed sending request received message", err)
+        span.RecordError(err)
+        return
+    }
+
 	// respond to command
 	msg, err := m.baseCommand.createFollowupMessage(ctx, "⏳ unmute in progress", s, i)
 	if err != nil {

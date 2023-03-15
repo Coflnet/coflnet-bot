@@ -91,6 +91,13 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
     ctx, span := m.tracer.Start(ctx, "handle-mute-command")
     defer span.End()
 
+	// first response
+    if err := m.baseCommand.requestReceived(ctx, s, i); err != nil {
+        slog.Error("sending first response failed", err)
+        span.RecordError(err)
+        return
+    }
+
 	// respond to command
 	msg, err := m.baseCommand.createFollowupMessage(ctx, "⏳ mute in progress", s, i)
 	if err != nil {
@@ -98,6 +105,7 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
 		span.RecordError(err)
 		return
 	}
+
 
     // Access options in the order provided by the user.
 	optionMap := m.baseCommand.parseResponseOptions(i)
