@@ -57,3 +57,16 @@ func (b *baseCommand) editFollowupMessage(ctx context.Context, content, initialF
 		Content: &content,
 	})
 }
+
+func (b *baseCommand) requestReceived(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate) error {
+    _, span := b.tracer.Start(ctx, "send-first-response")
+    defer span.End()
+
+	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Flags:   discordgo.MessageFlagsEphemeral,
+			Content: "⏳ request received",
+		},
+	})
+}

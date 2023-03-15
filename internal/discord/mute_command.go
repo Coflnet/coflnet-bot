@@ -11,12 +11,12 @@ import (
 	"github.com/Coflnet/coflnet-bot/schemas/chat"
 	"github.com/bwmarrin/discordgo"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slog"
 )
 
 type MuteCommand struct {
+    baseCommand *baseCommand
     tracer trace.Tracer
     chatApi *coflnet.ChatApi
     clientApi *coflnet.ApiClient
@@ -37,6 +37,7 @@ func (m *MuteCommand) Name() string {
 }
 
 func (m *MuteCommand) Init() {
+	m.baseCommand = newBaseCommand()
 
     chatApi, err := coflnet.NewChatClient()
     if err != nil {
@@ -90,30 +91,24 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
     ctx, span := m.tracer.Start(ctx, "handle-mute-command")
     defer span.End()
 
-    // check if the user is at least mod 
-    if !utils.IsUserHelper(i.Member.Roles) && !utils.IsUserMod(i.Member.Roles) {
-        err := errors.New(fmt.Sprintf("User %s is not a mod", i.Member.User.Username))
-        slog.Warn("failed to mute user", err)
+	// first response
+    if err := m.baseCommand.requestReceived(ctx, s, i); err != nil {
+        slog.Error("sending first response failed", err)
         span.RecordError(err)
-
-        s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: "❌ you do not have permissions to mute players, this incident will be reported",
-                AllowedMentions: &discordgo.MessageAllowedMentions{},
-			},
-		})
         return
     }
 
-    // Access options in the order provided by the user.
-	options := i.ApplicationCommandData().Options
-
-	// Or convert the slice into a map
-	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
-	for _, opt := range options {
-		optionMap[opt.Name] = opt
+	// respond to command
+	msg, err := m.baseCommand.createFollowupMessage(ctx, "⏳ mute in progress", s, i)
+	if err != nil {
+		slog.Error("failed to create followup message", err)
+		span.RecordError(err)
+		return
 	}
+
+
+    // Access options in the order provided by the user.
+	optionMap := m.baseCommand.parseResponseOptions(i)
 
     // get the reason
     reason := optionMap["reason"].StringValue()
@@ -127,47 +122,30 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
     // get the user to mute
     user := optionMap["user"].StringValue()
 
+    // check if the user is at least mod 
+    if !utils.IsUserHelper(i.Member.Roles) && !utils.IsUserMod(i.Member.Roles) {
+        err := errors.New(fmt.Sprintf("User %s is not a mod", i.Member.User.Username))
+        slog.Warn("failed to mute user", err)
+        span.RecordError(err)
+        if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("❌ failed to mute user %s; you are not authorized; error: %s", user, span.SpanContext().TraceID()), msg.ID, s, i); err != nil {
+            slog.Error("failed to edit followup message", err)
+            span.RecordError(err)
+        }
+        return
+    }
+
     // search the uuid for the mc username
     userUUID, err := m.clientApi.SearchUUIDForPlayer(ctx, user)
     if err != nil {
         slog.Error("mc uuid not found", err)
         span.RecordError(err)
-        s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-            Type: discordgo.InteractionResponseChannelMessageWithSource,
-            Data: &discordgo.InteractionResponseData{
-                Content: fmt.Sprintf("❌ failed to mute %s, error: %s", user, span.SpanContext().TraceID()),
-                AllowedMentions: &discordgo.MessageAllowedMentions{},
-            },
-        })
+        errMsg := fmt.Sprintf("❌ failed to mute %s, mc uuid for %s not found; error: %s", user, user, span.SpanContext().TraceID())
+        if _, err := m.baseCommand.editFollowupMessage(ctx, errMsg, msg.ID, s, i); err != nil {
+            slog.Error("failed to edit followup message", err)
+            span.RecordError(err)
+        }
         return
     }
-
-    go func() {
-        _, span := m.tracer.Start(ctx, "respond-to-mute-command")
-        defer span.End()
-
-        // set start time as attribute
-        span.SetAttributes(attribute.Int64("start-respond", time.Now().Unix()))
-
-        slog.Debug("sending response to mute command")
-        err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-            Type: discordgo.InteractionResponseChannelMessageWithSource,
-            Data: &discordgo.InteractionResponseData{
-                Content: fmt.Sprintf("trying to mute %s", user),
-                AllowedMentions: &discordgo.MessageAllowedMentions{},
-            },
-        })
-
-        if err != nil {
-            slog.Error("failed to respond to mute command", err)
-            span.RecordError(err)
-            return
-        }
-
-        slog.Info("successfully responded to mute command")
-        span.SetAttributes(attribute.Int64("end-respond", time.Now().Unix()))
-    }()
-
 
     slog.Info(fmt.Sprintf("muting %s for %s; Muter: %s", user, reason, muter))
     mute, err := m.chatApi.MuteUser(ctx, &chat.APIChatMutePostTextJSON{
@@ -180,24 +158,19 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
     if err != nil {
         slog.Error("failed to mute user", err)
         span.RecordError(err)
-        s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-            Type: discordgo.InteractionResponseDeferredMessageUpdate,
-            Data: &discordgo.InteractionResponseData{
-                Content: fmt.Sprintf("❌ failed to mute %s; error: id: %s, text: %s", user, err.Error(), span.SpanContext().TraceID()),
-                AllowedMentions: &discordgo.MessageAllowedMentions{},
-            },
-        })
+        errMsg := fmt.Sprintf("❌ failed to mute %s; error: id: %s, text: %s", user, err.Error(), span.SpanContext().TraceID())
+        if _, err := m.baseCommand.editFollowupMessage(ctx, errMsg, msg.ID, s, i); err != nil {
+            slog.Error("failed to edit followup message", err)
+            span.RecordError(err)
+        }
         return
     }
 
-    slog.Info("update response message")
-    s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-        Type: discordgo.InteractionResponseUpdateMessage,
-        Data: &discordgo.InteractionResponseData{
-            Content: fmt.Sprintf("✅ muted %s until %s", user, mute.Expires.Value),
-            AllowedMentions: &discordgo.MessageAllowedMentions{},
-        },
-    })
+	slog.Info("update the followup message")
+    if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("✅ muted %s until %s", user, mute.Expires.Value), msg.ID, s, i); err != nil {
+        slog.Error("failed to edit follup message", err)
+        span.RecordError(err)
+    }
 }
 
 

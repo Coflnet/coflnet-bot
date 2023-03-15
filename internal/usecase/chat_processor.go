@@ -144,7 +144,7 @@ func (p *ChatProcessor) processDiscordMessage(ctx context.Context, msg *discordg
 	ctx, span := p.tracer.Start(ctx, "process-discord-message")
 	defer span.End()
 	defer metrics.DiscordMessagesProcessed.Inc()
-	slog.Debug("processing discord message from %s with content %s", msg.Author.Username, msg.Content)
+	slog.Debug(fmt.Sprintf("processing discord message from %s with content %s", msg.Author.Username, msg.Content))
 
 	// create a error channel for potential errors in go routines
 	wg := &sync.WaitGroup{}

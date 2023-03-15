@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"regexp"
+	"sync"
 	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
@@ -27,8 +28,31 @@ const (
 )
 
 var (
-    instance *DiscordHandler
+    instance *DiscordHandler = nil
+    once sync.Once
 )
+
+func NewDiscordHandler() (*DiscordHandler, error) {
+
+    once.Do(func() {
+        instance := &DiscordHandler{
+            tracer: otel.Tracer(discordHandlerTracerName),
+            initialized: false,
+        }
+
+        err := instance.initSession()
+        if err != nil {
+            slog.Error("error initializing discord session", err)
+            panic(err)
+        }
+    })
+
+    for instance == nil || !instance.initialized {
+        time.Sleep(100 * time.Millisecond)
+    }
+
+    return instance, nil
+}
 
 type Discord interface {
     SendMessage(msg *DiscordMessage) error
@@ -63,28 +87,6 @@ type AllowedMentions struct {
 	Parse []string `json:"parse"`
 }
 
-func NewDiscordHandler() (*DiscordHandler, error) {
-
-    if instance != nil {
-        for !instance.initialized {
-            time.Sleep(100 * time.Millisecond)
-        }
-        return instance, nil
-    }
-
-    slog.Info("creating new discord handler")
-    instance := &DiscordHandler{
-        tracer: otel.Tracer(discordHandlerTracerName),
-        initialized: false,
-    }
-
-    err := instance.initSession()
-    if err != nil {
-        return nil, err
-    }
-
-    return instance, nil
-}
 
 func (d *DiscordHandler) Close() {
     d.unregisterCommands()
@@ -104,7 +106,13 @@ func (d *DiscordHandler) initSession() error {
         d.session.Open()
         defer d.session.Close()
 
-        d.RegisterCommands()
+        time.Sleep(1 * time.Second)
+
+        err := d.RegisterCommands()
+        if err != nil {
+            slog.Error("error when registering commands", err)
+            panic(err)
+        }
         defer d.Close()
 
         d.initialized = true
