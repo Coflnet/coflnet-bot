@@ -6,6 +6,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	kafkago "github.com/segmentio/kafka-go"
+	"golang.org/x/exp/slog"
 )
 
 // MessageProcessor is the interface for processing messages
@@ -74,10 +75,11 @@ func (p *KafkaProcessor) CollectMessages(ctx context.Context, channelLength int)
     go func() {
         defer close(result)
         for {
-            msg, err := p.reader.ReadMessage(ctx)
+            msg, err := p.reader.FetchMessage(ctx)
+
             if err != nil {
-                log.Panic().Err(err).Msg("error reading message")
-                return
+                slog.Error("error reading message", err)
+                continue
             }
 
             result <- &msg
