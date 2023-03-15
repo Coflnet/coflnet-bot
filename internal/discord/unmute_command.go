@@ -80,7 +80,7 @@ func (m *UnmuteCommand) CreateCommand() *discordgo.ApplicationCommand {
 }
 
 func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	ctx, span := m.tracer.Start(ctx, "handle-unmute-command")
