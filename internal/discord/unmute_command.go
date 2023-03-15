@@ -107,7 +107,7 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
 		err := errors.New(fmt.Sprintf("User %s is not a mod or a helper", i.Member.User.Username))
 		slog.Warn("failed to unmute user", err)
 		span.RecordError(err)
-        if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("❌ failed to unmute user %s; you are not authorized; error: %s", span.SpanContext().TraceID()), msg.ID, s, i); err != nil {
+        if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("❌ failed to unmute user %s; you are not authorized; error: %s", user, span.SpanContext().TraceID()), msg.ID, s, i); err != nil {
             slog.Error("failed to edit followup message", err)
             span.RecordError(err)
         }
