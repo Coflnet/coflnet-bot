@@ -102,6 +102,16 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
 	}
 
 
+
+	// parse the strange discord map to a normal map
+	optionMap := m.baseCommand.parseResponseOptions(i)
+
+	// get the reason
+	reason := optionMap["reason"].StringValue()
+
+	// get the user to mute
+	user := optionMap["user"].StringValue()
+
 	// check if the user is at least mod
 	if !utils.IsUserMod(i.Member.Roles) && !utils.IsUserHelper(i.Member.Roles) {
 		err := errors.New(fmt.Sprintf("User %s is not a mod or a helper", i.Member.User.Username))
@@ -114,15 +124,6 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
 
 		return
 	}
-
-	// parse the strange discord map to a normal map
-	optionMap := m.baseCommand.parseResponseOptions(i)
-
-	// get the reason
-	reason := optionMap["reason"].StringValue()
-
-	// get the user to mute
-	user := optionMap["user"].StringValue()
 
 	// search the uuid for the mc username
 	userUUID, err := m.clientApi.SearchUUIDForPlayer(ctx, user)

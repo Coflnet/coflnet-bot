@@ -3,8 +3,6 @@ package main
 import (
 	"os"
 	"os/signal"
-	"sync"
-	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
