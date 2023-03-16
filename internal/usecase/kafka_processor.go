@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"time"
 
 	kafkago "github.com/segmentio/kafka-go"
 	"golang.org/x/exp/slog"
@@ -78,6 +79,7 @@ func (p *KafkaProcessor) CollectMessages(ctx context.Context, channelLength int)
 
             if err != nil {
                 slog.Error("error reading message", err)
+                time.Sleep(5 * time.Second)
                 continue
             }
 
