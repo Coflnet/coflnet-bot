@@ -83,9 +83,9 @@ func tracerProvider() (*tracesdk.TracerProvider, error) {
 
 func startMessageProcessors() {
 	processors := []usecase.MessageProcessor{
-		new(usecase.FlipProcessor),
+		//new(usecase.FlipProcessor),
         new(usecase.ChatProcessor),
-        new(usecase.McVerifyProcessor),
+        //new(usecase.McVerifyProcessor),
         new(usecase.DiscordMessageProcessor),
 	}
 
