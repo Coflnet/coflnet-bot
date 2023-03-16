@@ -1,4 +1,4 @@
-package discord
+package discornd
 
 import (
 	"bytes"
@@ -34,18 +34,19 @@ var (
 
 func NewDiscordHandler() (*DiscordHandler, error) {
 
+    instance := &DiscordHandler{
+        tracer: otel.Tracer(discordHandlerTracerName),
+        initialized: false,
+    }
     once.Do(func() {
-        instance := &DiscordHandler{
-            tracer: otel.Tracer(discordHandlerTracerName),
-            initialized: false,
-        }
-
         err := instance.initSession()
         if err != nil {
             slog.Error("error initializing discord session", err)
             panic(err)
         }
     })
+
+    time.Sleep(time.Minute * 1)
 
     return instance, nil
 }
