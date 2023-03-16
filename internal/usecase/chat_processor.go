@@ -61,14 +61,14 @@ func (r *ChatProcessor) StartProcessing() error {
 
 	go func() {
         slog.Info("starting redis chat processor")
-		err := r.StartRedisChatProcessor()
+		err := r.startRedisChatProcessor()
 		slog.Error("redis chat processor stopped", err)
         panic(err)
 	}()
 
 	go func() {
         slog.Info("starting discord chat processor")
-		err := r.StartDiscordChatProcessor()
+		err := r.startDiscordChatProcessor()
 		slog.Error("discord chat processor stopped", err)
         panic(err)
 	}()
@@ -76,7 +76,7 @@ func (r *ChatProcessor) StartProcessing() error {
     return nil
 }
 
-func (r *ChatProcessor) StartRedisChatProcessor() error {
+func (r *ChatProcessor) startRedisChatProcessor() error {
 	ctx := context.Background()
 
     slog.Info("start receiving redis chat messages")
@@ -106,7 +106,7 @@ func (r *ChatProcessor) StartRedisChatProcessor() error {
 	return errors.New("redis chat pubsub channel closed")
 }
 
-func (r *ChatProcessor) StartDiscordChatProcessor() error {
+func (r *ChatProcessor) startDiscordChatProcessor() error {
 
 	ctx := context.Background()
 	slog.Info("starting discord chat processor")

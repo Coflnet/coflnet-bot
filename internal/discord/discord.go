@@ -40,10 +40,9 @@ func GetDiscordHandler() (*DiscordHandler, error) {
 
         if instance == nil {
             slog.Info("initializing discord handler")
-            instance := &DiscordHandler{
-                tracer: otel.Tracer(discordHandlerTracerName),
-            }
-            err := instance.initSession()
+
+            var err error
+            instance, err = InitSession()
 
             if err != nil {
                 slog.Error("error initializing discord session", err)
@@ -98,11 +97,16 @@ func (d *DiscordHandler) Close() {
     d.session.Close()
 }
 
-func (d *DiscordHandler) initSession() error {
+func InitSession() (*DiscordHandler, error) {
+
+    d := &DiscordHandler{
+        tracer: otel.Tracer(discordHandlerTracerName),
+    }
+
 	var err error
 	d.session, err = discordgo.New("Bot " + utils.DiscordBotToken())
 	if err != nil {
-        return err
+        return nil, err
 	}
 
 	d.session.Identify.Intents = discordgo.IntentsAllWithoutPrivileged
@@ -131,7 +135,7 @@ func (d *DiscordHandler) initSession() error {
     }()
 
     sessionOpen.Wait()
-    return nil
+    return d, nil
 }
 
 
