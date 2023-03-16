@@ -50,32 +50,33 @@ func (p *DiscordMessageProcessor) StartProcessing() error {
 	msgs := p.kafkaProcessor.CollectMessages(ctx, 100)
 	semaphore := make(chan struct{}, 10)
 
-	for msg := range msgs {
-		semaphore <- struct{}{}
-		go func(msg *kafkago.Message) {
-			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-			defer cancel()
+    go func() {
+	    for msg := range msgs {
+	    	semaphore <- struct{}{}
+	    	go func(msg *kafkago.Message) {
+	    		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	    		defer cancel()
 
-			defer func() { <-semaphore }()
+	    		defer func() { <-semaphore }()
 
-            _, span := otel.Tracer(flipProcessorTracerName).Start(ctx, "process-discord-message-kafka-message")
-            defer span.End()
+                _, span := otel.Tracer(flipProcessorTracerName).Start(ctx, "process-discord-message-kafka-message")
+                defer span.End()
 
-			err := p.processMessage(ctx, msg)
-			if err != nil {
-				log.Error().Err(err).Msg("error processing flip summary")
-                span.RecordError(err)
-				return
-			}
-            span.AddEvent("processed message")
+	    		err := p.processMessage(ctx, msg)
+	    		if err != nil {
+	    			log.Error().Err(err).Msg("error processing flip summary")
+                    span.RecordError(err)
+	    			return
+	    		}
+                span.AddEvent("processed message")
 
-			p.kafkaProcessor.CommitMessage(ctx, msg)
-            span.AddEvent("committed message")
-		}(msg)
-	}
-
-	slog.Warn(fmt.Sprintf("kafka processor for topic %s stopped", p.kafkaProcessor.Topic))
-	return nil
+	    		p.kafkaProcessor.CommitMessage(ctx, msg)
+                span.AddEvent("committed message")
+	    	}(msg)
+	    }
+        panic("channel closed")
+    }()
+    return nil
 }
 
 func (p *DiscordMessageProcessor) processMessage(ctx context.Context, msg *kafkago.Message) error {

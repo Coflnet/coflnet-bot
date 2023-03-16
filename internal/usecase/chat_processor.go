@@ -58,24 +58,22 @@ func (r *ChatProcessor) StartProcessing() error {
 	}
     
     slog.Info("starting chat processor goroutines")
-	var oneDone = make(chan error)
 
 	go func() {
         slog.Info("starting redis chat processor")
 		err := r.StartRedisChatProcessor()
 		slog.Error("redis chat processor stopped", err)
-		oneDone <- err
+        panic(err)
 	}()
 
 	go func() {
         slog.Info("starting discord chat processor")
 		err := r.StartDiscordChatProcessor()
 		slog.Error("discord chat processor stopped", err)
-		oneDone <- err
+        panic(err)
 	}()
 
-	err := <-oneDone
-	panic(err)
+    return nil
 }
 
 func (r *ChatProcessor) StartRedisChatProcessor() error {

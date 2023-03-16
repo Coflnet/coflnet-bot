@@ -56,39 +56,44 @@ func (p *FlipProcessor) StartProcessing() error {
 	semaphore := make(chan struct{}, channelSize)
 
     slog.Info("starting to process flip summaries")
-	for msg := range msgs {
-		semaphore <- struct{}{}
-		go func(msg *kafkago.Message) {
-			defer func() { <-semaphore }()
 
-			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-			defer cancel()
+    go func() {
+	    for msg := range msgs {
+	    	semaphore <- struct{}{}
+	    	go func(msg *kafkago.Message) {
+	    		defer func() { <-semaphore }()
 
-            ctx, span := otel.Tracer(flipProcessorTracerName).Start(ctx, "process-flipsummary-kafka-message")
-            defer span.End()
+	    		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	    		defer cancel()
 
-            slog.Debug("channel size: ", len(semaphore))
+                ctx, span := otel.Tracer(flipProcessorTracerName).Start(ctx, "process-flipsummary-kafka-message")
+                defer span.End()
 
-			err := p.processMessage(ctx, msg)
-			if err != nil {
-				slog.Error("error processing flip summary", err)
-                span.RecordError(err)
-				return
-			}
-            span.AddEvent("processed message")
+                slog.Debug("channel size: ", len(semaphore))
 
-			err = p.kafkaProcessor.CommitMessage(ctx, msg)
-            if err != nil {
-                slog.Error("error committing message", err)
-                span.RecordError(err)
-                return
-            }
+	    		err := p.processMessage(ctx, msg)
+	    		if err != nil {
+	    			slog.Error("error processing flip summary", err)
+                    span.RecordError(err)
+	    			return
+	    		}
+                span.AddEvent("processed message")
 
-            span.AddEvent("committed message")
-		}(msg)
-	}
+	    		err = p.kafkaProcessor.CommitMessage(ctx, msg)
+                if err != nil {
+                    slog.Error("error committing message", err)
+                    span.RecordError(err)
+                    return
+                }
 
-	return errors.New("flip processor kafka channel closed")
+                span.AddEvent("committed message")
+	    	}(msg)
+	    }
+
+        panic("channel closed")
+    }()
+
+    return nil
 }
 
 func (p *FlipProcessor) processMessage(ctx context.Context, msg *kafkago.Message) error {

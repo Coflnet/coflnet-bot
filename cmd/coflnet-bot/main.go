@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"os/signal"
+	"sync"
 	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
@@ -91,12 +92,10 @@ func startMessageProcessors() {
 	}
 
 	for _, p := range processors {
-		go func(p usecase.MessageProcessor) {
-			err := p.StartProcessing()
-            slog.Error("error in message processor", err)
+		err := p.StartProcessing()
+        if err != nil {
+            slog.Error("failed to start message processor", err)
             panic(err)
-		}(p)
-
-        time.Sleep(time.Second * 1)
+        }
 	}
 }

@@ -62,39 +62,41 @@ func (p *McVerifyProcessor) StartProcessing() error {
     msgs := p.kafkaProcessor.CollectMessages(ctx, 100)
     semaphore := make(chan struct{}, 10)
 
-    for msg := range msgs {
-        go func(msg *kafka.Message) {
-			semaphore <- struct{}{}
-            defer func() { <-semaphore }()
+    go func() {
+        for msg := range msgs {
+            go func(msg *kafka.Message) {
+	    		semaphore <- struct{}{}
+                defer func() { <-semaphore }()
 
-            ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-            defer cancel()
+                ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+                defer cancel()
 
-            _, span := p.tracer.Start(ctx, "process-mc-verify-kafka-message")
-            defer span.End()
+                _, span := p.tracer.Start(ctx, "process-mc-verify-kafka-message")
+                defer span.End()
 
-            err := p.processMessage(ctx, msg)
-            if err != nil {
-                slog.Error("failed to process message", err)
-                span.RecordError(err)
-                return
-            }
+                err := p.processMessage(ctx, msg)
+                if err != nil {
+                    slog.Error("failed to process message", err)
+                    span.RecordError(err)
+                    return
+                }
 
-            span.AddEvent("processed message")
+                span.AddEvent("processed message")
 
-            err = p.kafkaProcessor.CommitMessage(ctx, msg)
-            if err != nil {
-                slog.Error("failed to commit message", err)
-                span.RecordError(err)
-                return
-            }
+                err = p.kafkaProcessor.CommitMessage(ctx, msg)
+                if err != nil {
+                    slog.Error("failed to commit message", err)
+                    span.RecordError(err)
+                    return
+                }
 
-            slog.Debug("mc verify message processed")
-            span.AddEvent("comitted message")
-        }(msg)
-    }
-
-    return errors.New("kafka message channel closed")
+                slog.Debug("mc verify message processed")
+                span.AddEvent("comitted message")
+            }(msg)
+        }
+        panic("kafka message channel closed")
+    }()
+    return nil
 }
 
 func (p *McVerifyProcessor) processMessage(ctx context.Context, msg *kafka.Message) error {
