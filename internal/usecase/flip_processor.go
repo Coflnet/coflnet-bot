@@ -36,7 +36,7 @@ func (p *FlipProcessor) StartProcessing() error {
     p.tracer = otel.Tracer(flipProcessorTracerName)
 
     var err error
-    p.discordHandler, err = discord.NewDiscordHandler()
+    p.discordHandler, err = discord.GetDiscordHandler()
     if err != nil {
         slog.Error("error initializing discord handler", err)
         return err
@@ -46,7 +46,6 @@ func (p *FlipProcessor) StartProcessing() error {
 	if err != nil {
 		return err
 	}
-	defer p.kafkaProcessor.Close()
 
 	ctx := context.Background()
 
@@ -57,6 +56,8 @@ func (p *FlipProcessor) StartProcessing() error {
     slog.Info("starting to process flip summaries")
 
     go func() {
+	    defer p.kafkaProcessor.Close()
+
 	    for msg := range msgs {
 	    	semaphore <- struct{}{}
 	    	go func(msg *kafkago.Message) {

@@ -34,7 +34,7 @@ func (p *DiscordMessageProcessor) StartProcessing() error {
 	}
 
     var err error
-    p.discordHandler, err = discord.NewDiscordHandler()
+    p.discordHandler, err = discord.GetDiscordHandler()
     if err != nil {
         return err
     }
@@ -43,13 +43,13 @@ func (p *DiscordMessageProcessor) StartProcessing() error {
 	if err != nil {
 		return err
 	}
-	defer p.kafkaProcessor.Close()
 
 	ctx := context.Background()
 	msgs := p.kafkaProcessor.CollectMessages(ctx, 100)
 	semaphore := make(chan struct{}, 10)
 
     go func() {
+	    defer p.kafkaProcessor.Close()
 	    for msg := range msgs {
 	    	semaphore <- struct{}{}
 	    	go func(msg *kafkago.Message) {

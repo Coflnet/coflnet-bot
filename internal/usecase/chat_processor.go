@@ -40,7 +40,7 @@ func (r *ChatProcessor) init() error {
 	r.tracer = otel.Tracer(flipProcessorTracerName)
 	r.redisHandler = redis.NewRedisHandler()
 
-	r.discordHandler, err = discord.NewDiscordHandler()
+	r.discordHandler, err = discord.GetDiscordHandler()
 	if err != nil {
 		return err
 	}

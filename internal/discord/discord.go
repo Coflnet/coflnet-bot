@@ -29,24 +29,33 @@ const (
 
 var (
     instance *DiscordHandler = nil
-    once sync.Once
+    lock sync.Mutex
 )
 
-func NewDiscordHandler() (*DiscordHandler, error) {
+func GetDiscordHandler() (*DiscordHandler, error) {
 
-    instance := &DiscordHandler{
-        tracer: otel.Tracer(discordHandlerTracerName),
-        initialized: false,
-    }
-    once.Do(func() {
-        err := instance.initSession()
-        if err != nil {
-            slog.Error("error initializing discord session", err)
-            panic(err)
+    if instance == nil {
+        lock.Lock()
+        defer lock.Unlock()
+
+        if instance == nil {
+            slog.Info("initializing discord handler")
+            instance := &DiscordHandler{
+                tracer: otel.Tracer(discordHandlerTracerName),
+            }
+            err := instance.initSession()
+
+            if err != nil {
+                slog.Error("error initializing discord session", err)
+                return nil, err
+            }
+            slog.Info("discord handler initialized")
+        } else {
+            slog.Info("discord handler already initialized")
         }
-    })
-
-    time.Sleep(time.Minute * 1)
+    } else {
+        slog.Info("discord handler already initialized")
+    }
 
     return instance, nil
 }
@@ -64,7 +73,6 @@ type DiscordHandler struct {
     messagesReceived chan discordgo.Message
 
     tracer trace.Tracer
-    initialized bool
 }
 
 type DiscordMessage struct {
@@ -99,10 +107,12 @@ func (d *DiscordHandler) initSession() error {
 
 	d.session.Identify.Intents = discordgo.IntentsAllWithoutPrivileged
 
+    sessionOpen := sync.WaitGroup{}
+    sessionOpen.Add(1)
+
     go func() {
         d.session.Open()
         defer d.session.Close()
-
         time.Sleep(1 * time.Second)
 
         err := d.RegisterCommands()
@@ -112,8 +122,7 @@ func (d *DiscordHandler) initSession() error {
         }
         defer d.Close()
 
-        d.initialized = true
-
+        sessionOpen.Done()
         sig := make(chan os.Signal, 1)
         signal.Notify(sig, os.Interrupt)
         <-sig
@@ -121,6 +130,7 @@ func (d *DiscordHandler) initSession() error {
         slog.Info("closing discord session")
     }()
 
+    sessionOpen.Wait()
     return nil
 }
 

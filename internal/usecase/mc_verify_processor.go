@@ -52,16 +52,16 @@ func (p *McVerifyProcessor) StartProcessing() error {
     if err != nil {
         return err
     }
-    defer p.kafkaProcessor.Close()
 
 
     ctx := context.Background()
     slog.Info("starting mc verify processor")
 
     msgs := p.kafkaProcessor.CollectMessages(ctx, 100)
-    semaphore := make(chan struct{}, 10)
+    semaphore := make(chan struct{}, 3)
 
     go func() {
+        defer p.kafkaProcessor.Close()
         for msg := range msgs {
             go func(msg *kafka.Message) {
 	    		semaphore <- struct{}{}

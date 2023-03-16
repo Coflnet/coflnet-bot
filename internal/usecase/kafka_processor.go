@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"io"
 	"time"
 
 	kafkago "github.com/segmentio/kafka-go"
@@ -77,6 +78,12 @@ func (p *KafkaProcessor) CollectMessages(ctx context.Context, channelLength int)
         for {
             msg, err := p.reader.FetchMessage(ctx)
 
+            if err == io.EOF {
+                slog.Info("reader closed")
+                time.Sleep(5 * time.Second)
+                continue
+            }
+
             if err != nil {
                 slog.Error("error reading message", err)
                 time.Sleep(5 * time.Second)
@@ -86,6 +93,7 @@ func (p *KafkaProcessor) CollectMessages(ctx context.Context, channelLength int)
             result <- &msg
         }
     }()
+
     return result
 }
 
