@@ -47,10 +47,6 @@ func NewDiscordHandler() (*DiscordHandler, error) {
         }
     })
 
-    for instance == nil || !instance.initialized {
-        time.Sleep(100 * time.Millisecond)
-    }
-
     return instance, nil
 }
 
