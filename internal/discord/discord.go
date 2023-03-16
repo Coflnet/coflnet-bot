@@ -1,4 +1,4 @@
-package discornd
+package discord
 
 import (
 	"bytes"
