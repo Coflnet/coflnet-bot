@@ -114,15 +114,19 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
 
     // get the reason
     reason := optionMap["reason"].StringValue()
+    span.SetAttributes(attribute.String("reason", reason))
 
     // get the message
     message := optionMap["message"].StringValue()
+    span.SetAttributes(attribute.String("message", message))
 
     // the the muter
     muter := i.Member.User.Username
+    span.SetAttributes(attribute.String("muter", muter))
 
     // get the user to mute
     user := optionMap["user"].StringValue()
+    span.SetAttributes(attribute.String("user-to-mute", user))
 
     // check if the user is at least mod 
     if !utils.IsUserHelper(i.Member.Roles) && !utils.IsUserMod(i.Member.Roles) {
@@ -138,9 +142,12 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
 
     // search the uuid for the mc username
     userUUIDs, err := m.clientApi.SearchUUIDForPlayer(ctx, user)
-    if err != nil {
+    if err != nil || len(userUUIDs) == 0 {
         slog.Error("mc uuid not found", err)
-        span.RecordError(err)
+        if err != nil {
+            span.RecordError(err)
+        }
+
         errMsg := fmt.Sprintf("❌ failed to mute %s, mc uuid for %s not found; error: %s", user, user, span.SpanContext().TraceID())
         if _, err := m.baseCommand.editFollowupMessage(ctx, errMsg, msg.ID, s, i); err != nil {
             slog.Error("failed to edit followup message", err)
@@ -174,7 +181,11 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
             slog.Error("failed to edit follup message", err)
             span.RecordError(err)
         }
+
+        return
     }
+
+
 
     span.SetAttributes(attribute.String("muted-uuids", strings.Join(userUUIDs, "_")))
 }

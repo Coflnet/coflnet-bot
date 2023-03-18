@@ -68,9 +68,6 @@ func (m *ApiClient) SearchUUIDForPlayer(ctx context.Context, username string) ([
     }
 
     for _, player := range playerResults {
-        if player.UUID.IsSet() {
-            continue
-        }
         result = append(result, player.UUID.Value)
     }
 
