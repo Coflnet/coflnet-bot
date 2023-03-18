@@ -43,7 +43,7 @@ func (m *ApiClient) Init() error {
 }
 
 func (m *ApiClient) SearchUUIDForPlayer(ctx context.Context, username string) ([]string, error) {
-    ctx, span := m.tracer.Start(ctx, "get-server-info")
+    ctx, span := m.tracer.Start(ctx, "search-uuid-for-player")
     defer span.End()
 
     span.SetAttributes(attribute.String("player_name", username))
@@ -60,7 +60,7 @@ func (m *ApiClient) SearchUUIDForPlayer(ctx context.Context, username string) ([
         return result, err
     }
 
-    span.SetAttributes(attribute.String("player_count", fmt.Sprintf("%d", len(playerResults))))
+    span.SetAttributes(attribute.Int("player_count", len(playerResults)))
 
     if len(playerResults) == 0 {
         slog.Warn("no player found")
@@ -73,6 +73,8 @@ func (m *ApiClient) SearchUUIDForPlayer(ctx context.Context, username string) ([
         }
         result = append(result, player.UUID.Value)
     }
+
+    span.SetAttributes(attribute.Int("valid_uuids", len(result)))
 
     return result, nil
 }
