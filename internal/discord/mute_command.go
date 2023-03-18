@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/coflnet"
@@ -11,6 +12,7 @@ import (
 	"github.com/Coflnet/coflnet-bot/schemas/chat"
 	"github.com/bwmarrin/discordgo"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slog"
 )
@@ -135,7 +137,7 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
     }
 
     // search the uuid for the mc username
-    userUUID, err := m.clientApi.SearchUUIDForPlayer(ctx, user)
+    userUUIDs, err := m.clientApi.SearchUUIDForPlayer(ctx, user)
     if err != nil {
         slog.Error("mc uuid not found", err)
         span.RecordError(err)
@@ -147,30 +149,34 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
         return
     }
 
-    slog.Info(fmt.Sprintf("muting %s for %s; Muter: %s", user, reason, muter))
-    mute, err := m.chatApi.MuteUser(ctx, &chat.APIChatMutePostTextJSON{
-        Muter: chat.NewOptNilString(muter),
-        Reason: chat.NewOptNilString(reason),
-        Message: chat.NewOptNilString(message),
-        UUID: chat.NewOptNilString(userUUID),
-    })
+    for _, userUUID := range userUUIDs {
+        slog.Info(fmt.Sprintf("muting %s for %s; Muter: %s", user, reason, muter))
+        mute, err := m.chatApi.MuteUser(ctx, &chat.APIChatMutePostTextJSON{
+            Muter: chat.NewOptNilString(muter),
+            Reason: chat.NewOptNilString(reason),
+            Message: chat.NewOptNilString(message),
+            UUID: chat.NewOptNilString(userUUID),
+        })
 
-    if err != nil {
-        slog.Error("failed to mute user", err)
-        span.RecordError(err)
-        errMsg := fmt.Sprintf("❌ failed to mute %s; error: id: %s, text: %s", user, err.Error(), span.SpanContext().TraceID())
-        if _, err := m.baseCommand.editFollowupMessage(ctx, errMsg, msg.ID, s, i); err != nil {
-            slog.Error("failed to edit followup message", err)
+        if err != nil {
+            slog.Error("failed to mute user", err)
+            span.RecordError(err)
+            errMsg := fmt.Sprintf("❌ failed to mute %s; id: %s, text: %s", user, span.SpanContext().TraceID(), err.Error())
+            if _, err := m.baseCommand.editFollowupMessage(ctx, errMsg, msg.ID, s, i); err != nil {
+                slog.Error("failed to edit followup message", err)
+                span.RecordError(err)
+            }
+            return
+        }
+
+	    slog.Info("update the followup message")
+        if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("✅ muted %s until %s", user, mute.Expires.Value), msg.ID, s, i); err != nil {
+            slog.Error("failed to edit follup message", err)
             span.RecordError(err)
         }
-        return
     }
 
-	slog.Info("update the followup message")
-    if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("✅ muted %s until %s", user, mute.Expires.Value), msg.ID, s, i); err != nil {
-        slog.Error("failed to edit follup message", err)
-        span.RecordError(err)
-    }
+    span.SetAttributes(attribute.String("muted-uuids", strings.Join(userUUIDs, "_")))
 }
 
 

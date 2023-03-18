@@ -67,7 +67,6 @@ type DiscordHandler struct {
     session *discordgo.Session
     commands []*discordgo.ApplicationCommand
 
-
     // internal data structure that receives messages from discord
     messagesReceived chan discordgo.Message
 
