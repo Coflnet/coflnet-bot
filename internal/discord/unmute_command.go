@@ -110,11 +110,14 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
 
 	// get the reason
 	reason := optionMap["reason"].StringValue()
+    span.SetAttributes(attribute.String("reason", reason))
 
 	// get the user to mute
 	user := optionMap["user"].StringValue()
+    span.SetAttributes(attribute.String("user", user))
 
 	// check if the user is at least mod
+    span.SetAttributes(attribute.String("unmuter", i.Member.User.Username))
 	if !utils.IsUserMod(i.Member.Roles) && !utils.IsUserHelper(i.Member.Roles) {
 		err := errors.New(fmt.Sprintf("User %s is not a mod or a helper", i.Member.User.Username))
 		slog.Warn("failed to unmute user", err)
@@ -124,8 +127,10 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
             span.RecordError(err)
         }
 
+        span.SetAttributes(attribute.Bool("authorized", false))
 		return
 	}
+    span.SetAttributes(attribute.Bool("authorized", true))
 
 	// search the uuid for the mc username
 	userUUIDs, err := m.clientApi.SearchUUIDForPlayer(ctx, user)

@@ -72,6 +72,7 @@ func (m *ApiClient) SearchUUIDForPlayer(ctx context.Context, username string) ([
     }
 
     span.SetAttributes(attribute.Int("valid_uuids", len(result)))
+    span.SetAttributes(attribute.String("uuids", strings.Join(result, ",")))
 
     return result, nil
 }
