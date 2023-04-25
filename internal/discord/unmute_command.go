@@ -17,6 +17,15 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+func NewUnmuteCommand(chat *coflnet.ChatApi, api *coflnet.ApiClient) *UnmuteCommand {
+	return &UnmuteCommand{
+		tracer:      otel.Tracer("unmute-command"),
+		chatApi:     chat,
+		clientApi:   api,
+		baseCommand: newBaseCommand(),
+	}
+}
+
 type UnmuteCommand struct {
 	baseCommand *baseCommand
 	tracer      trace.Tracer
@@ -24,43 +33,11 @@ type UnmuteCommand struct {
 	clientApi   *coflnet.ApiClient
 }
 
-func CreateUnmuteCommand() *UnmuteCommand {
-	c := &UnmuteCommand{
-		tracer: otel.Tracer("unmute-command"),
-	}
-
-	c.Init()
-
-	return c
-}
-
 func (m *UnmuteCommand) Name() string {
 	return "in-game-unmute"
 }
 
-func (m *UnmuteCommand) Init() {
-
-	m.baseCommand = newBaseCommand()
-
-	chatApi, err := coflnet.NewChatClient()
-	if err != nil {
-		slog.Error("failed to create chat client", err)
-		panic(err)
-	}
-
-	apiClient, err := coflnet.NewApiClient()
-	if err != nil {
-		slog.Error("failed to create api client", err)
-		panic(err)
-	}
-
-	m.chatApi = chatApi
-	m.clientApi = apiClient
-}
-
 func (m *UnmuteCommand) CreateCommand() *discordgo.ApplicationCommand {
-	m.Init()
-
 	return &discordgo.ApplicationCommand{
 		Name:        m.Name(),
 		Description: "Unmutes a user in the ingame chat",
@@ -89,11 +66,11 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
 	defer span.End()
 
 	// first fake response
-    if err := m.baseCommand.requestReceived(ctx, s, i); err != nil {
-        slog.Error("failed sending request received message", err)
-        span.RecordError(err)
-        return
-    }
+	if err := m.baseCommand.requestReceived(ctx, s, i); err != nil {
+		slog.Error("failed sending request received message", err)
+		span.RecordError(err)
+		return
+	}
 
 	// respond to command
 	msg, err := m.baseCommand.createFollowupMessage(ctx, "⏳ unmute in progress", s, i)
@@ -103,76 +80,74 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
 		return
 	}
 
-
-
 	// parse the strange discord map to a normal map
 	optionMap := m.baseCommand.parseResponseOptions(i)
 
 	// get the reason
 	reason := optionMap["reason"].StringValue()
-    span.SetAttributes(attribute.String("reason", reason))
+	span.SetAttributes(attribute.String("reason", reason))
 
 	// get the user to mute
 	user := optionMap["user"].StringValue()
-    span.SetAttributes(attribute.String("user", user))
+	span.SetAttributes(attribute.String("user", user))
 
 	// check if the user is at least mod
-    span.SetAttributes(attribute.String("unmuter", i.Member.User.Username))
+	span.SetAttributes(attribute.String("unmuter", i.Member.User.Username))
 	if !utils.IsUserMod(i.Member.Roles) && !utils.IsUserHelper(i.Member.Roles) {
 		err := errors.New(fmt.Sprintf("User %s is not a mod or a helper", i.Member.User.Username))
 		slog.Warn("failed to unmute user", err)
 		span.RecordError(err)
-        if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("❌ failed to unmute user %s; you are not authorized; error: %s", user, span.SpanContext().TraceID()), msg.ID, s, i); err != nil {
-            slog.Error("failed to edit followup message", err)
-            span.RecordError(err)
-        }
+		if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("❌ failed to unmute user %s; you are not authorized; error: %s", user, span.SpanContext().TraceID()), msg.ID, s, i); err != nil {
+			slog.Error("failed to edit followup message", err)
+			span.RecordError(err)
+		}
 
-        span.SetAttributes(attribute.Bool("authorized", false))
+		span.SetAttributes(attribute.Bool("authorized", false))
 		return
 	}
-    span.SetAttributes(attribute.Bool("authorized", true))
+	span.SetAttributes(attribute.Bool("authorized", true))
 
 	// search the uuid for the mc username
 	userUUIDs, err := m.clientApi.SearchUUIDForPlayer(ctx, user)
 	if err != nil {
 		slog.Error("mc uuid not found", err)
 		span.RecordError(err)
-        if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("❌ failed to unmute user %s; uuid for %s not found; error: %s", user, user, span.SpanContext().TraceID()), msg.ID, s, i); err != nil {
-            slog.Error("failed to edit followup message", err)
-            span.RecordError(err)
-        }
+		if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("❌ failed to unmute user %s; uuid for %s not found; error: %s", user, user, span.SpanContext().TraceID()), msg.ID, s, i); err != nil {
+			slog.Error("failed to edit followup message", err)
+			span.RecordError(err)
+		}
 		return
 	}
 
-    for _, userUUID := range userUUIDs {
-	    slog.Info(fmt.Sprintf("unmuting %s for %s; Muter: %s", user, reason, i.Member.User.Username))
-	    _, err = m.chatApi.UnmuteUser(ctx, &chat.APIChatMuteDeleteTextJSON{
-	    	UUID: chat.OptNilString{
-	    		Value: userUUID,
-	    		Set:   true,
-	    	},
-	    	Reason: chat.OptNilString{
-	    		Value: reason,
-	    		Set:   true,
-	    	},
-	    })
+	for _, userUUID := range userUUIDs {
+		slog.Info(fmt.Sprintf("unmuting %s for %s; Muter: %s", user, reason, i.Member.User.Username))
+		_, err = m.chatApi.UnmuteUser(ctx, &chat.APIChatMuteDeleteTextJSON{
+			UUID: chat.OptNilString{
+				Value: userUUID,
+				Set:   true,
+			},
+			Reason: chat.OptNilString{
+				Value: reason,
+				Set:   true,
+			},
+		})
 
-	    if err != nil {
-	    	slog.Error("failed to unmute user", err)
-	    	span.RecordError(err)
-            if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("❌ failed to unmute user %s; error: %s", user, span.SpanContext().TraceID()), msg.ID, s, i); err != nil {
-                slog.Error("failed to edit followup message", err)
-                span.RecordError(err)
-            }
-	    	return
-	    }
+		if err != nil {
+			slog.Error("failed to unmute user", err)
+			span.RecordError(err)
+			if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("❌ failed to unmute user %s; error: %s", user, span.SpanContext().TraceID()), msg.ID, s, i); err != nil {
+				slog.Error("failed to edit followup message", err)
+				span.RecordError(err)
+			}
+			return
+		}
 
-	    slog.Info("update the followup message")
-        if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("✅ %s unmuted", user), msg.ID, s, i); err != nil {
-            slog.Error("failed to edit follup message", err)
-            span.RecordError(err)
-        }
-    }
+		slog.Info("update the followup message")
+		if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("✅ %s unmuted", user), msg.ID, s, i); err != nil {
+			slog.Error("failed to edit follup message", err)
+			span.RecordError(err)
+		}
+	}
 
-    span.SetAttributes(attribute.String("unmuted-uuids", strings.Join(userUUIDs, ", ")))
+	span.SetAttributes(attribute.String("unmuted-uuids", strings.Join(userUUIDs, ", ")))
 }

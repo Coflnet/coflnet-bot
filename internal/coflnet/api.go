@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/Coflnet/coflnet-bot/schemas/api"
@@ -18,61 +19,51 @@ type ApiClient struct {
 	apiClient *api.Client
 }
 
-func NewApiClient() (*ApiClient, error) {
+func NewApiClient() *ApiClient {
 	c := &ApiClient{
 		tracer: otel.Tracer("api-client"),
 	}
 
-    err := c.Init()
-    if err != nil {
-        return nil, err
-    }
-    return c, nil
-}
-
-func (m *ApiClient) Init() error {
-
-	apiClient, err := api.NewClient(utils.ApiBaseUrl())
+	var err error
+	c.apiClient, err = api.NewClient(utils.ApiBaseUrl())
 	if err != nil {
-		slog.Error("failed to create api client", err)
-        return err
+		panic(err)
 	}
 
-	m.apiClient = apiClient
-    return nil
+	return c
 }
 
 func (m *ApiClient) SearchUUIDForPlayer(ctx context.Context, username string) ([]string, error) {
-    ctx, span := m.tracer.Start(ctx, "search-uuid-for-player")
-    defer span.End()
+	ctx, span := m.tracer.Start(ctx, "search-uuid-for-player")
+	defer span.End()
 
-    span.SetAttributes(attribute.String("player_name", username))
+	span.SetAttributes(attribute.String("player_name", username))
 
-    result := make([]string, 0)
+	result := make([]string, 0)
 
-    playerResults, err := m.apiClient.APISearchPlayerPlayerNameGet(ctx, api.APISearchPlayerPlayerNameGetParams{
-        PlayerName: username,
-    })
+	playerResults, err := m.apiClient.APISearchPlayerPlayerNameGet(ctx, api.APISearchPlayerPlayerNameGetParams{
+		PlayerName: username,
+	})
 
-    if err != nil {
-        slog.Error("failed to get player info", err)
-        span.RecordError(err)
-        return result, err
-    }
+	if err != nil {
+		slog.Error("failed to get player info", err)
+		span.RecordError(err)
+		return result, err
+	}
 
-    span.SetAttributes(attribute.Int("player_count", len(playerResults)))
+	span.SetAttributes(attribute.Int("player_count", len(playerResults)))
 
-    if len(playerResults) == 0 {
-        slog.Warn("no player found")
-        return result, errors.New(fmt.Sprintf("no player with name %s found", username))
-    }
+	if len(playerResults) == 0 {
+		slog.Warn("no player found")
+		return result, errors.New(fmt.Sprintf("no player with name %s found", username))
+	}
 
-    for _, player := range playerResults {
-        result = append(result, player.UUID.Value)
-    }
+	for _, player := range playerResults {
+		result = append(result, player.UUID.Value)
+	}
 
-    span.SetAttributes(attribute.Int("valid_uuids", len(result)))
-    span.SetAttributes(attribute.String("uuids", strings.Join(result, ",")))
+	span.SetAttributes(attribute.Int("valid_uuids", len(result)))
+	span.SetAttributes(attribute.String("uuids", strings.Join(result, ",")))
 
-    return result, nil
+	return result, nil
 }

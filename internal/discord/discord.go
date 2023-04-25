@@ -24,53 +24,36 @@ import (
 )
 
 const (
-    discordHandlerTracerName = "discord-handler"
+	discordHandlerTracerName = "discord-handler"
 )
 
-var (
-    instance *DiscordHandler = nil
-    lock sync.Mutex
-)
+func NewDiscordHandler(mute *MuteCommand, unmute *UnmuteCommand) *DiscordHandler {
+	instance, err := InitSession()
 
-func GetDiscordHandler() (*DiscordHandler, error) {
+	if err != nil {
+		panic(err)
+	}
 
-    if instance == nil {
-        lock.Lock()
-        defer lock.Unlock()
+	instance.muteCommand = mute
+	instance.unmuteCommand = unmute
 
-        if instance == nil {
-            slog.Info("initializing discord handler")
-
-            var err error
-            instance, err = InitSession()
-
-            if err != nil {
-                slog.Error("error initializing discord session", err)
-                return nil, err
-            }
-            slog.Info("discord handler initialized")
-        } else {
-            slog.Info("discord handler already initialized")
-        }
-    } else {
-        slog.Info("discord handler already initialized")
-    }
-
-    return instance, nil
+	return &instance
 }
 
 type Discord interface {
-    SendMessage(msg *DiscordMessage) error
+	SendMessage(msg *DiscordMessage) error
 }
 
 type DiscordHandler struct {
-    session *discordgo.Session
-    commands []*discordgo.ApplicationCommand
+	session       *discordgo.Session
+	commands      []*discordgo.ApplicationCommand
+	muteCommand   *MuteCommand
+	unmuteCommand *UnmuteCommand
 
-    // internal data structure that receives messages from discord
-    messagesReceived chan discordgo.Message
+	// internal data structure that receives messages from discord
+	messagesReceived chan discordgo.Message
 
-    tracer trace.Tracer
+	tracer trace.Tracer
 }
 
 type DiscordMessage struct {
@@ -90,73 +73,71 @@ type AllowedMentions struct {
 	Parse []string `json:"parse"`
 }
 
-
 func (d *DiscordHandler) Close() {
-    d.unregisterCommands()
-    d.session.Close()
+	d.unregisterCommands()
+	d.session.Close()
 }
 
-func InitSession() (*DiscordHandler, error) {
+func InitSession() (DiscordHandler, error) {
 
-    d := &DiscordHandler{
-        tracer: otel.Tracer(discordHandlerTracerName),
-    }
+	d := DiscordHandler{
+		tracer: otel.Tracer(discordHandlerTracerName),
+	}
 
 	var err error
 	d.session, err = discordgo.New("Bot " + utils.DiscordBotToken())
 	if err != nil {
-        return nil, err
+		return DiscordHandler{}, err
 	}
 
 	d.session.Identify.Intents = discordgo.IntentsAllWithoutPrivileged
 
-    sessionOpen := sync.WaitGroup{}
-    sessionOpen.Add(1)
+	sessionOpen := sync.WaitGroup{}
+	sessionOpen.Add(1)
 
-    go func() {
-        d.session.Open()
-        defer d.session.Close()
-        time.Sleep(1 * time.Second)
+	go func() {
+		d.session.Open()
+		defer d.session.Close()
+		time.Sleep(1 * time.Second)
 
-        err := d.RegisterCommands()
-        if err != nil {
-            slog.Error("error when registering commands", err)
-            panic(err)
-        }
-        defer d.Close()
+		err := d.RegisterCommands()
+		if err != nil {
+			slog.Error("error when registering commands", err)
+			panic(err)
+		}
+		defer d.Close()
 
-        sessionOpen.Done()
-        sig := make(chan os.Signal, 1)
-        signal.Notify(sig, os.Interrupt)
-        <-sig
+		sessionOpen.Done()
+		sig := make(chan os.Signal, 1)
+		signal.Notify(sig, os.Interrupt)
+		<-sig
 
-        slog.Info("closing discord session")
-    }()
+		slog.Info("closing discord session")
+	}()
 
-    sessionOpen.Wait()
-    return d, nil
+	sessionOpen.Wait()
+	return d, nil
 }
-
 
 // SendMessage sends a discord message to the discord server
 func (d *DiscordHandler) SendMessage(ctx context.Context, msg *DiscordMessage) error {
-    _, span := d.tracer.Start(ctx, "send-discord-message")
-    defer span.End()
-    slog.Debug("sending a discord message")
+	_, span := d.tracer.Start(ctx, "send-discord-message")
+	defer span.End()
+	slog.Debug("sending a discord message")
 
-    if msg == nil || msg.Message == "" {
+	if msg == nil || msg.Message == "" {
 		return fmt.Errorf("no message is set")
 	}
 
 	if msg.Webhook == "" {
 		if msg.Channel != "" {
-            var err error
-            msg.Webhook, err = d.webhookForChannel(msg.Channel)
-            if err != nil {
-                slog.Error("error when getting webhook for channel", err)
-                span.RecordError(err)
-                return err
-            }
+			var err error
+			msg.Webhook, err = d.webhookForChannel(msg.Channel)
+			if err != nil {
+				slog.Error("error when getting webhook for channel", err)
+				span.RecordError(err)
+				return err
+			}
 		}
 	}
 
@@ -173,8 +154,8 @@ func (d *DiscordHandler) SendMessage(ctx context.Context, msg *DiscordMessage) e
 
 	body, err := json.Marshal(data)
 	if err != nil {
-        slog.Error("error when marshalling webhook request", err)
-        span.RecordError(err)
+		slog.Error("error when marshalling webhook request", err)
+		span.RecordError(err)
 		return err
 	}
 
@@ -182,8 +163,8 @@ func (d *DiscordHandler) SendMessage(ctx context.Context, msg *DiscordMessage) e
 	_, err = http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
 
 	if err != nil {
-        slog.Error("error when sending webhook request", err)
-        span.RecordError(err)
+		slog.Error("error when sending webhook request", err)
+		span.RecordError(err)
 		return err
 	}
 
@@ -192,20 +173,20 @@ func (d *DiscordHandler) SendMessage(ctx context.Context, msg *DiscordMessage) e
 
 // returns a channel which contains all messages received from discord, or error if such a channel already exists
 func (d *DiscordHandler) DiscordMessagesSent(ctx context.Context) (<-chan discordgo.Message, error) {
-    if d.messagesReceived == nil {
-        d.messagesReceived = make(chan discordgo.Message, 100)
-    } else {
-        return nil, errors.New("messages received channel already exists")
-    }
+	if d.messagesReceived == nil {
+		d.messagesReceived = make(chan discordgo.Message, 100)
+	} else {
+		return nil, errors.New("messages received channel already exists")
+	}
 
-    slog.Info("adding a discord handler for received messages")
-    d.session.AddHandler(d.messageReceived)
+	slog.Info("adding a discord handler for received messages")
+	d.session.AddHandler(d.messageReceived)
 
-    return d.messagesReceived, nil
+	return d.messagesReceived, nil
 }
 
 func (d *DiscordHandler) messageReceived(_ *discordgo.Session, m *discordgo.MessageCreate) {
-    d.messagesReceived <- *m.Message
+	d.messagesReceived <- *m.Message
 }
 
 func (d *DiscordHandler) webhookForChannel(channel string) (string, error) {
@@ -222,16 +203,16 @@ func (d *DiscordHandler) webhookForChannel(channel string) (string, error) {
 		return utils.FlipperRoleWebhook(), nil
 	case discord.FeedbackChannel:
 		return utils.FeedbackWebhook(), nil
-    case discord.FlipChannel:
-        return utils.FlipWebhook(), nil
+	case discord.FlipChannel:
+		return utils.FlipWebhook(), nil
 	}
 
 	return "", errors.New("no webhook found for channel")
 }
 
 func (d *DiscordHandler) SendMessageToIngameChat(ctx context.Context, message *mongo.ChatMessage) error {
-    ctx, span := d.tracer.Start(ctx, "send-discord-message-to-ingame-chat")
-    defer span.End()
+	ctx, span := d.tracer.Start(ctx, "send-discord-message-to-ingame-chat")
+	defer span.End()
 
 	if message.UUID == "" {
 		return fmt.Errorf("no icon url is set")
@@ -239,8 +220,8 @@ func (d *DiscordHandler) SendMessageToIngameChat(ctx context.Context, message *m
 
 	iconUrl := fmt.Sprintf("https://crafatar.com/avatars/%s", message.UUID)
 	url := os.Getenv("CHAT_WEBHOOK")
-    span.SetAttributes(attribute.String("iconUr", iconUrl))
-    span.SetAttributes(attribute.String("url", url))
+	span.SetAttributes(attribute.String("iconUr", iconUrl))
+	span.SetAttributes(attribute.String("url", url))
 
 	msg := message.Message
 	data := &WebhookRequest{
@@ -252,16 +233,16 @@ func (d *DiscordHandler) SendMessageToIngameChat(ctx context.Context, message *m
 
 	body, err := json.Marshal(data)
 	if err != nil {
-        slog.Error("error when marshalling webhook request", err)
-        span.RecordError(err)
+		slog.Error("error when marshalling webhook request", err)
+		span.RecordError(err)
 	}
 
-    response, err := http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
-    span.SetAttributes(attribute.Int("status", response.StatusCode))
+	response, err := http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
+	span.SetAttributes(attribute.Int("status", response.StatusCode))
 
 	if err != nil {
-        slog.Error("error when sending webhook request", err)
-        span.RecordError(err)
+		slog.Error("error when sending webhook request", err)
+		span.RecordError(err)
 		return err
 	}
 
@@ -274,11 +255,11 @@ func (d *DiscordHandler) sanitizeMessage(message string) string {
 	slog.Debug("sanitizing message: %s", message)
 	reg := regexp.MustCompile("§.")
 	message = reg.ReplaceAllString(message, "")
-    slog.Debug("sanitized message: %s", message)
+	slog.Debug("sanitized message: %s", message)
 
 	return message
 }
 
 func (d *DiscordHandler) AnswerDiscordMessage(msg string, originalMessage *discordgo.Message) (*discordgo.Message, error) {
-    return d.session.ChannelMessageSendReply(originalMessage.ChannelID, msg, originalMessage.Reference())
+	return d.session.ChannelMessageSendReply(originalMessage.ChannelID, msg, originalMessage.Reference())
 }

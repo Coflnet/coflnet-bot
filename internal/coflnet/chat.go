@@ -18,27 +18,22 @@ const (
 	chatApiTracerName = "chat-api-client"
 )
 
-var (
-	instance *ChatApi
-)
+func NewChatApi() *ChatApi {
+	instance := &ChatApi{}
+	instance.tracer = otel.Tracer(chatApiTracerName)
+
+	var err error
+	instance.apiClient, err = chat.NewClient(utils.ChatBaseUrl())
+	if err != nil {
+		panic(err)
+	}
+
+	return instance
+}
 
 type ChatApi struct {
 	apiClient *chat.Client
 	tracer    trace.Tracer
-}
-
-func NewChatClient() (*ChatApi, error) {
-
-	if instance != nil {
-		return instance, nil
-	}
-
-	var err error
-	instance := &ChatApi{}
-	instance.apiClient, err = chat.NewClient(utils.ChatBaseUrl())
-	instance.tracer = otel.Tracer(chatApiTracerName)
-
-	return instance, err
 }
 
 func (r *ChatApi) SendMessage(ctx context.Context, msg *chat.APIChatSendPostTextJSON) (*chat.ChatMessage, error) {

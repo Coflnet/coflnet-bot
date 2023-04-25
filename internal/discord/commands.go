@@ -11,18 +11,17 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-
 func (d *DiscordHandler) RegisterCommands() error {
-    time.Sleep(time.Second * 10)
-    ctx, cancel := context.WithTimeout(context.Background(), time.Second * 30)
-    defer cancel()
+	time.Sleep(time.Second * 10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
 
-    ctx, span := d.tracer.Start(ctx, "register-commands")
-    defer span.End()
+	ctx, span := d.tracer.Start(ctx, "register-commands")
+	defer span.End()
 
 	customCommands := []DiscordCommand{
-		CreateMuteCommand(),
-        CreateUnmuteCommand(),
+		d.muteCommand,
+		d.unmuteCommand,
 	}
 
 	// convert the custom commands into discordgo commands
@@ -35,22 +34,21 @@ func (d *DiscordHandler) RegisterCommands() error {
 
 	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
 	for i, v := range commands {
-        _, span := d.tracer.Start(ctx, "register-command")
-        defer span.End()
-        span.SetAttributes(attribute.String("command-name", v.Name))
+		_, span := d.tracer.Start(ctx, "register-command")
+		defer span.End()
+		span.SetAttributes(attribute.String("command-name", v.Name))
 
-        
-        slog.Info(fmt.Sprintf("registering command: %s", v.Name))
+		slog.Info(fmt.Sprintf("registering command: %s", v.Name))
 		cmd, err := d.session.ApplicationCommandCreate(d.session.State.User.ID, utils.DiscordGuildId(), v)
 		if err != nil {
-            span.RecordError(err)
+			span.RecordError(err)
 			slog.Error("failed to register command", err)
-            return err
+			return err
 		}
 
 		registeredCommands[i] = cmd
-        slog.Info(fmt.Sprintf("registered command: %s", cmd.Name))
-        span.SetAttributes(attribute.String("command-id", cmd.ID))
+		slog.Info(fmt.Sprintf("registered command: %s", cmd.Name))
+		span.SetAttributes(attribute.String("command-id", cmd.ID))
 	}
 
 	d.commands = registeredCommands

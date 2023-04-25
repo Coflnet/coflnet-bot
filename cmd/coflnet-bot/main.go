@@ -6,7 +6,7 @@ import (
 
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
-	"github.com/Coflnet/coflnet-bot/internal/usecase"
+	"github.com/Coflnet/coflnet-bot/internal/processor"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
@@ -16,16 +16,28 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+type App struct {
+	chatProcessor *processor.ChatProcessor
+}
+
+func newApp(chatProcessor *processor.ChatProcessor) *App {
+	return &App{
+		chatProcessor: chatProcessor,
+	}
+}
+
 func main() {
-	// setup tracer
 	setupTracer()
 
-    // setup logger
-    h := slog.HandlerOptions{Level: slog.LevelInfo}.NewTextHandler(os.Stdout)
-    if utils.DebugEnabled() {
-        h = slog.HandlerOptions{Level: slog.LevelDebug}.NewTextHandler(os.Stdout)
-    }
-    slog.SetDefault(slog.New(h))
+	// setup logger
+	h := slog.HandlerOptions{Level: slog.LevelInfo}.NewTextHandler(os.Stdout)
+	if utils.DebugEnabled() {
+		slog.Info("debug mode enabled")
+		h = slog.HandlerOptions{Level: slog.LevelDebug}.NewTextHandler(os.Stdout)
+	} else {
+		slog.Info("debug mode disabled")
+	}
+	slog.SetDefault(slog.New(h))
 
 	// metrics
 	go metrics.Init()
@@ -34,16 +46,14 @@ func main() {
 	err := mongo.Init()
 	if err != nil {
 		slog.Error("error connecting to database", err)
-        panic(err)
+		panic(err)
 	}
 	defer mongo.CloseConnection()
 
-	// start the message processors
-    slog.Info("start message processors")
-    startMessageProcessors()
+	app := wireApp()
+	app.startMessageProcessors()
 
-	// wait for interrupt
-    slog.Info("waiting for interrupt")
+	slog.Info("waiting for interrupt")
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
@@ -54,7 +64,7 @@ func setupTracer() {
 	tp, err := tracerProvider()
 	if err != nil {
 		slog.Error("failed to create tracer provider", err)
-        panic(err)
+		panic(err)
 	}
 
 	// Register our TracerProvider as the global so any imported
@@ -81,19 +91,21 @@ func tracerProvider() (*tracesdk.TracerProvider, error) {
 	return tp, nil
 }
 
-func startMessageProcessors() {
-	processors := []usecase.MessageProcessor{
+func (a *App) startMessageProcessors() {
+
+	processors := []processor.MessageProcessor{
+		a.chatProcessor,
 		//new(usecase.FlipProcessor),
-        new(usecase.ChatProcessor),
-        //new(usecase.McVerifyProcessor),
-        new(usecase.DiscordMessageProcessor),
+		// new(usecase.ChatProcessor),
+		//new(usecase.McVerifyProcessor),
+		// new(usecase.DiscordMessageProcessor),
 	}
 
 	for _, p := range processors {
 		err := p.StartProcessing()
-        if err != nil {
-            slog.Error("failed to start message processor", err)
-            panic(err)
-        }
+		if err != nil {
+			slog.Error("failed to start message processor", err)
+			panic(err)
+		}
 	}
 }

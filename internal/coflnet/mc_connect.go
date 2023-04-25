@@ -14,43 +14,46 @@ import (
 )
 
 const (
-    mcConnectApiName = "mc-connect-api"
+	mcConnectApiName = "mc-connect-api"
 )
 
-type McConnectApi struct { apiClient *mc_connect.Client
-    tracer trace.Tracer
+func NewMcConnectApi() *McConnectApi {
+	var err error
+	r := &McConnectApi{}
+
+	r.apiClient, err = mc_connect.NewClient(utils.McConnectBaseUrl())
+	r.tracer = otel.Tracer(mcConnectApiName)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return r
 }
 
-func NewMcConnectClient() (*McConnectApi, error) {
-    var err error
-    r := &McConnectApi{}
-
-    r.apiClient, err = mc_connect.NewClient(utils.McConnectBaseUrl())
-    r.tracer = otel.Tracer(mcConnectApiName)
-
-    return r, err
+type McConnectApi struct {
+	apiClient *mc_connect.Client
+	tracer    trace.Tracer
 }
 
 func (a *McConnectApi) GetPlayer(ctx context.Context, id int) (*mc_connect.User, error) {
-    ctx, span := a.tracer.Start(ctx, "get-player-from-mc-connect-api")
-    defer span.End()
+	ctx, span := a.tracer.Start(ctx, "get-player-from-mc-connect-api")
+	defer span.End()
 
-    span.SetAttributes(attribute.Int("id", id))
+	span.SetAttributes(attribute.Int("id", id))
 
-    if a.apiClient == nil {
-        return nil, errors.New("mc connect api client not initialized")
-    }
+	if a.apiClient == nil {
+		return nil, errors.New("mc connect api client not initialized")
+	}
 
-    user, err := a.apiClient.ConnectUserUserIdGet(ctx, mc_connect.ConnectUserUserIdGetParams{
-        UserId: strconv.Itoa(id),
-    })
+	user, err := a.apiClient.ConnectUserUserIdGet(ctx, mc_connect.ConnectUserUserIdGetParams{
+		UserId: strconv.Itoa(id),
+	})
 
-    if err != nil {
-        span.RecordError(err)
-        return nil, err
-    }
+	if err != nil {
+		span.RecordError(err)
+		return nil, err
+	}
 
-    return user, nil
+	return user, nil
 }
-
-

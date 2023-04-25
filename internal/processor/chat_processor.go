@@ -1,4 +1,4 @@
-package usecase
+package processor
 
 import (
 	"context"
@@ -13,6 +13,7 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/Coflnet/coflnet-bot/internal/redis"
+	"github.com/Coflnet/coflnet-bot/internal/usecase"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/Coflnet/coflnet-bot/schemas/chat"
 	"github.com/bwmarrin/discordgo"
@@ -28,61 +29,51 @@ const (
 	coflDiscordClientName = "cofl-discord"
 )
 
+func NewChatProcessor(u *usecase.UserHandler, r *redis.RedisHandler, d *discord.DiscordHandler, c *coflnet.ChatApi) *ChatProcessor {
+	return &ChatProcessor{
+		userHandler:       u,
+		redisHandler:      r,
+		discordHandler:    d,
+		coflnetChatClient: c,
+		tracer:            otel.Tracer(flipProcessorTracerName),
+	}
+}
+
 type ChatProcessor struct {
 	redisHandler      *redis.RedisHandler
 	discordHandler    *discord.DiscordHandler
+	userHandler       *usecase.UserHandler
 	coflnetChatClient *coflnet.ChatApi
 	tracer            trace.Tracer
 }
 
-func (r *ChatProcessor) init() error {
-	var err error
-	r.tracer = otel.Tracer(flipProcessorTracerName)
-	r.redisHandler = redis.NewRedisHandler()
-
-	r.discordHandler, err = discord.GetDiscordHandler()
-	if err != nil {
-		return err
-	}
-
-	r.coflnetChatClient, err = coflnet.NewChatClient()
-	return err
-}
-
 func (r *ChatProcessor) StartProcessing() error {
-    slog.Info("starting chat processor")
-
-	if err := r.init(); err != nil {
-        slog.Error("error initializing chat processor", err)
-		return err
-	}
-    
-    slog.Info("starting chat processor goroutines")
+	slog.Info("starting chat processor")
 
 	go func() {
-        slog.Info("starting redis chat processor")
+		slog.Info("starting redis chat processor")
 		err := r.startRedisChatProcessor()
 		slog.Error("redis chat processor stopped", err)
-        panic(err)
+		panic(err)
 	}()
 
 	go func() {
-        slog.Info("starting discord chat processor")
+		slog.Info("starting discord chat processor")
 		err := r.startDiscordChatProcessor()
 		slog.Error("discord chat processor stopped", err)
-        panic(err)
+		panic(err)
 	}()
 
-    return nil
+	return nil
 }
 
 func (r *ChatProcessor) startRedisChatProcessor() error {
 	ctx := context.Background()
 
-    slog.Info("start receiving redis chat messages")
+	slog.Info("start receiving redis chat messages")
 	msgs := r.redisHandler.ReceiveChatPubSubMessage(ctx)
 
-    slog.Info("listening for redis chat messages")
+	slog.Info("listening for redis chat messages")
 	for msg := range msgs {
 
 		go func(msg *redisgo.Message) {
@@ -181,6 +172,14 @@ func (p *ChatProcessor) processDiscordMessage(ctx context.Context, msg *discordg
 		}()
 	}
 
+	// refresh the user
+	go func(ctx context.Context, user *discordgo.User) {
+		ctx, span := p.tracer.Start(ctx, "trigger-refresh-user")
+		defer span.End()
+
+		p.userHandler.RefreshUserByDiscordUser(ctx, user)
+	}(ctx, msg.Author)
+
 	wg.Wait()
 	slog.Debug("finished processing discord message from %s with content %s", msg.Author.Username, msg.Content)
 	return nil
@@ -209,7 +208,7 @@ func (p *ChatProcessor) processRedisMessage(ctx context.Context, msg *redisgo.Me
 
 	err = p.discordHandler.SendMessageToIngameChat(ctx, message)
 	if err != nil {
-        slog.Error(fmt.Sprintf("could not send message to discord, message: %s", msg.Payload), err)
+		slog.Error(fmt.Sprintf("could not send message to discord, message: %s", msg.Payload), err)
 		return err
 	}
 
@@ -230,7 +229,7 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 
 	if len(users) >= 2 {
 		users = utils.FilterUsersForPreferredUsers(msg.Author.ID, users)
-        slog.Debug(fmt.Sprintf("found multiple users for discord account, after filtering preferred users remaining: %d", len(users)))
+		slog.Debug(fmt.Sprintf("found multiple users for discord account, after filtering preferred users remaining: %d", len(users)))
 	}
 
 	if len(users) == 0 {
@@ -243,35 +242,35 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 
 	user := users[len(users)-1]
 
-    if user.UUID() == "" {
-        err := errors.New(fmt.Sprintf("user has no uuid, can not forward the message, error: %s", span.SpanContext().TraceID()))
-        slog.Warn(fmt.Sprintf("no uuid found for user"), err)
-        span.RecordError(err)
-        return err
-    }
+	if user.UUID() == "" {
+		err := errors.New(fmt.Sprintf("user has no uuid, can not forward the message, error: %s", span.SpanContext().TraceID()))
+		slog.Warn(fmt.Sprintf("no uuid found for user"), err)
+		span.RecordError(err)
+		return err
+	}
 
-    slog.Info(fmt.Sprintf("sending discord message from %s(%s) to chat api, message: %s", msg.Author, user.UUID(), msg.Content))
-    param := &chat.APIChatSendPostTextJSON{
+	slog.Info(fmt.Sprintf("sending discord message from %s(%s) to chat api, message: %s", msg.Author, user.UUID(), msg.Content))
+	param := &chat.APIChatSendPostTextJSON{
 		Message: chat.OptNilString{
 			Value: msg.Content,
-            Set: true,
+			Set:   true,
 		},
 		UUID: chat.OptNilString{
 			Value: user.UUID(),
-            Set: true,
+			Set:   true,
 		},
 		ClientName: chat.OptNilString{
 			Value: coflDiscordClientName,
-            Set: true,
+			Set:   true,
 		},
-        Name: chat.OptNilString{
-            Value: user.Username(),
-            Set: true,
-        },
+		Name: chat.OptNilString{
+			Value: user.Username(),
+			Set:   true,
+		},
 	}
-    j, _ := param.MarshalJSON()
-    fmt.Println(string(j))
-    _, err = p.coflnetChatClient.SendMessage(ctx, param)
+	j, _ := param.MarshalJSON()
+	fmt.Println(string(j))
+	_, err = p.coflnetChatClient.SendMessage(ctx, param)
 
 	if err != nil {
 		slog.Error("error sending discord message to chat api", err)
@@ -279,8 +278,8 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 		return err
 	}
 
-    slog.Info("a message was sent to chat api")
-    span.SetAttributes(attribute.Bool("message_sent", true))
+	slog.Info("a message was sent to chat api")
+	span.SetAttributes(attribute.Bool("message_sent", true))
 	return nil
 }
 

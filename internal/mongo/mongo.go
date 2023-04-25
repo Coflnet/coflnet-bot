@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	client             *mongo.Client
-	database           *mongo.Database
+	client   *mongo.Client
+	database *mongo.Database
 
 	messageCollection  *mongo.Collection
 	coflChatCollection *mongo.Collection
@@ -24,14 +24,14 @@ var (
 	unMuteCollection   *mongo.Collection
 	warningCollection  *mongo.Collection
 
-    tracer trace.Tracer
+	tracer trace.Tracer
 )
 
 func Init() error {
 
 	var err error
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-    defer cancel()
+	defer cancel()
 
 	client, err = mongo.Connect(ctx, options.Client().ApplyURI(mongoHost()))
 	if err != nil {
@@ -46,14 +46,14 @@ func Init() error {
 	unMuteCollection = database.Collection("unmutes")
 	warningCollection = database.Collection("warnings")
 
-    tracer = otel.Tracer("mongo")
+	tracer = otel.Tracer("mongo")
 
 	return nil
 }
 
 func CloseConnection() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-  defer cancel()
+	defer cancel()
 
 	err := client.Disconnect(ctx)
 	if err != nil {
@@ -62,5 +62,5 @@ func CloseConnection() {
 }
 
 func mongoHost() string {
-  return utils.Env("MONGO_HOST")
+	return utils.Env("MONGO_HOST")
 }

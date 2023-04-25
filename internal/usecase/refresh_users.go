@@ -5,6 +5,5 @@ import (
 )
 
 func StartRefresh() {
-    slog.Warn("refreshing users is not implemented yet")
+	slog.Warn("refreshing users is not implemented yet")
 }
-
