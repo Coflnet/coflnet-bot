@@ -8,10 +8,10 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o ./app cmd/coflnet-bot/main.go
+RUN mkdir -p bin && go build -o ./bin ./...
 
 FROM gcr.io/distroless/base-debian11
 
-COPY --from=builder /build/app /app
+COPY --from=builder /build/bin/coflnet-bot /app
 
 ENTRYPOINT ["/app"]
