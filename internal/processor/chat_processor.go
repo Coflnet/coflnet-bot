@@ -173,12 +173,14 @@ func (p *ChatProcessor) processDiscordMessage(ctx context.Context, msg *discordg
 	}
 
 	// refresh the user
-	go func(ctx context.Context, user *discordgo.User) {
+	go func(user *discordgo.User) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 		ctx, span := p.tracer.Start(ctx, "trigger-refresh-user")
 		defer span.End()
 
 		p.userHandler.RefreshUserByDiscordUser(ctx, user)
-	}(ctx, msg.Author)
+	}(msg.Author)
 
 	wg.Wait()
 	slog.Debug("finished processing discord message from %s with content %s", msg.Author.Username, msg.Content)
