@@ -107,6 +107,7 @@ func (u *UserHandler) checkForDeprecatedUsernameDiscriminator(ctx context.Contex
 	}
 
 	span.SetAttributes(attribute.Bool("deprecated-user-found", true))
+	slog.Info(fmt.Sprintf("found deprecated user with id %d set discord id %s", dbUser.UserId, user.ID))
 
 	// set the new discord id
 	ids := []string{user.ID}
