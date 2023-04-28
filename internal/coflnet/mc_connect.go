@@ -57,3 +57,32 @@ func (a *McConnectApi) GetPlayer(ctx context.Context, id int) (*mc_connect.User,
 
 	return user, nil
 }
+
+func (m *McConnectApi) PlayerByUUID(ctx context.Context, uuid string) (*mc_connect.User, error) {
+	ctx, span := m.tracer.Start(ctx, "get-player-from-mc-connect-api")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("uuid", uuid))
+
+	if m.apiClient == nil {
+		return nil, errors.New("mc connect api client not initialized")
+	}
+
+	user, err := m.apiClient.ConnectMinecraftMcUuidGet(ctx, mc_connect.ConnectMinecraftMcUuidGetParams{
+		McUuid: uuid,
+	})
+
+	if err != nil {
+		span.RecordError(err)
+		return nil, err
+	}
+
+	if user.ID.IsSet() {
+		span.SetAttributes(attribute.Int("id", int(user.ID.Value)))
+	} else {
+		span.SetAttributes(attribute.Int("id", -1))
+		return nil, errors.New("user id not set")
+	}
+
+	return user, nil
+}

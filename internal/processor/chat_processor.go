@@ -214,6 +214,14 @@ func (p *ChatProcessor) processRedisMessage(ctx context.Context, msg *redisgo.Me
 		return err
 	}
 
+	go func(uuid string) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		ctx, span := p.tracer.Start(ctx, "trigger-refresh-user")
+		defer span.End()
+		p.userHandler.RefreshUserByUUID(ctx, uuid)
+	}(message.UUID)
+
 	metrics.MessagesForwardedToCoflnetDiscordChatChannel.Inc()
 	return nil
 }
@@ -229,10 +237,10 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 		return err
 	}
 
-	if len(users) >= 2 {
-		users = utils.FilterUsersForPreferredUsers(msg.Author.ID, users)
-		slog.Debug(fmt.Sprintf("found multiple users for discord account, after filtering preferred users remaining: %d", len(users)))
-	}
+	user := utils.FilterUsersForPreferredUsers(msg.Author.ID, users)
+
+	span.SetAttributes(attribute.String("uuid", user.UUID()))
+	span.SetAttributes(attribute.Int("user-id", user.UserId))
 
 	if len(users) == 0 {
 		err := errors.New(fmt.Sprintf("no user found for discord account %s, can not forward the message, error: %s", msg.Author.Username, span.SpanContext().TraceID()))
@@ -242,11 +250,19 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 		return err
 	}
 
-	user := users[len(users)-1]
-
 	if user.UUID() == "" {
 		err := errors.New(fmt.Sprintf("user has no uuid, can not forward the message, error: %s", span.SpanContext().TraceID()))
 		slog.Warn(fmt.Sprintf("no uuid found for user"), err)
+		span.RecordError(err)
+		return err
+	}
+
+	slog.Info(fmt.Sprintf("sending discord message from %s(%s) to chat api, message: %s", msg.Author, user.UUID(), msg.Content))
+
+	// TODO refactor
+	playerName, err := coflnet.PlayerName(user.UUID())
+	if err != nil {
+		slog.Error("error getting player name from coflnet", err)
 		span.RecordError(err)
 		return err
 	}
@@ -266,10 +282,11 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 			Set:   true,
 		},
 		Name: chat.OptNilString{
-			Value: user.Username(),
+			Value: playerName,
 			Set:   true,
 		},
 	}
+
 	j, _ := param.MarshalJSON()
 	fmt.Println(string(j))
 	_, err = p.coflnetChatClient.SendMessage(ctx, param)

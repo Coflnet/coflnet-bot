@@ -34,11 +34,57 @@ type UserHandler struct {
 }
 
 func (u *UserHandler) RefreshUserById(ctx context.Context, id int) error {
-	return errors.New("not implemented")
+	ctx, span := u.tracer.Start(ctx, "refresh-user-by-id")
+	defer span.End()
+	span.SetAttributes(attribute.Int("id", id))
+
+	return nil
 }
 
 func (u *UserHandler) RefreshUserByDiscordId() error {
 	return errors.New("not implemented")
+}
+
+func (u *UserHandler) RefreshUserByUUID(ctx context.Context, uuid string) error {
+	ctx, span := u.tracer.Start(ctx, "refresh-user-by-uuid")
+	defer span.End()
+	span.SetAttributes(attribute.String("uuid", uuid))
+
+	users, err := u.userRepo.SearchUserByUUID(ctx, uuid)
+	if err != nil {
+		if _, ok := err.(*model.UserNotFoundError); !ok {
+			slog.Error(fmt.Sprintf("failed to search user by uuid; traceId: %s", span.SpanContext().TraceID()), err)
+			span.RecordError(err)
+			return err
+		}
+	}
+
+	// create a empty user if there is no user with the given uuid
+	if len(users) == 0 {
+		slog.Info(fmt.Sprintf("user with uuid %s not found; traceId: %s", uuid, span.SpanContext().TraceID()))
+		_, err := u.createUserFromMinecraftUUID(ctx, uuid)
+		if err != nil {
+			slog.Error(fmt.Sprintf("failed to create user from minecraft uuid; traceId: %s", span.SpanContext().TraceID()), err)
+			span.RecordError(err)
+			return err
+		}
+		slog.Info(fmt.Sprintf("created user with uuid %s; traceId: %s", uuid, span.SpanContext().TraceID()))
+	} else {
+		slog.Info(fmt.Sprintf("a user with the uuid %s was found, no need to create a new one; traceId: %s", uuid, span.SpanContext().TraceID()))
+	}
+
+	// update the given users
+	slog.Info(fmt.Sprintf("updating users with uuid %s; traceId: %s", uuid, span.SpanContext().TraceID()))
+	for _, user := range users {
+		err := u.RefreshUser(ctx, user)
+		if err != nil {
+			slog.Error(fmt.Sprintf("failed to refresh user by id; traceId: %s", span.SpanContext().TraceID()), err)
+			span.RecordError(err)
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (u *UserHandler) RefreshUserByDiscordUser(ctx context.Context, user *discordgo.User) error {
@@ -149,6 +195,35 @@ func (u *UserHandler) createUserFromDiscordUser(ctx context.Context, user *disco
 	return modelUser, nil
 }
 
+func (u *UserHandler) createUserFromMinecraftUUID(ctx context.Context, uuid string) (*model.User, error) {
+	ctx, span := u.tracer.Start(ctx, "create-user-from-minecraft-uuid")
+	defer span.End()
+	span.SetAttributes(attribute.String("minecraft-uuid", uuid))
+
+	mcUser, err := u.mcConnectApi.PlayerByUUID(ctx, uuid)
+	if err != nil {
+		slog.Error(fmt.Sprintf("failed to get minecraft user by uuid calling mc connect; traceId: %s", span.SpanContext().TraceID()), err)
+		span.RecordError(err)
+		return nil, err
+	}
+
+	modelUser := &model.User{
+		MinecraftUuids: []string{uuid},
+		PreferredUUID:  uuid,
+		LastRefresh:    time.Now(),
+		UserId:         int(mcUser.ID.Value),
+	}
+
+	err = u.userRepo.InsertEmptyModelUser(ctx, modelUser)
+	if err != nil {
+		slog.Error(fmt.Sprintf("failed to insert empty model user; traceId: %s", span.SpanContext().TraceID()), err)
+		span.RecordError(err)
+		return nil, err
+	}
+
+	return modelUser, nil
+}
+
 func (u *UserHandler) RefreshUser(ctx context.Context, user *model.User) error {
 	_, span := u.tracer.Start(ctx, "refresh-user")
 	defer span.End()
@@ -157,7 +232,7 @@ func (u *UserHandler) RefreshUser(ctx context.Context, user *model.User) error {
 
 	// if the user was last refreshed less than 5 minutes ago, skip
 	if user.LastRefresh.After(time.Now().Add(-5 * time.Minute)) {
-		slog.Debug("skipping refresh of user %d; user was refreshed at %v", user.UserId, user.LastRefresh)
+		slog.Info("skipping refresh of user %d; user was refreshed at %v", user.UserId, user.LastRefresh)
 		span.SetAttributes(attribute.Bool("skipped", true))
 		return nil
 	}
@@ -177,7 +252,8 @@ func (u *UserHandler) RefreshUser(ctx context.Context, user *model.User) error {
 		slog.Error(fmt.Sprintf("failed to load user from payment api; traceId: %s", span.SpanContext().TraceID()), err)
 		span.RecordError(err)
 	}
-	slog.Debug(fmt.Sprintf("user %d owns %d products", user.UserId, len(ownedProducts)))
+
+	slog.Info(fmt.Sprintf("user %d owns %d products", user.UserId, len(ownedProducts)))
 
 	// load the hypixel information
 	slog.Warn("loading hypixel information is not implemented")

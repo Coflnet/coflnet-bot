@@ -68,6 +68,26 @@ func (u *UserRepo) SearchUserByDiscordId(ctx context.Context, searchId string) (
 	return &user, nil
 }
 
+func (u *UserRepo) SearchUserByUUID(ctx context.Context, uuid string) ([]*model.User, error) {
+	ctx, span := u.tracer.Start(ctx, "db-search-user-by-uuid")
+	defer span.End()
+	span.SetAttributes(attribute.String("uuid", uuid))
+
+	filter := bson.D{{Key: "minecraft_uuids", Value: uuid}}
+	cur, err := u.collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var user []*model.User
+	err = cur.All(ctx, &user)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (u *UserRepo) InsertEmptyModelUser(ctx context.Context, user *model.User) error {
 	ctx, span := u.tracer.Start(ctx, "db-insert-empty-user")
 	defer span.End()
