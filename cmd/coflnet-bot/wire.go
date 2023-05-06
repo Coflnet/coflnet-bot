@@ -20,7 +20,7 @@ func wireApp() *App {
 		wire.NewSet(coflnet.NewMcConnectApi, coflnet.NewPaymentApi, coflnet.NewChatApi, coflnet.NewApiClient),
 		wire.NewSet(discord.NewDiscordHandler, redis.NewRedisHandler),
 		wire.NewSet(usecase.NewUserHandler),
-		wire.NewSet(processor.NewChatProcessor),
+		wire.NewSet(processor.NewChatProcessor, processor.NewDiscordMessageProcessor),
 		newApp,
 	),
 	)

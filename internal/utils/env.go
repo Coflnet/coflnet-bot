@@ -16,7 +16,27 @@ func Env(key string) string {
 }
 
 func KafkaHost() string {
-	return Env("KAFKA_HOST")
+	return Env("KAFKA_BROKERS")
+}
+
+func KafkaCA() string {
+	return Env("KAFKA_TLS_CA_LOCATION")
+}
+
+func KafkaCert() string {
+	return Env("KAFKA_TLS_CERTIFICATE_LOCATION")
+}
+
+func KafkaKey() string {
+	return Env("KAFKA_TLS_KEY_LOCATION")
+}
+
+func KafkaUser() string {
+	return Env("KAFKA_USERNAME")
+}
+
+func KafkaPassword() string {
+	return Env("KAFKA_PASSWORD")
 }
 
 func McVerifyKafkaTopic() string {

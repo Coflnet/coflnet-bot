@@ -17,12 +17,14 @@ import (
 )
 
 type App struct {
-	chatProcessor *processor.ChatProcessor
+	chatProcessor           *processor.ChatProcessor
+	discordMessageProcessor *processor.DiscordMessageProcessor
 }
 
-func newApp(chatProcessor *processor.ChatProcessor) *App {
+func newApp(chatProcessor *processor.ChatProcessor, discordMessageProcessor *processor.DiscordMessageProcessor) *App {
 	return &App{
-		chatProcessor: chatProcessor,
+		chatProcessor:           chatProcessor,
+		discordMessageProcessor: discordMessageProcessor,
 	}
 }
 
@@ -95,6 +97,7 @@ func (a *App) startMessageProcessors() {
 
 	processors := []processor.MessageProcessor{
 		a.chatProcessor,
+		a.discordMessageProcessor,
 		//new(usecase.FlipProcessor),
 		// new(usecase.ChatProcessor),
 		//new(usecase.McVerifyProcessor),

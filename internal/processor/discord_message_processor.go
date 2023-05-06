@@ -18,9 +18,15 @@ const (
 	discordMessageTracerName = "discord-message-processor"
 )
 
-func NewDiscordMessageProcessor(d discord.DiscordHandler) *DiscordMessageProcessor {
+func NewDiscordMessageProcessor(d *discord.DiscordHandler) *DiscordMessageProcessor {
 	return &DiscordMessageProcessor{
 		discordHandler: d,
+		tracer:         otel.Tracer(discordMessageTracerName),
+		kafkaProcessor: &KafkaProcessor{
+			Host:          utils.KafkaHost(),
+			Topic:         utils.DiscordMessageTopic(),
+			ConsumerGroup: utils.DiscordMessageConsumerGroup(),
+		},
 	}
 }
 
@@ -28,18 +34,10 @@ func NewDiscordMessageProcessor(d discord.DiscordHandler) *DiscordMessageProcess
 type DiscordMessageProcessor struct {
 	kafkaProcessor *KafkaProcessor
 	tracer         trace.Tracer
-	discordHandler discord.DiscordHandler
+	discordHandler *discord.DiscordHandler
 }
 
 func (p *DiscordMessageProcessor) StartProcessing() error {
-	p.tracer = otel.Tracer(flipProcessorTracerName)
-
-	p.kafkaProcessor = &KafkaProcessor{
-		Host:          utils.KafkaHost(),
-		Topic:         utils.DiscordMessageTopic(),
-		ConsumerGroup: utils.DiscordMessageConsumerGroup(),
-	}
-
 	err := p.kafkaProcessor.Init()
 	if err != nil {
 		return err
@@ -64,7 +62,7 @@ func (p *DiscordMessageProcessor) StartProcessing() error {
 
 				err := p.processMessage(ctx, msg)
 				if err != nil {
-					log.Error().Err(err).Msg("error processing flip summary")
+					log.Error().Err(err).Msg("error processing message in topic " + p.kafkaProcessor.Topic)
 					span.RecordError(err)
 					return
 				}
@@ -103,4 +101,25 @@ func (p *DiscordMessageProcessor) processMessage(ctx context.Context, msg *kafka
 
 	slog.Info("send a message to discord %s", msg.Key)
 	return nil
+}
+
+func (p *DiscordMessageProcessor) WriteTestMessage() error {
+	ctx := context.Background()
+	msg := &discord.DiscordMessage{
+		Message: "test",
+		Channel: "test",
+	}
+
+	d, err := json.Marshal(msg)
+	if err != nil {
+		slog.Error("error marshalling message %s", err)
+		return err
+	}
+
+	km := kafkago.Message{
+		Key:   []byte("test"),
+		Value: d,
+	}
+
+	return p.kafkaProcessor.WriteMessage(ctx, km)
 }

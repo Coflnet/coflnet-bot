@@ -30,6 +30,7 @@ func wireApp() *App {
 	unmuteCommand := discord.NewUnmuteCommand(chatApi, apiClient)
 	discordHandler := discord.NewDiscordHandler(muteCommand, unmuteCommand)
 	chatProcessor := processor.NewChatProcessor(userHandler, redisHandler, discordHandler, chatApi)
-	app := newApp(chatProcessor)
+	discordMessageProcessor := processor.NewDiscordMessageProcessor(discordHandler)
+	app := newApp(chatProcessor, discordMessageProcessor)
 	return app
 }
