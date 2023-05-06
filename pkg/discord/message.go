@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/rs/zerolog/log"
-	"github.com/segmentio/kafka-go"
 	"os"
 	"time"
+
+	"github.com/rs/zerolog/log"
+	"github.com/segmentio/kafka-go"
 )
 
 type DiscordMessageToSend struct {
@@ -23,7 +24,7 @@ const (
 	CiSuccessChannel   = "ci-success"
 	CiFailureChannel   = "ci-failure"
 	FeedbackChannel    = "feedback"
-    FlipChannel       = "flip"
+	FlipChannel        = "flip"
 )
 
 func SendMessageToFeedback(msg string) error {
