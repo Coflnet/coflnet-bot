@@ -64,7 +64,7 @@ func (p *KafkaProcessor) Init() error {
 		slog.Warn("error appending certs from pem")
 	}
 
-	mechanism, err := scram.Mechanism(scram.SHA512, utils.KafkaUser(), utils.KafkaPassword())
+	mechanism, err := scram.Mechanism(scram.SHA256, utils.KafkaUser(), utils.KafkaPassword())
 	if err != nil {
 		slog.Error("error creating scram mechanism", err)
 		return err
