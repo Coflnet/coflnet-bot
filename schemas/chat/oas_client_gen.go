@@ -5,7 +5,6 @@ package chat
 import (
 	"context"
 	"net/url"
-	"os"
 	"time"
 
 	"github.com/go-faster/errors"
@@ -169,12 +168,18 @@ func (c *Client) sendAPIChatMuteDelete(ctx context.Context, request APIChatMuteD
 		// Validation is not needed for the empty body type.
 	case *APIChatMuteDeleteApplicationJSON:
 		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
 		}
 	case *APIChatMuteDeleteTextJSON:
 		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
@@ -221,8 +226,6 @@ func (c *Client) sendAPIChatMuteDelete(ctx context.Context, request APIChatMuteD
 		return res, errors.Wrap(err, "encode request")
 	}
 
-    r.Header.Set("authorization", os.Getenv("COFL_CHAT_API_KEY"))
-
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -258,12 +261,18 @@ func (c *Client) sendAPIChatMutePost(ctx context.Context, request APIChatMutePos
 		// Validation is not needed for the empty body type.
 	case *APIChatMutePostApplicationJSON:
 		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
 		}
 	case *APIChatMutePostTextJSON:
 		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
@@ -306,9 +315,6 @@ func (c *Client) sendAPIChatMutePost(ctx context.Context, request APIChatMutePos
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-
-    r.Header.Set("authorization", os.Getenv("COFL_CHAT_API_KEY"))
-
 	if err := encodeAPIChatMutePostRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
@@ -348,12 +354,18 @@ func (c *Client) sendAPIChatSendPost(ctx context.Context, request APIChatSendPos
 		// Validation is not needed for the empty body type.
 	case *APIChatSendPostApplicationJSON:
 		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
 		}
 	case *APIChatSendPostTextJSON:
 		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
 			return nil
 		}(); err != nil {
 			return res, errors.Wrap(err, "validate")
@@ -396,9 +408,6 @@ func (c *Client) sendAPIChatSendPost(ctx context.Context, request APIChatSendPos
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-
-    r.Header.Set("authorization", os.Getenv("COFL_CHAT_API_KEY"))
-
 	if err := encodeAPIChatSendPostRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}

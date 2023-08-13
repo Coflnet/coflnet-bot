@@ -11,7 +11,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func getUserById(c *gin.Context) {
+type UserController struct {
+}
+
+func NewUserController() *UserController {
+	return &UserController{}
+}
+
+func (con *UserController) RegisterRoutes(router *gin.RouterGroup) {
+	router.GET("/:id", con.getUserById)
+	router.GET("/discord/:tag", con.getUserByDiscordTag)
+}
+
+func (con *UserController) getUserById(c *gin.Context) {
 	id := c.Param("id")
 
 	if id == "" {
@@ -46,7 +58,7 @@ func getUserById(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func GetUserByDiscordTag(c *gin.Context) {
+func (con *UserController) getUserByDiscordTag(c *gin.Context) {
 	tag := c.Param("tag")
 
 	if tag == "" {

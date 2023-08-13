@@ -3,15 +3,14 @@ package processor
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
-	"github.com/rs/zerolog/log"
 	kafkago "github.com/segmentio/kafka-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
-	"golang.org/x/exp/slog"
 )
 
 const (
@@ -19,15 +18,26 @@ const (
 )
 
 func NewDiscordMessageProcessor(d *discord.DiscordHandler) *DiscordMessageProcessor {
-	return &DiscordMessageProcessor{
+
+	dp := &DiscordMessageProcessor{
 		discordHandler: d,
 		tracer:         otel.Tracer(discordMessageTracerName),
-		kafkaProcessor: &KafkaProcessor{
-			Host:          utils.KafkaHost(),
-			Topic:         utils.DiscordMessageTopic(),
-			ConsumerGroup: utils.DiscordMessageConsumerGroup(),
-		},
 	}
+
+	kafkaUrl, err := utils.KafkaHost()
+	if err != nil {
+		slog.Error("error getting kafka url", slog.String("err", err.Error()))
+		return nil
+	}
+
+	kafkaProcessor := &KafkaProcessor{
+		Host:          kafkaUrl,
+		Topic:         utils.DiscordMessageTopic(),
+		ConsumerGroup: utils.DiscordMessageConsumerGroup(),
+	}
+	dp.kafkaProcessor = kafkaProcessor
+
+	return dp
 }
 
 // sends messages from a kafka topic to discord
@@ -48,27 +58,40 @@ func (p *DiscordMessageProcessor) StartProcessing() error {
 	semaphore := make(chan struct{}, 10)
 
 	go func() {
-		defer p.kafkaProcessor.Close()
+		defer func(kafkaProcessor *KafkaProcessor) {
+			err = kafkaProcessor.Close()
+			if err != nil {
+				slog.Error("error closing kafka processor", err)
+			}
+		}(p.kafkaProcessor)
+
 		for msg := range msgs {
 			semaphore <- struct{}{}
 			go func(msg *kafkago.Message) {
-				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+				var cancel context.CancelFunc
+				ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
 				defer cancel()
 
 				defer func() { <-semaphore }()
 
-				_, span := otel.Tracer(flipProcessorTracerName).Start(ctx, "process-discord-message-kafka-message")
+				_, span := p.tracer.Start(ctx, "process-discord-message-kafka-message")
 				defer span.End()
 
-				err := p.processMessage(ctx, msg)
+				err = p.processMessage(ctx, msg)
 				if err != nil {
-					log.Error().Err(err).Msg("error processing message in topic " + p.kafkaProcessor.Topic)
+					slog.Error("error processing message in topic "+p.kafkaProcessor.Topic, err)
 					span.RecordError(err)
 					return
 				}
 				span.AddEvent("processed message")
 
-				p.kafkaProcessor.CommitMessage(ctx, msg)
+				err = p.kafkaProcessor.CommitMessage(ctx, msg)
+				if err != nil {
+					slog.Error("error committing message in topic "+p.kafkaProcessor.Topic, err)
+					span.RecordError(err)
+					return
+				}
+
 				span.AddEvent("committed message")
 			}(msg)
 		}
@@ -78,7 +101,7 @@ func (p *DiscordMessageProcessor) StartProcessing() error {
 }
 
 func (p *DiscordMessageProcessor) processMessage(ctx context.Context, msg *kafkago.Message) error {
-	_, span := otel.Tracer(flipProcessorTracerName).Start(ctx, "process-discord-message")
+	_, span := p.tracer.Start(ctx, "process-discord-message")
 	defer span.End()
 
 	// deserialize message

@@ -3,6 +3,7 @@ package coflnet
 import (
 	"context"
 	"errors"
+	"golang.org/x/exp/slog"
 	"strconv"
 	"sync"
 	"time"
@@ -25,9 +26,15 @@ func NewPaymentApi() *PaymentApi {
 	r := &PaymentApi{}
 	r.tracer = otel.Tracer(PaymentTraceName)
 
-	r.paymentClient, err = payments.NewClient(utils.PaymentBaseUrl())
+	paymentBaseUrl, err := utils.PaymentBaseUrl()
 	if err != nil {
-		panic(err)
+		slog.Error("error getting payment api url", err)
+		return r
+	}
+
+	r.paymentClient, err = payments.NewClient(paymentBaseUrl)
+	if err != nil {
+		slog.Error("error creating payment api client", err)
 	}
 
 	return r
@@ -38,9 +45,11 @@ type PaymentApi struct {
 	paymentClient *payments.Client
 }
 
-// TODO make this fancier
-// load all products and map them to colors/roles
 func (p *PaymentApi) OwningTimesOfUser(ctx context.Context, userId int) ([]model.OwnedProducts, error) {
+	if p.paymentClient == nil {
+		return nil, errors.New("payment api client not initialized")
+	}
+
 	_, span := p.tracer.Start(ctx, "owning-times-of-user")
 	defer span.End()
 	span.SetAttributes(attribute.Int("user-id", userId))
@@ -80,6 +89,10 @@ func (p *PaymentApi) OwningTimesOfUser(ctx context.Context, userId int) ([]model
 }
 
 func (p *PaymentApi) OwningTimeProductOfUser(ctx context.Context, userId int, productSlug string) (time.Time, error) {
+	if p.paymentClient == nil {
+		return time.Time{}, errors.New("payment api client not initialized")
+	}
+
 	_, span := p.tracer.Start(ctx, "owning-time-product")
 	defer span.End()
 

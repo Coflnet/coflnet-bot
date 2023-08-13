@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/Coflnet/coflnet-bot/internal/utils"
@@ -11,7 +12,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"golang.org/x/exp/slog"
 )
 
 type ApiClient struct {
@@ -24,8 +24,13 @@ func NewApiClient() *ApiClient {
 		tracer: otel.Tracer("api-client"),
 	}
 
-	var err error
-	c.apiClient, err = api.NewClient(utils.ApiBaseUrl())
+	apiUrl, err := utils.ApiBaseUrl()
+	if err != nil {
+		slog.Error("missing api base url, continue without that functionality", slog.String("err", err.Error()))
+		return c
+	}
+
+	c.apiClient, err = api.NewClient(apiUrl)
 	if err != nil {
 		panic(err)
 	}

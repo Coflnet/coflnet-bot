@@ -1,14 +1,12 @@
 package discord
 
 import (
-	"context"
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/Coflnet/coflnet-bot/internal/utils"
+	"net/http"
 	"os"
-	"time"
-
-	"github.com/rs/zerolog/log"
-	"github.com/segmentio/kafka-go"
 )
 
 type DiscordMessageToSend struct {
@@ -52,47 +50,19 @@ func SendMessageToRoleChannel(msg string) error {
 }
 
 func sendMessageToChannel(msg, channel string) error {
-	w, err := writer()
+	payload, err := message(msg, channel)
 	if err != nil {
 		return err
 	}
 
-	defer func(w *kafka.Writer) {
-		err := w.Close()
-		if err != nil {
-			log.Error().Err(err).Msgf("there was an error when closing the writer")
-		}
-	}(&w)
-
-	b, err := message(msg, channel)
+	// make http POST request
+	host, err := utils.CoflnetBotBaseUrl()
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	return w.WriteMessages(ctx, kafka.Message{
-		Key:   []byte(fmt.Sprintf("%d", time.Now().Unix())),
-		Value: b,
-	})
-}
-
-func writer() (kafka.Writer, error) {
-	h, err := kafkaHost()
-	if err != nil {
-		return kafka.Writer{}, err
-	}
-
-	t, err := discordMessageTopic()
-	if err != nil {
-		return kafka.Writer{}, err
-	}
-
-	return kafka.Writer{
-		Addr:  kafka.TCP(h),
-		Topic: t,
-	}, nil
+	_, err = http.Post(fmt.Sprintf("%s/api/webhook/message", host), "application/json", bytes.NewBuffer(payload))
+	return err
 }
 
 func message(msg, channel string) ([]byte, error) {
@@ -104,7 +74,6 @@ func message(msg, channel string) ([]byte, error) {
 	b, err := json.Marshal(v)
 
 	if err != nil {
-		log.Error().Err(err).Msgf("there was an error when marshaling the message")
 		return nil, err
 	}
 

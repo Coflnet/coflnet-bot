@@ -3,12 +3,12 @@ package redis
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/go-redis/redis/v8"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
-	"golang.org/x/exp/slog"
 )
 
 const (
@@ -28,26 +28,44 @@ func NewRedisHandler() *RedisHandler {
 		tracer: otel.Tracer(redisHandlerTracerName),
 	}
 
+	redisUrl, err := utils.RedisHost()
+	if err != nil {
+		slog.Error("error getting redis url", err)
+		return r
+	}
+
 	r.rdb = redis.NewClient(&redis.Options{
-		Addr:    utils.RedisHost(), 
+		Addr:     redisUrl,
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
 
-    slog.Info(fmt.Sprintf("use redis host %s", utils.RedisHost()))
+	slog.Info(fmt.Sprintf("use redis host %s", redisUrl))
 	return r
 }
 
 func (r *RedisHandler) ReceiveChatPubSubMessage(ctx context.Context) <-chan *redis.Message {
 	ch := make(chan *redis.Message, 100)
 
+	if r.rdb == nil {
+		slog.Error("redis client not initialized")
+		close(ch)
+		return ch
+	}
+
 	go func() {
-        defer panic("redis receive stopped")
 		defer close(ch)
 
-        slog.Info(fmt.Sprintf("start listening for chat messages on channel %s", utils.RedisChatPubSubChannel()))
+		slog.Info(fmt.Sprintf("start listening for chat messages on channel %s", utils.RedisChatPubSubChannel()))
 		pubsub := r.rdb.Subscribe(ctx, utils.RedisChatPubSubChannel())
-		defer pubsub.Close()
+
+		defer func(pubsub *redis.PubSub) {
+			err := pubsub.Close()
+			if err != nil {
+				slog.Error("failed to close pubsub", err)
+				close(ch)
+			}
+		}(pubsub)
 
 		for {
 			msg, err := pubsub.ReceiveMessage(ctx)
@@ -55,7 +73,7 @@ func (r *RedisHandler) ReceiveChatPubSubMessage(ctx context.Context) <-chan *red
 				slog.Error("failed to receive message", err)
 				continue
 			}
-            slog.Debug(fmt.Sprintf("receive message: %s", msg.Payload))
+			slog.Debug(fmt.Sprintf("receive message: %s", msg.Payload))
 			ch <- msg
 		}
 	}()

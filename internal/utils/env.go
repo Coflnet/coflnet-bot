@@ -15,8 +15,8 @@ func Env(key string) string {
 	return value
 }
 
-func KafkaHost() string {
-	return Env("KAFKA_BROKERS")
+func KafkaHost() (string, error) {
+	return optionalEnvVar("KAFKA_BROKERS")
 }
 
 func KafkaCA() string {
@@ -71,8 +71,8 @@ func RedisChatPubSubChannel() string {
 	return Env("REDIS_CHAT_PUBSUB_CHANNEL")
 }
 
-func RedisHost() string {
-	return Env("REDIS_HOST")
+func RedisHost() (string, error) {
+	return optionalEnvVar("REDIS_HOST")
 }
 
 func coflChatId() string {
@@ -123,10 +123,18 @@ func FlipWebhook() string {
 	return getEnv("FLIP_WEBHOOK")
 }
 
-func getEnv(e string) string {
+func optionalEnvVar(e string) (string, error) {
 	v := os.Getenv(e)
 	if v == "" {
 		err := fmt.Errorf("missing %s environment variable", e)
+		return "", err
+	}
+	return v, nil
+}
+
+func getEnv(e string) string {
+	v, err := optionalEnvVar(e)
+	if err != nil {
 		panic(err)
 	}
 	return v
@@ -140,8 +148,8 @@ func DiscordGuildId() string {
 	return getEnv("DISCORD_GUILD_ID")
 }
 
-func ChatBaseUrl() string {
-	return getEnv("CHAT_BASE_URL")
+func ChatBaseUrl() (string, error) {
+	return optionalEnvVar("CHAT_BASE_URL")
 }
 
 func ChatChannelId() string {
@@ -152,16 +160,16 @@ func DiscordInGameChannelId() string {
 	return getEnv("DISCORD_IN_GAME_CHANNEL_ID")
 }
 
-func McConnectBaseUrl() string {
-	return getEnv("MC_CONNECT_BASE_URL")
+func McConnectBaseUrl() (string, error) {
+	return optionalEnvVar("MC_CONNECT_BASE_URL")
 }
 
-func PaymentBaseUrl() string {
-	return getEnv("PAYMENT_BASE_URL")
+func PaymentBaseUrl() (string, error) {
+	return optionalEnvVar("PAYMENT_BASE_URL")
 }
 
-func ApiBaseUrl() string {
-	return getEnv("API_BASE_URL")
+func ApiBaseUrl() (string, error) {
+	return optionalEnvVar("API_BASE_URL")
 }
 
 func DiscordMessageConsumerGroup() string {
@@ -174,4 +182,8 @@ func DiscordMessageTopic() string {
 
 func MongoHost() string {
 	return getEnv("MONGO_HOST")
+}
+
+func CoflnetBotBaseUrl() (string, error) {
+	return optionalEnvVar("COFLNET_BOT_BASE_URL")
 }

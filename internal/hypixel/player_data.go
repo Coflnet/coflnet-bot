@@ -4,18 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"log/slog"
 	"net/http"
 	"net/url"
-
-	"github.com/rs/zerolog/log"
 )
 
 func PlayerData(uuid string) (*PlayerDataResponse, error) {
 	proxyUrl := fmt.Sprintf("http://sky-proxy.sky:8000/Proxy/hypixel?path=%s", url.QueryEscape("/player?uuid="+uuid))
 	u, err := url.Parse(proxyUrl)
 	if err != nil {
-		log.Error().Err(err).Msgf("error parsing url")
+		slog.Error("error parsing url", err)
 		return nil, err
 	}
 
@@ -27,16 +25,16 @@ func PlayerData(uuid string) (*PlayerDataResponse, error) {
 	resp, err := http.DefaultClient.Do(&request)
 
 	if err != nil {
-		log.Error().Err(err).Msgf("error getting player data")
+		slog.Error("error getting player data", err)
 		return nil, err
 	}
 	defer func(Body io.ReadCloser) {
 		_ = Body.Close()
 	}(resp.Body)
 
-	bytes, err := ioutil.ReadAll(resp.Body)
+	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Error().Err(err).Msgf("error reading response body")
+		slog.Error("error reading response body", err)
 		return nil, err
 	}
 
@@ -44,7 +42,7 @@ func PlayerData(uuid string) (*PlayerDataResponse, error) {
 	err = json.Unmarshal(bytes, &data)
 
 	if err != nil {
-		log.Error().Err(err).Msgf("error unmarshalling response")
+		slog.Error("error unmarshalling response", err)
 		return nil, err
 	}
 

@@ -3,6 +3,7 @@ package discord
 import (
 	"context"
 	"fmt"
+	"go.opentelemetry.io/otel/trace"
 	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/utils"
@@ -34,8 +35,11 @@ func (d *DiscordHandler) RegisterCommands() error {
 
 	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
 	for i, v := range commands {
-		_, span := d.tracer.Start(ctx, "register-command")
-		defer span.End()
+		_, span = d.tracer.Start(ctx, "register-command")
+		defer func(s trace.Span) {
+			s.End()
+		}(span)
+
 		span.SetAttributes(attribute.String("command-name", v.Name))
 
 		slog.Info(fmt.Sprintf("registering command: %s", v.Name))

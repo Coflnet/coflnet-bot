@@ -22,10 +22,15 @@ func NewChatApi() *ChatApi {
 	instance := &ChatApi{}
 	instance.tracer = otel.Tracer(chatApiTracerName)
 
-	var err error
-	instance.apiClient, err = chat.NewClient(utils.ChatBaseUrl())
+	chatBaseUrl, err := utils.ChatBaseUrl()
 	if err != nil {
-		panic(err)
+		slog.Error("error getting chat api url", err)
+		return instance
+	}
+
+	instance.apiClient, err = chat.NewClient(chatBaseUrl)
+	if err != nil {
+		slog.Error("error creating chat api client", err)
 	}
 
 	return instance

@@ -3,6 +3,7 @@ package coflnet
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"strconv"
 
 	"go.opentelemetry.io/otel"
@@ -18,14 +19,18 @@ const (
 )
 
 func NewMcConnectApi() *McConnectApi {
-	var err error
 	r := &McConnectApi{}
-
-	r.apiClient, err = mc_connect.NewClient(utils.McConnectBaseUrl())
 	r.tracer = otel.Tracer(mcConnectApiName)
 
+	apiClientUrl, err := utils.McConnectBaseUrl()
 	if err != nil {
-		panic(err)
+		slog.Error("error getting mc connect api url", err)
+		return r
+	}
+	r.apiClient, err = mc_connect.NewClient(apiClientUrl)
+	if err != nil {
+		slog.Error("error creating mc connect api client", err)
+		return r
 	}
 
 	return r
@@ -37,14 +42,14 @@ type McConnectApi struct {
 }
 
 func (a *McConnectApi) GetPlayer(ctx context.Context, id int) (*mc_connect.User, error) {
+	if a.apiClient == nil {
+		return nil, errors.New("mc connect api client not initialized")
+	}
+
 	ctx, span := a.tracer.Start(ctx, "get-player-from-mc-connect-api")
 	defer span.End()
 
 	span.SetAttributes(attribute.Int("id", id))
-
-	if a.apiClient == nil {
-		return nil, errors.New("mc connect api client not initialized")
-	}
 
 	user, err := a.apiClient.ConnectUserUserIdGet(ctx, mc_connect.ConnectUserUserIdGetParams{
 		UserId: strconv.Itoa(id),
@@ -58,17 +63,17 @@ func (a *McConnectApi) GetPlayer(ctx context.Context, id int) (*mc_connect.User,
 	return user, nil
 }
 
-func (m *McConnectApi) PlayerByUUID(ctx context.Context, uuid string) (*mc_connect.User, error) {
-	ctx, span := m.tracer.Start(ctx, "get-player-from-mc-connect-api")
+func (a *McConnectApi) PlayerByUUID(ctx context.Context, uuid string) (*mc_connect.User, error) {
+	if a.apiClient == nil {
+		return nil, errors.New("mc connect api client not initialized")
+	}
+
+	ctx, span := a.tracer.Start(ctx, "get-player-from-mc-connect-api")
 	defer span.End()
 
 	span.SetAttributes(attribute.String("uuid", uuid))
 
-	if m.apiClient == nil {
-		return nil, errors.New("mc connect api client not initialized")
-	}
-
-	user, err := m.apiClient.ConnectMinecraftMcUuidGet(ctx, mc_connect.ConnectMinecraftMcUuidGetParams{
+	user, err := a.apiClient.ConnectMinecraftMcUuidGet(ctx, mc_connect.ConnectMinecraftMcUuidGetParams{
 		McUuid: uuid,
 	})
 

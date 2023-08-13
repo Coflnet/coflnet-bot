@@ -35,7 +35,7 @@ func NewChatProcessor(u *usecase.UserHandler, r *redis.RedisHandler, d *discord.
 		redisHandler:      r,
 		discordHandler:    d,
 		coflnetChatClient: c,
-		tracer:            otel.Tracer(flipProcessorTracerName),
+		tracer:            otel.Tracer("chat-processor"),
 	}
 }
 
@@ -50,21 +50,25 @@ type ChatProcessor struct {
 func (r *ChatProcessor) StartProcessing() error {
 	slog.Info("starting chat processor")
 
+	var errCh chan error
+
 	go func() {
 		slog.Info("starting redis chat processor")
 		err := r.startRedisChatProcessor()
 		slog.Error("redis chat processor stopped", err)
-		panic(err)
+
+		errCh <- err
 	}()
 
 	go func() {
 		slog.Info("starting discord chat processor")
 		err := r.startDiscordChatProcessor()
 		slog.Error("discord chat processor stopped", err)
-		panic(err)
+
+		errCh <- err
 	}()
 
-	return nil
+	return <-errCh
 }
 
 func (r *ChatProcessor) startRedisChatProcessor() error {

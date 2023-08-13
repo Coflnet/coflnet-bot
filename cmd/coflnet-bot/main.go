@@ -1,9 +1,8 @@
 package main
 
 import (
-	"os"
-	"os/signal"
-
+	"fmt"
+	"github.com/Coflnet/coflnet-bot/internal/api"
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/Coflnet/coflnet-bot/internal/processor"
@@ -13,33 +12,28 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
-	"golang.org/x/exp/slog"
+	"log/slog"
+	"os"
+	"os/signal"
 )
 
 type App struct {
 	chatProcessor           *processor.ChatProcessor
 	discordMessageProcessor *processor.DiscordMessageProcessor
+	apiController           *api.ApiController
 }
 
-func newApp(chatProcessor *processor.ChatProcessor, discordMessageProcessor *processor.DiscordMessageProcessor) *App {
+func newApp(chatProcessor *processor.ChatProcessor, discordMessageProcessor *processor.DiscordMessageProcessor, apiController *api.ApiController) *App {
 	return &App{
 		chatProcessor:           chatProcessor,
 		discordMessageProcessor: discordMessageProcessor,
+		apiController:           apiController,
 	}
 }
 
 func main() {
 	setupTracer()
-
-	// setup logger
-	h := slog.HandlerOptions{Level: slog.LevelInfo}.NewTextHandler(os.Stdout)
-	if utils.DebugEnabled() {
-		slog.Info("debug mode enabled")
-		h = slog.HandlerOptions{Level: slog.LevelDebug}.NewTextHandler(os.Stdout)
-	} else {
-		slog.Info("debug mode disabled")
-	}
-	slog.SetDefault(slog.New(h))
+	setupLogger()
 
 	// metrics
 	go metrics.Init()
@@ -53,13 +47,36 @@ func main() {
 	defer mongo.CloseConnection()
 
 	app := wireApp()
-	app.startMessageProcessors()
+	go app.startMessageProcessors()
+
+	go func() {
+		err = app.apiController.Start()
+		if err != nil {
+			panic(err)
+		}
+		slog.Info("api controller ended")
+	}()
 
 	slog.Info("waiting for interrupt")
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
 	slog.Info("shutting down..")
+}
+
+func setupLogger() {
+	var level slog.Level
+	if utils.DebugEnabled() {
+		level = slog.LevelDebug
+	} else {
+		level = slog.LevelInfo
+	}
+	opts := slog.HandlerOptions{
+		Level: level,
+	}
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &opts))
+	slog.SetDefault(logger)
+	slog.Info(fmt.Sprintf("starting coflnet-bot with log level %s", level.String()))
 }
 
 func setupTracer() {
@@ -98,17 +115,12 @@ func (a *App) startMessageProcessors() {
 	processors := []processor.MessageProcessor{
 		a.chatProcessor,
 		a.discordMessageProcessor,
-		//new(usecase.FlipProcessor),
-		// new(usecase.ChatProcessor),
-		//new(usecase.McVerifyProcessor),
-		// new(usecase.DiscordMessageProcessor),
 	}
 
 	for _, p := range processors {
 		err := p.StartProcessing()
 		if err != nil {
 			slog.Error("failed to start message processor", err)
-			panic(err)
 		}
 	}
 }

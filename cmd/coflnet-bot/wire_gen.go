@@ -7,6 +7,7 @@
 package main
 
 import (
+	"github.com/Coflnet/coflnet-bot/internal/api"
 	"github.com/Coflnet/coflnet-bot/internal/coflnet"
 	"github.com/Coflnet/coflnet-bot/internal/db"
 	"github.com/Coflnet/coflnet-bot/internal/discord"
@@ -31,6 +32,9 @@ func wireApp() *App {
 	discordHandler := discord.NewDiscordHandler(muteCommand, unmuteCommand)
 	chatProcessor := processor.NewChatProcessor(userHandler, redisHandler, discordHandler, chatApi)
 	discordMessageProcessor := processor.NewDiscordMessageProcessor(discordHandler)
-	app := newApp(chatProcessor, discordMessageProcessor)
+	userController := api.NewUserController()
+	webhookController := api.NewWebhookController(discordHandler)
+	apiController := api.NewApiController(userController, webhookController)
+	app := newApp(chatProcessor, discordMessageProcessor, apiController)
 	return app
 }

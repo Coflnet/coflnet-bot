@@ -4,6 +4,7 @@
 package main
 
 import (
+	"github.com/Coflnet/coflnet-bot/internal/api"
 	"github.com/Coflnet/coflnet-bot/internal/coflnet"
 	"github.com/Coflnet/coflnet-bot/internal/db"
 	"github.com/Coflnet/coflnet-bot/internal/discord"
@@ -21,6 +22,7 @@ func wireApp() *App {
 		wire.NewSet(discord.NewDiscordHandler, redis.NewRedisHandler),
 		wire.NewSet(usecase.NewUserHandler),
 		wire.NewSet(processor.NewChatProcessor, processor.NewDiscordMessageProcessor),
+		wire.NewSet(api.NewUserController, api.NewWebhookController, api.NewApiController),
 		newApp,
 	),
 	)
