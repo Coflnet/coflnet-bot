@@ -1203,6 +1203,17 @@ func (s *Server) decodeUserUserIdOwnsLongestPostRequest(r *http.Request) (
 			if request == nil {
 				return errors.New("nil is invalid value")
 			}
+			if err := (validate.Array{
+				MinLength:    0,
+				MinLengthSet: false,
+				MaxLength:    0,
+				MaxLengthSet: false,
+			}).ValidateLength(len(request)); err != nil {
+				return errors.Wrap(err, "array")
+			}
+			if err := validate.UniqueItems(request); err != nil {
+				return errors.Wrap(err, "array")
+			}
 			return nil
 		}(); err != nil {
 			return req, close, errors.Wrap(err, "validate")
@@ -1287,6 +1298,17 @@ func (s *Server) decodeUserUserIdOwnsPostRequest(r *http.Request) (
 			if request == nil {
 				return errors.New("nil is invalid value")
 			}
+			if err := (validate.Array{
+				MinLength:    0,
+				MinLengthSet: false,
+				MaxLength:    0,
+				MaxLengthSet: false,
+			}).ValidateLength(len(request)); err != nil {
+				return errors.Wrap(err, "array")
+			}
+			if err := validate.UniqueItems(request); err != nil {
+				return errors.Wrap(err, "array")
+			}
 			return nil
 		}(); err != nil {
 			return req, close, errors.Wrap(err, "validate")
@@ -1370,6 +1392,17 @@ func (s *Server) decodeUserUserIdOwnsUntilPostRequest(r *http.Request) (
 		if err := func() error {
 			if request == nil {
 				return errors.New("nil is invalid value")
+			}
+			if err := (validate.Array{
+				MinLength:    0,
+				MinLengthSet: false,
+				MaxLength:    0,
+				MaxLengthSet: false,
+			}).ValidateLength(len(request)); err != nil {
+				return errors.Wrap(err, "array")
+			}
+			if err := validate.UniqueItems(request); err != nil {
+				return errors.Wrap(err, "array")
 			}
 			return nil
 		}(); err != nil {

@@ -14,9 +14,11 @@ import (
 // calling handler that matches the path or returning not found error.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	elem := r.URL.Path
+	elemIsEscaped := false
 	if rawPath := r.URL.RawPath; rawPath != "" {
 		if normalized, ok := uri.NormalizeEscapedPath(rawPath); ok {
 			elem = normalized
+			elemIsEscaped = strings.ContainsRune(elem, '%')
 		}
 	}
 	if prefix := s.cfg.Prefix; len(prefix) > 0 {
@@ -64,7 +66,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					// Leaf node.
 					switch r.Method {
 					case "POST":
-						s.handleApplyPostRequest([0]string{}, w, r)
+						s.handleApplyPostRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "POST")
 					}
@@ -93,7 +95,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "POST":
-							s.handleCallbackPaypalPostRequest([0]string{}, w, r)
+							s.handleCallbackPaypalPostRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "POST")
 						}
@@ -111,7 +113,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "POST":
-							s.handleCallbackStripePostRequest([0]string{}, w, r)
+							s.handleCallbackStripePostRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "POST")
 						}
@@ -129,9 +131,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				if len(elem) == 0 {
 					switch r.Method {
 					case "GET":
-						s.handleGroupGetRequest([0]string{}, w, r)
+						s.handleGroupGetRequest([0]string{}, elemIsEscaped, w, r)
 					case "POST":
-						s.handleGroupPostRequest([0]string{}, w, r)
+						s.handleGroupPostRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "GET,POST")
 					}
@@ -160,15 +162,15 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "DELETE":
 							s.handleGroupGroupSlugDeleteRequest([1]string{
 								args[0],
-							}, w, r)
+							}, elemIsEscaped, w, r)
 						case "GET":
 							s.handleGroupGroupSlugGetRequest([1]string{
 								args[0],
-							}, w, r)
+							}, elemIsEscaped, w, r)
 						case "PUT":
 							s.handleGroupGroupSlugPutRequest([1]string{
 								args[0],
-							}, w, r)
+							}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "DELETE,GET,PUT")
 						}
@@ -189,11 +191,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "DELETE":
 								s.handleGroupGroupSlugProductsDeleteRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							case "POST":
 								s.handleGroupGroupSlugProductsPostRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "DELETE,POST")
 							}
@@ -212,9 +214,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				if len(elem) == 0 {
 					switch r.Method {
 					case "GET":
-						s.handleProductsGetRequest([0]string{}, w, r)
+						s.handleProductsGetRequest([0]string{}, elemIsEscaped, w, r)
 					case "PUT":
-						s.handleProductsPutRequest([0]string{}, w, r)
+						s.handleProductsPutRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "GET,PUT")
 					}
@@ -251,7 +253,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleProductsPProductSlugGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -313,7 +315,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "GET":
 											s.handleProductsServiceServiceSlugCountGetRequest([1]string{
 												args[0],
-											}, w, r)
+											}, elemIsEscaped, w, r)
 										default:
 											s.notAllowed(w, r, "GET")
 										}
@@ -333,7 +335,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "GET":
 											s.handleProductsServiceServiceSlugIdsGetRequest([1]string{
 												args[0],
-											}, w, r)
+											}, elemIsEscaped, w, r)
 										default:
 											s.notAllowed(w, r, "GET")
 										}
@@ -353,7 +355,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "GET":
 											s.handleProductsServiceServiceSlugOwnedGetRequest([1]string{
 												args[0],
-											}, w, r)
+											}, elemIsEscaped, w, r)
 										default:
 											s.notAllowed(w, r, "GET")
 										}
@@ -373,7 +375,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "GET":
-									s.handleProductsServicesGetRequest([0]string{}, w, r)
+									s.handleProductsServicesGetRequest([0]string{}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "GET")
 								}
@@ -392,9 +394,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleProductsTopupGetRequest([0]string{}, w, r)
+								s.handleProductsTopupGetRequest([0]string{}, elemIsEscaped, w, r)
 							case "PUT":
-								s.handleProductsTopupPutRequest([0]string{}, w, r)
+								s.handleProductsTopupPutRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET,PUT")
 							}
@@ -419,7 +421,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleProductsUserUserIdGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -438,9 +440,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				if len(elem) == 0 {
 					switch r.Method {
 					case "GET":
-						s.handleRulesGetRequest([0]string{}, w, r)
+						s.handleRulesGetRequest([0]string{}, elemIsEscaped, w, r)
 					case "POST":
-						s.handleRulesPostRequest([0]string{}, w, r)
+						s.handleRulesPostRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "GET,POST")
 					}
@@ -466,11 +468,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "DELETE":
 							s.handleRulesRuleSlugDeleteRequest([1]string{
 								args[0],
-							}, w, r)
+							}, elemIsEscaped, w, r)
 						case "GET":
 							s.handleRulesRuleSlugGetRequest([1]string{
 								args[0],
-							}, w, r)
+							}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "DELETE,GET")
 						}
@@ -522,7 +524,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "POST":
-									s.handleTopUpCompensatePostRequest([0]string{}, w, r)
+									s.handleTopUpCompensatePostRequest([0]string{}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "POST")
 								}
@@ -540,7 +542,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "POST":
-									s.handleTopUpCustomPostRequest([0]string{}, w, r)
+									s.handleTopUpCustomPostRequest([0]string{}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "POST")
 								}
@@ -559,7 +561,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleTopUpOptionsGetRequest([0]string{}, w, r)
+								s.handleTopUpOptionsGetRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -577,7 +579,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "POST":
-								s.handleTopUpPaypalPostRequest([0]string{}, w, r)
+								s.handleTopUpPaypalPostRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "POST")
 							}
@@ -595,7 +597,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "POST":
-								s.handleTopUpStripePostRequest([0]string{}, w, r)
+								s.handleTopUpStripePostRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "POST")
 							}
@@ -635,11 +637,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleTransactionPlanedUUserIdGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							case "POST":
 								s.handleTransactionPlanedUUserIdPostRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET,POST")
 							}
@@ -666,12 +668,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									s.handleTransactionPlanedUUserIdTTransactionIdDeleteRequest([2]string{
 										args[0],
 										args[1],
-									}, w, r)
+									}, elemIsEscaped, w, r)
 								case "PUT":
 									s.handleTransactionPlanedUUserIdTTransactionIdPutRequest([2]string{
 										args[0],
 										args[1],
-									}, w, r)
+									}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "DELETE,PUT")
 								}
@@ -690,7 +692,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "POST":
-								s.handleTransactionSendPostRequest([0]string{}, w, r)
+								s.handleTransactionSendPostRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "POST")
 							}
@@ -715,7 +717,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleTransactionUUserIdGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -745,11 +747,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					case "GET":
 						s.handleUserUserIdGetRequest([1]string{
 							args[0],
-						}, w, r)
+						}, elemIsEscaped, w, r)
 					case "POST":
 						s.handleUserUserIdPostRequest([1]string{
 							args[0],
-						}, w, r)
+						}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "GET,POST")
 					}
@@ -780,7 +782,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handleUserUserIdOwnsPostRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "POST")
 							}
@@ -812,7 +814,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "POST":
 										s.handleUserUserIdOwnsLongestPostRequest([1]string{
 											args[0],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "POST")
 									}
@@ -832,7 +834,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "POST":
 										s.handleUserUserIdOwnsUntilPostRequest([1]string{
 											args[0],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "POST")
 									}
@@ -867,7 +869,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										s.handleUserUserIdOwnsProductSlugUntilGetRequest([2]string{
 											args[0],
 											args[1],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "GET")
 									}
@@ -895,7 +897,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								s.handleUserUserIdPurchaseProductSlugPostRequest([2]string{
 									args[0],
 									args[1],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "POST")
 							}
@@ -921,7 +923,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								s.handleUserUserIdServicePurchaseProductSlugPostRequest([2]string{
 									args[0],
 									args[1],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "POST")
 							}
@@ -941,7 +943,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handleUserUserIdTransferPostRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "POST")
 							}
@@ -961,7 +963,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							s.handleUserUserIdTransactionIdDeleteRequest([2]string{
 								args[0],
 								args[1],
-							}, w, r)
+							}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "DELETE")
 						}

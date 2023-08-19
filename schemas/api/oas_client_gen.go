@@ -5,15 +5,18 @@ package api
 import (
 	"context"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/go-faster/errors"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/metric"
 
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/uri"
+	"github.com/ogen-go/ogen/validate"
 )
 
 // Client implements OAS client.
@@ -26,12 +29,19 @@ var _ Handler = struct {
 	*Client
 }{}
 
+func trimTrailingSlashes(u *url.URL) {
+	u.Path = strings.TrimRight(u.Path, "/")
+	u.RawPath = strings.TrimRight(u.RawPath, "/")
+}
+
 // NewClient initializes new Client defined by OAS.
 func NewClient(serverURL string, opts ...ClientOption) (*Client, error) {
 	u, err := url.Parse(serverURL)
 	if err != nil {
 		return nil, err
 	}
+	trimTrailingSlashes(u)
+
 	c, err := newClientConfig(opts...).baseClient()
 	if err != nil {
 		return nil, err
@@ -74,12 +84,13 @@ func (c *Client) sendAPIAuctionAuctionUuidGet(ctx context.Context, params APIAuc
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIAuctionAuctionUuidGet",
@@ -91,14 +102,15 @@ func (c *Client) sendAPIAuctionAuctionUuidGet(ctx context.Context, params APIAuc
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/auction/"
+	var pathParts [2]string
+	pathParts[0] = "/api/auction/"
 	{
 		// Encode "auctionUuid" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -111,11 +123,16 @@ func (c *Client) sendAPIAuctionAuctionUuidGet(ctx context.Context, params APIAuc
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -153,12 +170,13 @@ func (c *Client) sendAPIAuctionAuctionUuidUIDGet(ctx context.Context, params API
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIAuctionAuctionUuidUIDGet",
@@ -170,14 +188,15 @@ func (c *Client) sendAPIAuctionAuctionUuidUIDGet(ctx context.Context, params API
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/auction/"
+	var pathParts [3]string
+	pathParts[0] = "/api/auction/"
 	{
 		// Encode "auctionUuid" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -190,12 +209,17 @@ func (c *Client) sendAPIAuctionAuctionUuidUIDGet(ctx context.Context, params API
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/uid"
+	pathParts[2] = "/uid"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -242,12 +266,13 @@ func (c *Client) sendAPIAuctionsActiveUUIDPost(ctx context.Context, request []st
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIAuctionsActiveUUIDPost",
@@ -259,17 +284,19 @@ func (c *Client) sendAPIAuctionsActiveUUIDPost(ctx context.Context, request []st
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/auctions/active/uuid"
+	var pathParts [1]string
+	pathParts[0] = "/api/auctions/active/uuid"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -310,12 +337,13 @@ func (c *Client) sendAPIAuctionsBatchGet(ctx context.Context, params APIAuctions
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIAuctionsBatchGet",
@@ -327,14 +355,16 @@ func (c *Client) sendAPIAuctionsBatchGet(ctx context.Context, params APIAuctions
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/auctions/batch"
+	var pathParts [1]string
+	pathParts[0] = "/api/auctions/batch"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -375,7 +405,7 @@ func (c *Client) sendAPIAuctionsBatchGet(ctx context.Context, params APIAuctions
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -413,12 +443,13 @@ func (c *Client) sendAPIAuctionsSupplyLowGet(ctx context.Context) (res []SupplyE
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIAuctionsSupplyLowGet",
@@ -430,17 +461,19 @@ func (c *Client) sendAPIAuctionsSupplyLowGet(ctx context.Context) (res []SupplyE
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/auctions/supply/low"
+	var pathParts [1]string
+	pathParts[0] = "/api/auctions/supply/low"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -478,12 +511,13 @@ func (c *Client) sendAPIAuctionsTagItemTagActiveBinGet(ctx context.Context, para
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIAuctionsTagItemTagActiveBinGet",
@@ -495,14 +529,15 @@ func (c *Client) sendAPIAuctionsTagItemTagActiveBinGet(ctx context.Context, para
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/auctions/tag/"
+	var pathParts [3]string
+	pathParts[0] = "/api/auctions/tag/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -515,9 +550,14 @@ func (c *Client) sendAPIAuctionsTagItemTagActiveBinGet(ctx context.Context, para
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/active/bin"
+	pathParts[2] = "/active/bin"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -541,7 +581,7 @@ func (c *Client) sendAPIAuctionsTagItemTagActiveBinGet(ctx context.Context, para
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -580,12 +620,13 @@ func (c *Client) sendAPIAuctionsTagItemTagActiveOverviewGet(ctx context.Context,
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIAuctionsTagItemTagActiveOverviewGet",
@@ -597,14 +638,15 @@ func (c *Client) sendAPIAuctionsTagItemTagActiveOverviewGet(ctx context.Context,
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/auctions/tag/"
+	var pathParts [3]string
+	pathParts[0] = "/api/auctions/tag/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -617,9 +659,14 @@ func (c *Client) sendAPIAuctionsTagItemTagActiveOverviewGet(ctx context.Context,
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/active/overview"
+	pathParts[2] = "/active/overview"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -643,7 +690,7 @@ func (c *Client) sendAPIAuctionsTagItemTagActiveOverviewGet(ctx context.Context,
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -681,12 +728,13 @@ func (c *Client) sendAPIAuctionsTagItemTagRecentOverviewGet(ctx context.Context,
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIAuctionsTagItemTagRecentOverviewGet",
@@ -698,14 +746,15 @@ func (c *Client) sendAPIAuctionsTagItemTagRecentOverviewGet(ctx context.Context,
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/auctions/tag/"
+	var pathParts [3]string
+	pathParts[0] = "/api/auctions/tag/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -718,9 +767,14 @@ func (c *Client) sendAPIAuctionsTagItemTagRecentOverviewGet(ctx context.Context,
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/recent/overview"
+	pathParts[2] = "/recent/overview"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -744,7 +798,7 @@ func (c *Client) sendAPIAuctionsTagItemTagRecentOverviewGet(ctx context.Context,
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -784,12 +838,13 @@ func (c *Client) sendAPIAuctionsTagItemTagSoldGet(ctx context.Context, params AP
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIAuctionsTagItemTagSoldGet",
@@ -801,14 +856,15 @@ func (c *Client) sendAPIAuctionsTagItemTagSoldGet(ctx context.Context, params AP
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/auctions/tag/"
+	var pathParts [3]string
+	pathParts[0] = "/api/auctions/tag/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -821,9 +877,14 @@ func (c *Client) sendAPIAuctionsTagItemTagSoldGet(ctx context.Context, params AP
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/sold"
+	pathParts[2] = "/sold"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -864,7 +925,7 @@ func (c *Client) sendAPIAuctionsTagItemTagSoldGet(ctx context.Context, params AP
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -903,12 +964,13 @@ func (c *Client) sendAPIAuctionsUIDUIDSoldGet(ctx context.Context, params APIAuc
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIAuctionsUIDUIDSoldGet",
@@ -920,14 +982,15 @@ func (c *Client) sendAPIAuctionsUIDUIDSoldGet(ctx context.Context, params APIAuc
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/auctions/uid/"
+	var pathParts [3]string
+	pathParts[0] = "/api/auctions/uid/"
 	{
 		// Encode "uid" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -940,12 +1003,17 @@ func (c *Client) sendAPIAuctionsUIDUIDSoldGet(ctx context.Context, params APIAuc
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/sold"
+	pathParts[2] = "/sold"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -993,12 +1061,13 @@ func (c *Client) sendAPIAuctionsUidsSoldPost(ctx context.Context, request *Inven
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIAuctionsUidsSoldPost",
@@ -1010,17 +1079,19 @@ func (c *Client) sendAPIAuctionsUidsSoldPost(ctx context.Context, request *Inven
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/auctions/uids/sold"
+	var pathParts [1]string
+	pathParts[0] = "/api/auctions/uids/sold"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1063,12 +1134,13 @@ func (c *Client) sendAPIBazaarItemHistoryItemTagStatusGet(ctx context.Context, p
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIBazaarItemHistoryItemTagStatusGet",
@@ -1080,14 +1152,15 @@ func (c *Client) sendAPIBazaarItemHistoryItemTagStatusGet(ctx context.Context, p
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/bazaar/item/history/"
+	var pathParts [3]string
+	pathParts[0] = "/api/bazaar/item/history/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -1100,12 +1173,17 @@ func (c *Client) sendAPIBazaarItemHistoryItemTagStatusGet(ctx context.Context, p
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/status"
+	pathParts[2] = "/status"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1143,12 +1221,13 @@ func (c *Client) sendAPIBazaarItemTagHistoryDayGet(ctx context.Context, params A
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIBazaarItemTagHistoryDayGet",
@@ -1160,14 +1239,15 @@ func (c *Client) sendAPIBazaarItemTagHistoryDayGet(ctx context.Context, params A
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/bazaar/"
+	var pathParts [3]string
+	pathParts[0] = "/api/bazaar/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -1180,12 +1260,17 @@ func (c *Client) sendAPIBazaarItemTagHistoryDayGet(ctx context.Context, params A
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/history/day"
+	pathParts[2] = "/history/day"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1223,12 +1308,13 @@ func (c *Client) sendAPIBazaarItemTagHistoryGet(ctx context.Context, params APIB
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIBazaarItemTagHistoryGet",
@@ -1240,14 +1326,15 @@ func (c *Client) sendAPIBazaarItemTagHistoryGet(ctx context.Context, params APIB
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/bazaar/"
+	var pathParts [3]string
+	pathParts[0] = "/api/bazaar/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -1260,9 +1347,14 @@ func (c *Client) sendAPIBazaarItemTagHistoryGet(ctx context.Context, params APIB
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/history"
+	pathParts[2] = "/history"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -1303,7 +1395,7 @@ func (c *Client) sendAPIBazaarItemTagHistoryGet(ctx context.Context, params APIB
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1341,12 +1433,13 @@ func (c *Client) sendAPIBazaarItemTagHistoryHourGet(ctx context.Context, params 
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIBazaarItemTagHistoryHourGet",
@@ -1358,14 +1451,15 @@ func (c *Client) sendAPIBazaarItemTagHistoryHourGet(ctx context.Context, params 
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/bazaar/"
+	var pathParts [3]string
+	pathParts[0] = "/api/bazaar/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -1378,12 +1472,17 @@ func (c *Client) sendAPIBazaarItemTagHistoryHourGet(ctx context.Context, params 
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/history/hour"
+	pathParts[2] = "/history/hour"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1421,12 +1520,13 @@ func (c *Client) sendAPIBazaarItemTagHistoryWeekGet(ctx context.Context, params 
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIBazaarItemTagHistoryWeekGet",
@@ -1438,14 +1538,15 @@ func (c *Client) sendAPIBazaarItemTagHistoryWeekGet(ctx context.Context, params 
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/bazaar/"
+	var pathParts [3]string
+	pathParts[0] = "/api/bazaar/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -1458,12 +1559,17 @@ func (c *Client) sendAPIBazaarItemTagHistoryWeekGet(ctx context.Context, params 
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/history/week"
+	pathParts[2] = "/history/week"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1501,12 +1607,13 @@ func (c *Client) sendAPIBazaarItemTagSnapshotGet(ctx context.Context, params API
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIBazaarItemTagSnapshotGet",
@@ -1518,14 +1625,15 @@ func (c *Client) sendAPIBazaarItemTagSnapshotGet(ctx context.Context, params API
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/bazaar/"
+	var pathParts [3]string
+	pathParts[0] = "/api/bazaar/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -1538,9 +1646,14 @@ func (c *Client) sendAPIBazaarItemTagSnapshotGet(ctx context.Context, params API
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/snapshot"
+	pathParts[2] = "/snapshot"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -1564,7 +1677,7 @@ func (c *Client) sendAPIBazaarItemTagSnapshotGet(ctx context.Context, params API
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1602,12 +1715,13 @@ func (c *Client) sendAPICraftAPICraftGet(ctx context.Context) (res *APICraftAPIC
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APICraftAPICraftGet",
@@ -1619,17 +1733,19 @@ func (c *Client) sendAPICraftAPICraftGet(ctx context.Context) (res *APICraftAPIC
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/craft/api/craft"
+	var pathParts [1]string
+	pathParts[0] = "/api/craft/api/craft"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1667,12 +1783,13 @@ func (c *Client) sendAPICraftProfitGet(ctx context.Context, params APICraftProfi
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APICraftProfitGet",
@@ -1684,14 +1801,16 @@ func (c *Client) sendAPICraftProfitGet(ctx context.Context, params APICraftProfi
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/craft/profit"
+	var pathParts [1]string
+	pathParts[0] = "/api/craft/profit"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -1732,7 +1851,7 @@ func (c *Client) sendAPICraftProfitGet(ctx context.Context, params APICraftProfi
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1770,12 +1889,13 @@ func (c *Client) sendAPICraftRecipeItemTagGet(ctx context.Context, params APICra
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APICraftRecipeItemTagGet",
@@ -1787,14 +1907,15 @@ func (c *Client) sendAPICraftRecipeItemTagGet(ctx context.Context, params APICra
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/craft/recipe/"
+	var pathParts [2]string
+	pathParts[0] = "/api/craft/recipe/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -1807,11 +1928,16 @@ func (c *Client) sendAPICraftRecipeItemTagGet(ctx context.Context, params APICra
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1849,12 +1975,13 @@ func (c *Client) sendAPIDataPlayerNamePost(ctx context.Context, params APIDataPl
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIDataPlayerNamePost",
@@ -1866,14 +1993,16 @@ func (c *Client) sendAPIDataPlayerNamePost(ctx context.Context, params APIDataPl
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/data/playerName"
+	var pathParts [1]string
+	pathParts[0] = "/api/data/playerName"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -1897,7 +2026,7 @@ func (c *Client) sendAPIDataPlayerNamePost(ctx context.Context, params APIDataPl
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1944,12 +2073,13 @@ func (c *Client) sendAPIDataPlayerNamesPost(ctx context.Context, request []strin
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIDataPlayerNamesPost",
@@ -1961,17 +2091,19 @@ func (c *Client) sendAPIDataPlayerNamesPost(ctx context.Context, request []strin
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/data/playerNames"
+	var pathParts [1]string
+	pathParts[0] = "/api/data/playerNames"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2012,12 +2144,13 @@ func (c *Client) sendAPIDataProxyPost(ctx context.Context) (res APIDataProxyPost
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIDataProxyPost",
@@ -2029,17 +2162,19 @@ func (c *Client) sendAPIDataProxyPost(ctx context.Context) (res APIDataProxyPost
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/data/proxy"
+	var pathParts [1]string
+	pathParts[0] = "/api/data/proxy"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2077,12 +2212,13 @@ func (c *Client) sendAPIFilterOptionsGet(ctx context.Context, params APIFilterOp
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIFilterOptionsGet",
@@ -2094,14 +2230,16 @@ func (c *Client) sendAPIFilterOptionsGet(ctx context.Context, params APIFilterOp
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/filter/options"
+	var pathParts [1]string
+	pathParts[0] = "/api/filter/options"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -2125,7 +2263,7 @@ func (c *Client) sendAPIFilterOptionsGet(ctx context.Context, params APIFilterOp
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2170,12 +2308,13 @@ func (c *Client) sendAPIFilterPost(ctx context.Context, request *FilterQuery) (r
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIFilterPost",
@@ -2187,17 +2326,19 @@ func (c *Client) sendAPIFilterPost(ctx context.Context, request *FilterQuery) (r
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/Filter"
+	var pathParts [1]string
+	pathParts[0] = "/api/Filter"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2239,12 +2380,13 @@ func (c *Client) sendAPIFlipSettingsOptionsGet(ctx context.Context) (res *FlipSe
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIFlipSettingsOptionsGet",
@@ -2256,17 +2398,19 @@ func (c *Client) sendAPIFlipSettingsOptionsGet(ctx context.Context) (res *FlipSe
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/flip/settings/options"
+	var pathParts [1]string
+	pathParts[0] = "/api/flip/settings/options"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2304,12 +2448,13 @@ func (c *Client) sendAPIFlipStatsFinderFinderNameGet(ctx context.Context, params
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIFlipStatsFinderFinderNameGet",
@@ -2321,14 +2466,15 @@ func (c *Client) sendAPIFlipStatsFinderFinderNameGet(ctx context.Context, params
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/flip/stats/finder/"
+	var pathParts [2]string
+	pathParts[0] = "/api/flip/stats/finder/"
 	{
 		// Encode "finderName" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2341,8 +2487,13 @@ func (c *Client) sendAPIFlipStatsFinderFinderNameGet(ctx context.Context, params
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -2383,7 +2534,7 @@ func (c *Client) sendAPIFlipStatsFinderFinderNameGet(ctx context.Context, params
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2421,12 +2572,13 @@ func (c *Client) sendAPIFlipStatsPlayerPlayerUuidGet(ctx context.Context, params
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIFlipStatsPlayerPlayerUuidGet",
@@ -2438,14 +2590,15 @@ func (c *Client) sendAPIFlipStatsPlayerPlayerUuidGet(ctx context.Context, params
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/flip/stats/player/"
+	var pathParts [2]string
+	pathParts[0] = "/api/flip/stats/player/"
 	{
 		// Encode "playerUuid" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2458,8 +2611,13 @@ func (c *Client) sendAPIFlipStatsPlayerPlayerUuidGet(ctx context.Context, params
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -2483,7 +2641,7 @@ func (c *Client) sendAPIFlipStatsPlayerPlayerUuidGet(ctx context.Context, params
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2521,12 +2679,13 @@ func (c *Client) sendAPIFlipStatsPlayerPlayerUuidHourGet(ctx context.Context, pa
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIFlipStatsPlayerPlayerUuidHourGet",
@@ -2538,14 +2697,15 @@ func (c *Client) sendAPIFlipStatsPlayerPlayerUuidHourGet(ctx context.Context, pa
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/flip/stats/player/"
+	var pathParts [3]string
+	pathParts[0] = "/api/flip/stats/player/"
 	{
 		// Encode "playerUuid" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2558,12 +2718,17 @@ func (c *Client) sendAPIFlipStatsPlayerPlayerUuidHourGet(ctx context.Context, pa
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/hour"
+	pathParts[2] = "/hour"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2601,12 +2766,13 @@ func (c *Client) sendAPIFlipTrackFoundAuctionIdPost(ctx context.Context, params 
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIFlipTrackFoundAuctionIdPost",
@@ -2618,14 +2784,15 @@ func (c *Client) sendAPIFlipTrackFoundAuctionIdPost(ctx context.Context, params 
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/flip/track/found/"
+	var pathParts [2]string
+	pathParts[0] = "/api/flip/track/found/"
 	{
 		// Encode "auctionId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2638,8 +2805,13 @@ func (c *Client) sendAPIFlipTrackFoundAuctionIdPost(ctx context.Context, params 
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -2697,7 +2869,7 @@ func (c *Client) sendAPIFlipTrackFoundAuctionIdPost(ctx context.Context, params 
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2735,12 +2907,13 @@ func (c *Client) sendAPIFlipTrackPurchaseAuctionIdPost(ctx context.Context, para
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIFlipTrackPurchaseAuctionIdPost",
@@ -2752,14 +2925,15 @@ func (c *Client) sendAPIFlipTrackPurchaseAuctionIdPost(ctx context.Context, para
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/flip/track/purchase/"
+	var pathParts [2]string
+	pathParts[0] = "/api/flip/track/purchase/"
 	{
 		// Encode "auctionId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2772,8 +2946,13 @@ func (c *Client) sendAPIFlipTrackPurchaseAuctionIdPost(ctx context.Context, para
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -2848,7 +3027,7 @@ func (c *Client) sendAPIFlipTrackPurchaseAuctionIdPost(ctx context.Context, para
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2887,12 +3066,13 @@ func (c *Client) sendAPIFlipUpdateWhenGet(ctx context.Context) (res time.Time, e
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIFlipUpdateWhenGet",
@@ -2904,17 +3084,19 @@ func (c *Client) sendAPIFlipUpdateWhenGet(ctx context.Context) (res time.Time, e
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/flip/update/when"
+	var pathParts [1]string
+	pathParts[0] = "/api/flip/update/when"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2953,12 +3135,13 @@ func (c *Client) sendAPIItemItemTagDetailsGet(ctx context.Context, params APIIte
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemItemTagDetailsGet",
@@ -2970,14 +3153,15 @@ func (c *Client) sendAPIItemItemTagDetailsGet(ctx context.Context, params APIIte
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/item/"
+	var pathParts [3]string
+	pathParts[0] = "/api/item/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2990,12 +3174,17 @@ func (c *Client) sendAPIItemItemTagDetailsGet(ctx context.Context, params APIIte
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/details"
+	pathParts[2] = "/details"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3033,12 +3222,13 @@ func (c *Client) sendAPIItemItemTagSimilarGet(ctx context.Context, params APIIte
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemItemTagSimilarGet",
@@ -3050,14 +3240,15 @@ func (c *Client) sendAPIItemItemTagSimilarGet(ctx context.Context, params APIIte
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/item/"
+	var pathParts [3]string
+	pathParts[0] = "/api/item/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3070,12 +3261,17 @@ func (c *Client) sendAPIItemItemTagSimilarGet(ctx context.Context, params APIIte
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/similar"
+	pathParts[2] = "/similar"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3113,12 +3309,13 @@ func (c *Client) sendAPIItemPriceItemTagBinGet(ctx context.Context, params APIIt
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemPriceItemTagBinGet",
@@ -3130,14 +3327,15 @@ func (c *Client) sendAPIItemPriceItemTagBinGet(ctx context.Context, params APIIt
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/item/price/"
+	var pathParts [3]string
+	pathParts[0] = "/api/item/price/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3150,9 +3348,14 @@ func (c *Client) sendAPIItemPriceItemTagBinGet(ctx context.Context, params APIIt
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/bin"
+	pathParts[2] = "/bin"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -3176,7 +3379,7 @@ func (c *Client) sendAPIItemPriceItemTagBinGet(ctx context.Context, params APIIt
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3215,12 +3418,13 @@ func (c *Client) sendAPIItemPriceItemTagCurrentGet(ctx context.Context, params A
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemPriceItemTagCurrentGet",
@@ -3232,14 +3436,15 @@ func (c *Client) sendAPIItemPriceItemTagCurrentGet(ctx context.Context, params A
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/item/price/"
+	var pathParts [3]string
+	pathParts[0] = "/api/item/price/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3252,9 +3457,14 @@ func (c *Client) sendAPIItemPriceItemTagCurrentGet(ctx context.Context, params A
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/current"
+	pathParts[2] = "/current"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -3278,7 +3488,7 @@ func (c *Client) sendAPIItemPriceItemTagCurrentGet(ctx context.Context, params A
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3316,12 +3526,13 @@ func (c *Client) sendAPIItemPriceItemTagGet(ctx context.Context, params APIItemP
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemPriceItemTagGet",
@@ -3333,14 +3544,15 @@ func (c *Client) sendAPIItemPriceItemTagGet(ctx context.Context, params APIItemP
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/item/price/"
+	var pathParts [2]string
+	pathParts[0] = "/api/item/price/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3353,8 +3565,13 @@ func (c *Client) sendAPIItemPriceItemTagGet(ctx context.Context, params APIItemP
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -3378,7 +3595,7 @@ func (c *Client) sendAPIItemPriceItemTagGet(ctx context.Context, params APIItemP
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3416,12 +3633,13 @@ func (c *Client) sendAPIItemPriceItemTagHistoryDayGet(ctx context.Context, param
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemPriceItemTagHistoryDayGet",
@@ -3433,14 +3651,15 @@ func (c *Client) sendAPIItemPriceItemTagHistoryDayGet(ctx context.Context, param
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/item/price/"
+	var pathParts [3]string
+	pathParts[0] = "/api/item/price/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3453,9 +3672,14 @@ func (c *Client) sendAPIItemPriceItemTagHistoryDayGet(ctx context.Context, param
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/history/day"
+	pathParts[2] = "/history/day"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -3479,7 +3703,7 @@ func (c *Client) sendAPIItemPriceItemTagHistoryDayGet(ctx context.Context, param
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3517,12 +3741,13 @@ func (c *Client) sendAPIItemPriceItemTagHistoryFullGet(ctx context.Context, para
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemPriceItemTagHistoryFullGet",
@@ -3534,14 +3759,15 @@ func (c *Client) sendAPIItemPriceItemTagHistoryFullGet(ctx context.Context, para
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/item/price/"
+	var pathParts [3]string
+	pathParts[0] = "/api/item/price/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3554,12 +3780,17 @@ func (c *Client) sendAPIItemPriceItemTagHistoryFullGet(ctx context.Context, para
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/history/full"
+	pathParts[2] = "/history/full"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3597,12 +3828,13 @@ func (c *Client) sendAPIItemPriceItemTagHistoryMonthGet(ctx context.Context, par
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemPriceItemTagHistoryMonthGet",
@@ -3614,14 +3846,15 @@ func (c *Client) sendAPIItemPriceItemTagHistoryMonthGet(ctx context.Context, par
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/item/price/"
+	var pathParts [3]string
+	pathParts[0] = "/api/item/price/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3634,9 +3867,14 @@ func (c *Client) sendAPIItemPriceItemTagHistoryMonthGet(ctx context.Context, par
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/history/month"
+	pathParts[2] = "/history/month"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -3660,7 +3898,7 @@ func (c *Client) sendAPIItemPriceItemTagHistoryMonthGet(ctx context.Context, par
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3698,12 +3936,13 @@ func (c *Client) sendAPIItemPriceItemTagHistoryWeekGet(ctx context.Context, para
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemPriceItemTagHistoryWeekGet",
@@ -3715,14 +3954,15 @@ func (c *Client) sendAPIItemPriceItemTagHistoryWeekGet(ctx context.Context, para
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/item/price/"
+	var pathParts [3]string
+	pathParts[0] = "/api/item/price/"
 	{
 		// Encode "itemTag" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3735,9 +3975,14 @@ func (c *Client) sendAPIItemPriceItemTagHistoryWeekGet(ctx context.Context, para
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/history/week"
+	pathParts[2] = "/history/week"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -3761,7 +4006,7 @@ func (c *Client) sendAPIItemPriceItemTagHistoryWeekGet(ctx context.Context, para
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3799,12 +4044,13 @@ func (c *Client) sendAPIItemSearchSearchValGet(ctx context.Context, params APIIt
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemSearchSearchValGet",
@@ -3816,14 +4062,15 @@ func (c *Client) sendAPIItemSearchSearchValGet(ctx context.Context, params APIIt
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/item/search/"
+	var pathParts [2]string
+	pathParts[0] = "/api/item/search/"
 	{
 		// Encode "searchVal" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3836,11 +4083,16 @@ func (c *Client) sendAPIItemSearchSearchValGet(ctx context.Context, params APIIt
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3879,12 +4131,13 @@ func (c *Client) sendAPIItemsBazaarTagsGet(ctx context.Context) (res []string, e
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemsBazaarTagsGet",
@@ -3896,17 +4149,19 @@ func (c *Client) sendAPIItemsBazaarTagsGet(ctx context.Context) (res []string, e
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/items/bazaar/tags"
+	var pathParts [1]string
+	pathParts[0] = "/api/items/bazaar/tags"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3944,12 +4199,13 @@ func (c *Client) sendAPIItemsGet(ctx context.Context) (res []ItemMetadataElement
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemsGet",
@@ -3961,17 +4217,19 @@ func (c *Client) sendAPIItemsGet(ctx context.Context) (res []ItemMetadataElement
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/items"
+	var pathParts [1]string
+	pathParts[0] = "/api/items"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -4010,6 +4268,17 @@ func (c *Client) sendAPIItemsNamesPost(ctx context.Context, request []string) (r
 		if request == nil {
 			return errors.New("nil is invalid value")
 		}
+		if err := (validate.Array{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    0,
+			MaxLengthSet: false,
+		}).ValidateLength(len(request)); err != nil {
+			return errors.Wrap(err, "array")
+		}
+		if err := validate.UniqueItems(request); err != nil {
+			return errors.Wrap(err, "array")
+		}
 		return nil
 	}(); err != nil {
 		return res, errors.Wrap(err, "validate")
@@ -4018,12 +4287,13 @@ func (c *Client) sendAPIItemsNamesPost(ctx context.Context, request []string) (r
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIItemsNamesPost",
@@ -4035,17 +4305,19 @@ func (c *Client) sendAPIItemsNamesPost(ctx context.Context, request []string) (r
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/items/names"
+	var pathParts [1]string
+	pathParts[0] = "/api/items/names"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -4086,12 +4358,13 @@ func (c *Client) sendAPIKatDataGet(ctx context.Context) (res []KatUpgradeCost, e
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIKatDataGet",
@@ -4103,17 +4376,19 @@ func (c *Client) sendAPIKatDataGet(ctx context.Context) (res []KatUpgradeCost, e
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/kat/data"
+	var pathParts [1]string
+	pathParts[0] = "/api/kat/data"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -4151,12 +4426,13 @@ func (c *Client) sendAPIKatProfitGet(ctx context.Context) (res []KatFlip, err er
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIKatProfitGet",
@@ -4168,17 +4444,19 @@ func (c *Client) sendAPIKatProfitGet(ctx context.Context) (res []KatFlip, err er
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/kat/profit"
+	var pathParts [1]string
+	pathParts[0] = "/api/kat/profit"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -4216,12 +4494,13 @@ func (c *Client) sendAPIMayorGet(ctx context.Context, params APIMayorGetParams) 
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIMayorGet",
@@ -4233,14 +4512,16 @@ func (c *Client) sendAPIMayorGet(ctx context.Context, params APIMayorGetParams) 
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/mayor"
+	var pathParts [1]string
+	pathParts[0] = "/api/mayor"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -4281,7 +4562,7 @@ func (c *Client) sendAPIMayorGet(ctx context.Context, params APIMayorGetParams) 
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -4319,12 +4600,13 @@ func (c *Client) sendAPIMayorYearGet(ctx context.Context, params APIMayorYearGet
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIMayorYearGet",
@@ -4336,14 +4618,15 @@ func (c *Client) sendAPIMayorYearGet(ctx context.Context, params APIMayorYearGet
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/mayor/"
+	var pathParts [2]string
+	pathParts[0] = "/api/mayor/"
 	{
 		// Encode "year" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -4356,11 +4639,16 @@ func (c *Client) sendAPIMayorYearGet(ctx context.Context, params APIMayorYearGet
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -4398,12 +4686,13 @@ func (c *Client) sendAPIModCommandsGet(ctx context.Context) (res []CommandListEn
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIModCommandsGet",
@@ -4415,17 +4704,19 @@ func (c *Client) sendAPIModCommandsGet(ctx context.Context) (res []CommandListEn
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/mod/commands"
+	var pathParts [1]string
+	pathParts[0] = "/api/mod/commands"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -4472,12 +4763,13 @@ func (c *Client) sendAPIModDescriptionModificationsPost(ctx context.Context, req
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIModDescriptionModificationsPost",
@@ -4489,17 +4781,19 @@ func (c *Client) sendAPIModDescriptionModificationsPost(ctx context.Context, req
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/mod/description/modifications"
+	var pathParts [1]string
+	pathParts[0] = "/api/mod/description/modifications"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -4580,12 +4874,13 @@ func (c *Client) sendAPIModDescriptionPost(ctx context.Context, request *Invento
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIModDescriptionPost",
@@ -4597,17 +4892,19 @@ func (c *Client) sendAPIModDescriptionPost(ctx context.Context, request *Invento
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/mod/description"
+	var pathParts [1]string
+	pathParts[0] = "/api/mod/description"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -4679,12 +4976,13 @@ func (c *Client) sendAPIModItemUUIDGet(ctx context.Context, params APIModItemUUI
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIModItemUUIDGet",
@@ -4696,14 +4994,15 @@ func (c *Client) sendAPIModItemUUIDGet(ctx context.Context, params APIModItemUUI
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/mod/item/"
+	var pathParts [2]string
+	pathParts[0] = "/api/mod/item/"
 	{
 		// Encode "uuid" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -4716,8 +5015,13 @@ func (c *Client) sendAPIModItemUUIDGet(ctx context.Context, params APIModItemUUI
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -4741,7 +5045,7 @@ func (c *Client) sendAPIModItemUUIDGet(ctx context.Context, params APIModItemUUI
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -4779,12 +5083,13 @@ func (c *Client) sendAPIPlayerPlayerUuidAuctionsGet(ctx context.Context, params 
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIPlayerPlayerUuidAuctionsGet",
@@ -4796,14 +5101,15 @@ func (c *Client) sendAPIPlayerPlayerUuidAuctionsGet(ctx context.Context, params 
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/player/"
+	var pathParts [3]string
+	pathParts[0] = "/api/player/"
 	{
 		// Encode "playerUuid" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -4816,9 +5122,14 @@ func (c *Client) sendAPIPlayerPlayerUuidAuctionsGet(ctx context.Context, params 
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/auctions"
+	pathParts[2] = "/auctions"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -4859,7 +5170,7 @@ func (c *Client) sendAPIPlayerPlayerUuidAuctionsGet(ctx context.Context, params 
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -4897,12 +5208,13 @@ func (c *Client) sendAPIPlayerPlayerUuidBidsGet(ctx context.Context, params APIP
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIPlayerPlayerUuidBidsGet",
@@ -4914,14 +5226,15 @@ func (c *Client) sendAPIPlayerPlayerUuidBidsGet(ctx context.Context, params APIP
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/player/"
+	var pathParts [3]string
+	pathParts[0] = "/api/player/"
 	{
 		// Encode "playerUuid" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -4934,9 +5247,14 @@ func (c *Client) sendAPIPlayerPlayerUuidBidsGet(ctx context.Context, params APIP
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/bids"
+	pathParts[2] = "/bids"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -4977,7 +5295,7 @@ func (c *Client) sendAPIPlayerPlayerUuidBidsGet(ctx context.Context, params APIP
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5015,12 +5333,13 @@ func (c *Client) sendAPIPlayerPlayerUuidNameGet(ctx context.Context, params APIP
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIPlayerPlayerUuidNameGet",
@@ -5032,14 +5351,15 @@ func (c *Client) sendAPIPlayerPlayerUuidNameGet(ctx context.Context, params APIP
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/player/"
+	var pathParts [3]string
+	pathParts[0] = "/api/player/"
 	{
 		// Encode "playerUuid" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -5052,12 +5372,17 @@ func (c *Client) sendAPIPlayerPlayerUuidNameGet(ctx context.Context, params APIP
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/name"
+	pathParts[2] = "/name"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5095,12 +5420,13 @@ func (c *Client) sendAPIPlayerPlayerUuidNamePost(ctx context.Context, params API
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIPlayerPlayerUuidNamePost",
@@ -5112,14 +5438,15 @@ func (c *Client) sendAPIPlayerPlayerUuidNamePost(ctx context.Context, params API
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/player/"
+	var pathParts [3]string
+	pathParts[0] = "/api/player/"
 	{
 		// Encode "playerUuid" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -5132,12 +5459,17 @@ func (c *Client) sendAPIPlayerPlayerUuidNamePost(ctx context.Context, params API
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/name"
+	pathParts[2] = "/name"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5184,12 +5516,13 @@ func (c *Client) sendAPIPremiumPricesAdjustedPost(ctx context.Context, request [
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIPremiumPricesAdjustedPost",
@@ -5201,17 +5534,19 @@ func (c *Client) sendAPIPremiumPricesAdjustedPost(ctx context.Context, request [
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/premium/prices/adjusted"
+	var pathParts [1]string
+	pathParts[0] = "/api/premium/prices/adjusted"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5261,12 +5596,13 @@ func (c *Client) sendAPIPremiumUserOwnsPost(ctx context.Context, request []strin
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIPremiumUserOwnsPost",
@@ -5278,17 +5614,19 @@ func (c *Client) sendAPIPremiumUserOwnsPost(ctx context.Context, request []strin
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/premium/user/owns"
+	var pathParts [1]string
+	pathParts[0] = "/api/premium/user/owns"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5339,12 +5677,13 @@ func (c *Client) sendAPIPriceNbtPost(ctx context.Context, request *InventoryData
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIPriceNbtPost",
@@ -5356,17 +5695,19 @@ func (c *Client) sendAPIPriceNbtPost(ctx context.Context, request *InventoryData
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/price/nbt"
+	var pathParts [1]string
+	pathParts[0] = "/api/price/nbt"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5407,12 +5748,13 @@ func (c *Client) sendAPIReferralInfoGet(ctx context.Context) (res *ReferralInfo,
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIReferralInfoGet",
@@ -5424,17 +5766,19 @@ func (c *Client) sendAPIReferralInfoGet(ctx context.Context) (res *ReferralInfo,
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/referral/info"
+	var pathParts [1]string
+	pathParts[0] = "/api/referral/info"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5472,12 +5816,13 @@ func (c *Client) sendAPIReferralReferredByPost(ctx context.Context, request *Ref
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIReferralReferredByPost",
@@ -5489,17 +5834,19 @@ func (c *Client) sendAPIReferralReferredByPost(ctx context.Context, request *Ref
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/referral/referred/by"
+	var pathParts [1]string
+	pathParts[0] = "/api/referral/referred/by"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5540,12 +5887,13 @@ func (c *Client) sendAPISearchPlayerPlayerNameGet(ctx context.Context, params AP
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APISearchPlayerPlayerNameGet",
@@ -5557,14 +5905,15 @@ func (c *Client) sendAPISearchPlayerPlayerNameGet(ctx context.Context, params AP
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/search/player/"
+	var pathParts [2]string
+	pathParts[0] = "/api/search/player/"
 	{
 		// Encode "playerName" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -5577,11 +5926,16 @@ func (c *Client) sendAPISearchPlayerPlayerNameGet(ctx context.Context, params AP
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5619,12 +5973,13 @@ func (c *Client) sendAPISearchSearchValGet(ctx context.Context, params APISearch
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APISearchSearchValGet",
@@ -5636,14 +5991,15 @@ func (c *Client) sendAPISearchSearchValGet(ctx context.Context, params APISearch
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/search/"
+	var pathParts [2]string
+	pathParts[0] = "/api/search/"
 	{
 		// Encode "searchVal" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -5656,8 +6012,13 @@ func (c *Client) sendAPISearchSearchValGet(ctx context.Context, params APISearch
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -5681,7 +6042,7 @@ func (c *Client) sendAPISearchSearchValGet(ctx context.Context, params APISearch
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5719,12 +6080,13 @@ func (c *Client) sendAPIServicePurchasePost(ctx context.Context, request *Purcha
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIServicePurchasePost",
@@ -5736,17 +6098,19 @@ func (c *Client) sendAPIServicePurchasePost(ctx context.Context, request *Purcha
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/service/purchase"
+	var pathParts [1]string
+	pathParts[0] = "/api/service/purchase"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5787,12 +6151,13 @@ func (c *Client) sendAPITopupOptionsGet(ctx context.Context) (res []TopUpProduct
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APITopupOptionsGet",
@@ -5804,17 +6169,19 @@ func (c *Client) sendAPITopupOptionsGet(ctx context.Context) (res []TopUpProduct
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/topup/options"
+	var pathParts [1]string
+	pathParts[0] = "/api/topup/options"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5852,12 +6219,13 @@ func (c *Client) sendAPITopupPaypalProductSlugPost(ctx context.Context, request 
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APITopupPaypalProductSlugPost",
@@ -5869,14 +6237,15 @@ func (c *Client) sendAPITopupPaypalProductSlugPost(ctx context.Context, request 
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/topup/paypal/"
+	var pathParts [2]string
+	pathParts[0] = "/api/topup/paypal/"
 	{
 		// Encode "productSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -5889,11 +6258,16 @@ func (c *Client) sendAPITopupPaypalProductSlugPost(ctx context.Context, request 
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -5934,12 +6308,13 @@ func (c *Client) sendAPITopupStripeProductSlugPost(ctx context.Context, request 
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APITopupStripeProductSlugPost",
@@ -5951,14 +6326,15 @@ func (c *Client) sendAPITopupStripeProductSlugPost(ctx context.Context, request 
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/topup/stripe/"
+	var pathParts [2]string
+	pathParts[0] = "/api/topup/stripe/"
 	{
 		// Encode "productSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -5971,11 +6347,16 @@ func (c *Client) sendAPITopupStripeProductSlugPost(ctx context.Context, request 
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -6016,12 +6397,13 @@ func (c *Client) sendAPIUserPrivacyGet(ctx context.Context) (res *PrivacySetting
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIUserPrivacyGet",
@@ -6033,17 +6415,19 @@ func (c *Client) sendAPIUserPrivacyGet(ctx context.Context) (res *PrivacySetting
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/user/privacy"
+	var pathParts [1]string
+	pathParts[0] = "/api/user/privacy"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -6090,12 +6474,13 @@ func (c *Client) sendAPIUserPrivacyPost(ctx context.Context, request *PrivacySet
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "APIUserPrivacyPost",
@@ -6107,17 +6492,19 @@ func (c *Client) sendAPIUserPrivacyPost(ctx context.Context, request *PrivacySet
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/api/user/privacy"
+	var pathParts [1]string
+	pathParts[0] = "/api/user/privacy"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}

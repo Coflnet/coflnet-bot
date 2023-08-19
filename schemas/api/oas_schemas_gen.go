@@ -21,6 +21,9 @@ type APIAuctionAuctionUuidUIDGetOKTextJSON struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s APIAuctionAuctionUuidUIDGetOKTextJSON) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
 	return s.Data.Read(p)
 }
 
@@ -34,6 +37,9 @@ type APIAuctionAuctionUuidUIDGetOKTextPlain struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s APIAuctionAuctionUuidUIDGetOKTextPlain) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
 	return s.Data.Read(p)
 }
 
@@ -63,6 +69,9 @@ type APIBazaarItemHistoryItemTagStatusGetOKTextJSON struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s APIBazaarItemHistoryItemTagStatusGetOKTextJSON) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
 	return s.Data.Read(p)
 }
 
@@ -76,6 +85,9 @@ type APIBazaarItemHistoryItemTagStatusGetOKTextPlain struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s APIBazaarItemHistoryItemTagStatusGetOKTextPlain) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
 	return s.Data.Read(p)
 }
 
@@ -97,6 +109,9 @@ type APIDataProxyPostOKTextJSON struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s APIDataProxyPostOKTextJSON) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
 	return s.Data.Read(p)
 }
 
@@ -110,6 +125,9 @@ type APIDataProxyPostOKTextPlain struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s APIDataProxyPostOKTextPlain) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
 	return s.Data.Read(p)
 }
 
@@ -133,27 +151,26 @@ type APIItemPriceItemTagHistoryWeekGetQuery struct{}
 
 type APIItemsNamesPostOKApplicationJSON struct{}
 
-type APIModDescriptionModificationsPostApplicationJSONBadRequest ErrorResponse
+type APIModDescriptionModificationsPostBadRequest ErrorResponse
 
-func (*APIModDescriptionModificationsPostApplicationJSONBadRequest) aPIModDescriptionModificationsPostRes() {
-}
+func (*APIModDescriptionModificationsPostBadRequest) aPIModDescriptionModificationsPostRes() {}
 
-type APIModDescriptionModificationsPostApplicationJSONInternalServerError ErrorResponse
+type APIModDescriptionModificationsPostInternalServerError ErrorResponse
 
-func (*APIModDescriptionModificationsPostApplicationJSONInternalServerError) aPIModDescriptionModificationsPostRes() {
+func (*APIModDescriptionModificationsPostInternalServerError) aPIModDescriptionModificationsPostRes() {
 }
 
 type APIModDescriptionModificationsPostOKApplicationJSON [][]DescModification
 
 func (*APIModDescriptionModificationsPostOKApplicationJSON) aPIModDescriptionModificationsPostRes() {}
 
-type APIModDescriptionPostApplicationJSONBadRequest ErrorResponse
+type APIModDescriptionPostBadRequest ErrorResponse
 
-func (*APIModDescriptionPostApplicationJSONBadRequest) aPIModDescriptionPostRes() {}
+func (*APIModDescriptionPostBadRequest) aPIModDescriptionPostRes() {}
 
-type APIModDescriptionPostApplicationJSONInternalServerError ErrorResponse
+type APIModDescriptionPostInternalServerError ErrorResponse
 
-func (*APIModDescriptionPostApplicationJSONInternalServerError) aPIModDescriptionPostRes() {}
+func (*APIModDescriptionPostInternalServerError) aPIModDescriptionPostRes() {}
 
 type APIModDescriptionPostOKApplicationJSON [][]string
 
@@ -171,6 +188,9 @@ type APIModItemUUIDGetOKTextJSON struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s APIModItemUUIDGetOKTextJSON) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
 	return s.Data.Read(p)
 }
 
@@ -184,6 +204,9 @@ type APIModItemUUIDGetOKTextPlain struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s APIModItemUUIDGetOKTextPlain) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
 	return s.Data.Read(p)
 }
 
@@ -205,6 +228,9 @@ type APIPlayerPlayerUuidNameGetOKTextJSON struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s APIPlayerPlayerUuidNameGetOKTextJSON) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
 	return s.Data.Read(p)
 }
 
@@ -218,6 +244,9 @@ type APIPlayerPlayerUuidNameGetOKTextPlain struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s APIPlayerPlayerUuidNameGetOKTextPlain) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
 	return s.Data.Read(p)
 }
 
@@ -235,6 +264,9 @@ type APIPlayerPlayerUuidNamePostOKTextJSON struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s APIPlayerPlayerUuidNamePostOKTextJSON) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
 	return s.Data.Read(p)
 }
 
@@ -248,6 +280,9 @@ type APIPlayerPlayerUuidNamePostOKTextPlain struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s APIPlayerPlayerUuidNamePostOKTextPlain) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
 	return s.Data.Read(p)
 }
 
@@ -4070,6 +4105,13 @@ func (o *NilString) SetTo(v string) {
 // IsSet returns true if value is Null.
 func (o NilString) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *NilString) SetToNull() {
+	o.Null = true
+	var v string
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o NilString) Get() (v string, ok bool) {
 	if o.Null {
@@ -5239,6 +5281,14 @@ func (o *OptNilBuyOrderArray) SetTo(v []BuyOrder) {
 // IsSet returns true if value is Null.
 func (o OptNilBuyOrderArray) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilBuyOrderArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []BuyOrder
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilBuyOrderArray) Get() (v []BuyOrder, ok bool) {
 	if o.Null {
@@ -5293,6 +5343,14 @@ func (o *OptNilColorEnchantArray) SetTo(v []ColorEnchant) {
 
 // IsSet returns true if value is Null.
 func (o OptNilColorEnchantArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilColorEnchantArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []ColorEnchant
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilColorEnchantArray) Get() (v []ColorEnchant, ok bool) {
@@ -5349,6 +5407,14 @@ func (o *OptNilColorSaveAuctionFlatNbt) SetTo(v ColorSaveAuctionFlatNbt) {
 // IsSet returns true if value is Null.
 func (o OptNilColorSaveAuctionFlatNbt) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilColorSaveAuctionFlatNbt) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v ColorSaveAuctionFlatNbt
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilColorSaveAuctionFlatNbt) Get() (v ColorSaveAuctionFlatNbt, ok bool) {
 	if o.Null {
@@ -5403,6 +5469,14 @@ func (o *OptNilDescriptionFieldArrayArray) SetTo(v [][]DescriptionField) {
 
 // IsSet returns true if value is Null.
 func (o OptNilDescriptionFieldArrayArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilDescriptionFieldArrayArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v [][]DescriptionField
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilDescriptionFieldArrayArray) Get() (v [][]DescriptionField, ok bool) {
@@ -5459,6 +5533,14 @@ func (o *OptNilEnchantmentArray) SetTo(v []Enchantment) {
 // IsSet returns true if value is Null.
 func (o OptNilEnchantmentArray) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilEnchantmentArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []Enchantment
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilEnchantmentArray) Get() (v []Enchantment, ok bool) {
 	if o.Null {
@@ -5513,6 +5595,14 @@ func (o *OptNilFlipDetailsArray) SetTo(v []FlipDetails) {
 
 // IsSet returns true if value is Null.
 func (o OptNilFlipDetailsArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilFlipDetailsArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []FlipDetails
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilFlipDetailsArray) Get() (v []FlipDetails, ok bool) {
@@ -5569,6 +5659,14 @@ func (o *OptNilIngredientArray) SetTo(v []Ingredient) {
 // IsSet returns true if value is Null.
 func (o OptNilIngredientArray) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilIngredientArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []Ingredient
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilIngredientArray) Get() (v []Ingredient, ok bool) {
 	if o.Null {
@@ -5623,6 +5721,14 @@ func (o *OptNilListEntryArray) SetTo(v []ListEntry) {
 
 // IsSet returns true if value is Null.
 func (o OptNilListEntryArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilListEntryArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []ListEntry
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilListEntryArray) Get() (v []ListEntry, ok bool) {
@@ -5679,6 +5785,14 @@ func (o *OptNilModelCandidateArray) SetTo(v []ModelCandidate) {
 // IsSet returns true if value is Null.
 func (o OptNilModelCandidateArray) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilModelCandidateArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []ModelCandidate
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilModelCandidateArray) Get() (v []ModelCandidate, ok bool) {
 	if o.Null {
@@ -5733,6 +5847,14 @@ func (o *OptNilModelPerkArray) SetTo(v []ModelPerk) {
 
 // IsSet returns true if value is Null.
 func (o OptNilModelPerkArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilModelPerkArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []ModelPerk
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilModelPerkArray) Get() (v []ModelPerk, ok bool) {
@@ -5789,6 +5911,14 @@ func (o *OptNilPropertyChangeArray) SetTo(v []PropertyChange) {
 // IsSet returns true if value is Null.
 func (o OptNilPropertyChangeArray) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilPropertyChangeArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []PropertyChange
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilPropertyChangeArray) Get() (v []PropertyChange, ok bool) {
 	if o.Null {
@@ -5843,6 +5973,14 @@ func (o *OptNilSaveBidsArray) SetTo(v []SaveBids) {
 
 // IsSet returns true if value is Null.
 func (o OptNilSaveBidsArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilSaveBidsArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []SaveBids
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilSaveBidsArray) Get() (v []SaveBids, ok bool) {
@@ -5899,6 +6037,14 @@ func (o *OptNilSellOrderArray) SetTo(v []SellOrder) {
 // IsSet returns true if value is Null.
 func (o OptNilSellOrderArray) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilSellOrderArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []SellOrder
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilSellOrderArray) Get() (v []SellOrder, ok bool) {
 	if o.Null {
@@ -5953,6 +6099,14 @@ func (o *OptNilString) SetTo(v string) {
 
 // IsSet returns true if value is Null.
 func (o OptNilString) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilString) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v string
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilString) Get() (v string, ok bool) {
@@ -6009,6 +6163,14 @@ func (o *OptNilStringArray) SetTo(v []string) {
 // IsSet returns true if value is Null.
 func (o OptNilStringArray) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilStringArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []string
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilStringArray) Get() (v []string, ok bool) {
 	if o.Null {
@@ -6063,6 +6225,14 @@ func (o *OptNilUUIDArray) SetTo(v []UUID) {
 
 // IsSet returns true if value is Null.
 func (o OptNilUUIDArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilUUIDArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []UUID
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilUUIDArray) Get() (v []UUID, ok bool) {

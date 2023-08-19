@@ -17,7 +17,7 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func decodeAPIAuctionAuctionUuidGetResponse(resp *http.Response) (res *ColorSaveAuction, err error) {
+func decodeAPIAuctionAuctionUuidGetResponse(resp *http.Response) (res *ColorSaveAuction, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -58,7 +58,7 @@ func decodeAPIAuctionAuctionUuidGetResponse(resp *http.Response) (res *ColorSave
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIAuctionAuctionUuidUIDGetResponse(resp *http.Response) (res APIAuctionAuctionUuidUIDGetRes, err error) {
+func decodeAPIAuctionAuctionUuidUIDGetResponse(resp *http.Response) (res APIAuctionAuctionUuidUIDGetRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -117,7 +117,7 @@ func decodeAPIAuctionAuctionUuidUIDGetResponse(resp *http.Response) (res APIAuct
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIAuctionsActiveUUIDPostResponse(resp *http.Response) (res []string, err error) {
+func decodeAPIAuctionsActiveUUIDPostResponse(resp *http.Response) (res []string, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -168,7 +168,7 @@ func decodeAPIAuctionsActiveUUIDPostResponse(resp *http.Response) (res []string,
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIAuctionsBatchGetResponse(resp *http.Response) (res *APIAuctionsBatchGetOK, err error) {
+func decodeAPIAuctionsBatchGetResponse(resp *http.Response) (res *APIAuctionsBatchGetOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -177,7 +177,7 @@ func decodeAPIAuctionsBatchGetResponse(resp *http.Response) (res *APIAuctionsBat
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIAuctionsSupplyLowGetResponse(resp *http.Response) (res []SupplyElement, err error) {
+func decodeAPIAuctionsSupplyLowGetResponse(resp *http.Response) (res []SupplyElement, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -226,7 +226,7 @@ func decodeAPIAuctionsSupplyLowGetResponse(resp *http.Response) (res []SupplyEle
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIAuctionsTagItemTagActiveBinGetResponse(resp *http.Response) (res []SaveAuction, err error) {
+func decodeAPIAuctionsTagItemTagActiveBinGetResponse(resp *http.Response) (res []SaveAuction, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -275,7 +275,7 @@ func decodeAPIAuctionsTagItemTagActiveBinGetResponse(resp *http.Response) (res [
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIAuctionsTagItemTagActiveOverviewGetResponse(resp *http.Response) (res []AuctionPreview, err error) {
+func decodeAPIAuctionsTagItemTagActiveOverviewGetResponse(resp *http.Response) (res []AuctionPreview, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -324,7 +324,7 @@ func decodeAPIAuctionsTagItemTagActiveOverviewGetResponse(resp *http.Response) (
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIAuctionsTagItemTagRecentOverviewGetResponse(resp *http.Response) (res []AuctionPreview, err error) {
+func decodeAPIAuctionsTagItemTagRecentOverviewGetResponse(resp *http.Response) (res []AuctionPreview, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -373,7 +373,7 @@ func decodeAPIAuctionsTagItemTagRecentOverviewGetResponse(resp *http.Response) (
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIAuctionsTagItemTagSoldGetResponse(resp *http.Response) (res []SaveAuction, err error) {
+func decodeAPIAuctionsTagItemTagSoldGetResponse(resp *http.Response) (res []SaveAuction, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -422,7 +422,7 @@ func decodeAPIAuctionsTagItemTagSoldGetResponse(resp *http.Response) (res []Save
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIAuctionsUIDUIDSoldGetResponse(resp *http.Response) (res []ItemSell, err error) {
+func decodeAPIAuctionsUIDUIDSoldGetResponse(resp *http.Response) (res []ItemSell, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -471,7 +471,7 @@ func decodeAPIAuctionsUIDUIDSoldGetResponse(resp *http.Response) (res []ItemSell
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIAuctionsUidsSoldPostResponse(resp *http.Response) (res *APIAuctionsUidsSoldPostOKApplicationJSON, err error) {
+func decodeAPIAuctionsUidsSoldPostResponse(resp *http.Response) (res *APIAuctionsUidsSoldPostOKApplicationJSON, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -512,7 +512,7 @@ func decodeAPIAuctionsUidsSoldPostResponse(resp *http.Response) (res *APIAuction
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIBazaarItemHistoryItemTagStatusGetResponse(resp *http.Response) (res APIBazaarItemHistoryItemTagStatusGetRes, err error) {
+func decodeAPIBazaarItemHistoryItemTagStatusGetResponse(resp *http.Response) (res APIBazaarItemHistoryItemTagStatusGetRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -571,7 +571,7 @@ func decodeAPIBazaarItemHistoryItemTagStatusGetResponse(resp *http.Response) (re
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIBazaarItemTagHistoryDayGetResponse(resp *http.Response) (res []GraphResult, err error) {
+func decodeAPIBazaarItemTagHistoryDayGetResponse(resp *http.Response) (res []GraphResult, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -620,7 +620,7 @@ func decodeAPIBazaarItemTagHistoryDayGetResponse(resp *http.Response) (res []Gra
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIBazaarItemTagHistoryGetResponse(resp *http.Response) (res []GraphResult, err error) {
+func decodeAPIBazaarItemTagHistoryGetResponse(resp *http.Response) (res []GraphResult, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -669,7 +669,7 @@ func decodeAPIBazaarItemTagHistoryGetResponse(resp *http.Response) (res []GraphR
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIBazaarItemTagHistoryHourGetResponse(resp *http.Response) (res []GraphResult, err error) {
+func decodeAPIBazaarItemTagHistoryHourGetResponse(resp *http.Response) (res []GraphResult, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -718,7 +718,7 @@ func decodeAPIBazaarItemTagHistoryHourGetResponse(resp *http.Response) (res []Gr
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIBazaarItemTagHistoryWeekGetResponse(resp *http.Response) (res []GraphResult, err error) {
+func decodeAPIBazaarItemTagHistoryWeekGetResponse(resp *http.Response) (res []GraphResult, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -767,7 +767,7 @@ func decodeAPIBazaarItemTagHistoryWeekGetResponse(resp *http.Response) (res []Gr
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIBazaarItemTagSnapshotGetResponse(resp *http.Response) (res *StorageQuickStatus, err error) {
+func decodeAPIBazaarItemTagSnapshotGetResponse(resp *http.Response) (res *StorageQuickStatus, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -808,7 +808,7 @@ func decodeAPIBazaarItemTagSnapshotGetResponse(resp *http.Response) (res *Storag
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPICraftAPICraftGetResponse(resp *http.Response) (res *APICraftAPICraftGetOKApplicationJSON, err error) {
+func decodeAPICraftAPICraftGetResponse(resp *http.Response) (res *APICraftAPICraftGetOKApplicationJSON, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -849,7 +849,7 @@ func decodeAPICraftAPICraftGetResponse(resp *http.Response) (res *APICraftAPICra
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPICraftProfitGetResponse(resp *http.Response) (res []ProfitableCraft, err error) {
+func decodeAPICraftProfitGetResponse(resp *http.Response) (res []ProfitableCraft, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -898,7 +898,7 @@ func decodeAPICraftProfitGetResponse(resp *http.Response) (res []ProfitableCraft
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPICraftRecipeItemTagGetResponse(resp *http.Response) (res *APICraftRecipeItemTagGetOKApplicationJSON, err error) {
+func decodeAPICraftRecipeItemTagGetResponse(resp *http.Response) (res *APICraftRecipeItemTagGetOKApplicationJSON, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -939,7 +939,7 @@ func decodeAPICraftRecipeItemTagGetResponse(resp *http.Response) (res *APICraftR
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIDataPlayerNamePostResponse(resp *http.Response) (res *Int32Int64ValueTuple, err error) {
+func decodeAPIDataPlayerNamePostResponse(resp *http.Response) (res *Int32Int64ValueTuple, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -980,7 +980,7 @@ func decodeAPIDataPlayerNamePostResponse(resp *http.Response) (res *Int32Int64Va
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIDataPlayerNamesPostResponse(resp *http.Response) (res []Int32Int64ValueTuple, err error) {
+func decodeAPIDataPlayerNamesPostResponse(resp *http.Response) (res []Int32Int64ValueTuple, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1029,7 +1029,7 @@ func decodeAPIDataPlayerNamesPostResponse(resp *http.Response) (res []Int32Int64
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIDataProxyPostResponse(resp *http.Response) (res APIDataProxyPostRes, err error) {
+func decodeAPIDataProxyPostResponse(resp *http.Response) (res APIDataProxyPostRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1088,7 +1088,7 @@ func decodeAPIDataProxyPostResponse(resp *http.Response) (res APIDataProxyPostRe
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIFilterOptionsGetResponse(resp *http.Response) (res []FilterOptions, err error) {
+func decodeAPIFilterOptionsGetResponse(resp *http.Response) (res []FilterOptions, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1137,7 +1137,7 @@ func decodeAPIFilterOptionsGetResponse(resp *http.Response) (res []FilterOptions
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIFilterPostResponse(resp *http.Response) (res bool, err error) {
+func decodeAPIFilterPostResponse(resp *http.Response) (res bool, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1180,7 +1180,7 @@ func decodeAPIFilterPostResponse(resp *http.Response) (res bool, err error) {
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIFlipSettingsOptionsGetResponse(resp *http.Response) (res *FlipSettings, err error) {
+func decodeAPIFlipSettingsOptionsGetResponse(resp *http.Response) (res *FlipSettings, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1221,7 +1221,7 @@ func decodeAPIFlipSettingsOptionsGetResponse(resp *http.Response) (res *FlipSett
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIFlipStatsFinderFinderNameGetResponse(resp *http.Response) (res []FlipDetails, err error) {
+func decodeAPIFlipStatsFinderFinderNameGetResponse(resp *http.Response) (res []FlipDetails, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1270,7 +1270,7 @@ func decodeAPIFlipStatsFinderFinderNameGetResponse(resp *http.Response) (res []F
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIFlipStatsPlayerPlayerUuidGetResponse(resp *http.Response) (res *FlipSumary, err error) {
+func decodeAPIFlipStatsPlayerPlayerUuidGetResponse(resp *http.Response) (res *FlipSumary, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1311,7 +1311,7 @@ func decodeAPIFlipStatsPlayerPlayerUuidGetResponse(resp *http.Response) (res *Fl
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIFlipStatsPlayerPlayerUuidHourGetResponse(resp *http.Response) (res *FlipSumary, err error) {
+func decodeAPIFlipStatsPlayerPlayerUuidHourGetResponse(resp *http.Response) (res *FlipSumary, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1352,7 +1352,7 @@ func decodeAPIFlipStatsPlayerPlayerUuidHourGetResponse(resp *http.Response) (res
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIFlipTrackFoundAuctionIdPostResponse(resp *http.Response) (res *APIFlipTrackFoundAuctionIdPostOK, err error) {
+func decodeAPIFlipTrackFoundAuctionIdPostResponse(resp *http.Response) (res *APIFlipTrackFoundAuctionIdPostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1361,7 +1361,7 @@ func decodeAPIFlipTrackFoundAuctionIdPostResponse(resp *http.Response) (res *API
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIFlipTrackPurchaseAuctionIdPostResponse(resp *http.Response) (res *APIFlipTrackPurchaseAuctionIdPostOK, err error) {
+func decodeAPIFlipTrackPurchaseAuctionIdPostResponse(resp *http.Response) (res *APIFlipTrackPurchaseAuctionIdPostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1370,7 +1370,7 @@ func decodeAPIFlipTrackPurchaseAuctionIdPostResponse(resp *http.Response) (res *
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIFlipUpdateWhenGetResponse(resp *http.Response) (res time.Time, err error) {
+func decodeAPIFlipUpdateWhenGetResponse(resp *http.Response) (res time.Time, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1413,7 +1413,7 @@ func decodeAPIFlipUpdateWhenGetResponse(resp *http.Response) (res time.Time, err
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemItemTagDetailsGetResponse(resp *http.Response) (res *SkyblockItem, err error) {
+func decodeAPIItemItemTagDetailsGetResponse(resp *http.Response) (res *SkyblockItem, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1454,7 +1454,7 @@ func decodeAPIItemItemTagDetailsGetResponse(resp *http.Response) (res *SkyblockI
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemItemTagSimilarGetResponse(resp *http.Response) (res []ItemPreview, err error) {
+func decodeAPIItemItemTagSimilarGetResponse(resp *http.Response) (res []ItemPreview, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1503,7 +1503,7 @@ func decodeAPIItemItemTagSimilarGetResponse(resp *http.Response) (res []ItemPrev
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemPriceItemTagBinGetResponse(resp *http.Response) (res *BinResponse, err error) {
+func decodeAPIItemPriceItemTagBinGetResponse(resp *http.Response) (res *BinResponse, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1544,7 +1544,7 @@ func decodeAPIItemPriceItemTagBinGetResponse(resp *http.Response) (res *BinRespo
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemPriceItemTagCurrentGetResponse(resp *http.Response) (res *CurrentPrice, err error) {
+func decodeAPIItemPriceItemTagCurrentGetResponse(resp *http.Response) (res *CurrentPrice, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1585,7 +1585,7 @@ func decodeAPIItemPriceItemTagCurrentGetResponse(resp *http.Response) (res *Curr
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemPriceItemTagGetResponse(resp *http.Response) (res *PriceSumary, err error) {
+func decodeAPIItemPriceItemTagGetResponse(resp *http.Response) (res *PriceSumary, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1626,7 +1626,7 @@ func decodeAPIItemPriceItemTagGetResponse(resp *http.Response) (res *PriceSumary
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemPriceItemTagHistoryDayGetResponse(resp *http.Response) (res []AveragePrice, err error) {
+func decodeAPIItemPriceItemTagHistoryDayGetResponse(resp *http.Response) (res []AveragePrice, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1675,7 +1675,7 @@ func decodeAPIItemPriceItemTagHistoryDayGetResponse(resp *http.Response) (res []
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemPriceItemTagHistoryFullGetResponse(resp *http.Response) (res []AveragePrice, err error) {
+func decodeAPIItemPriceItemTagHistoryFullGetResponse(resp *http.Response) (res []AveragePrice, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1724,7 +1724,7 @@ func decodeAPIItemPriceItemTagHistoryFullGetResponse(resp *http.Response) (res [
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemPriceItemTagHistoryMonthGetResponse(resp *http.Response) (res []AveragePrice, err error) {
+func decodeAPIItemPriceItemTagHistoryMonthGetResponse(resp *http.Response) (res []AveragePrice, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1773,7 +1773,7 @@ func decodeAPIItemPriceItemTagHistoryMonthGetResponse(resp *http.Response) (res 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemPriceItemTagHistoryWeekGetResponse(resp *http.Response) (res []AveragePrice, err error) {
+func decodeAPIItemPriceItemTagHistoryWeekGetResponse(resp *http.Response) (res []AveragePrice, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1822,7 +1822,7 @@ func decodeAPIItemPriceItemTagHistoryWeekGetResponse(resp *http.Response) (res [
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemSearchSearchValGetResponse(resp *http.Response) (res []SearchResultItem, err error) {
+func decodeAPIItemSearchSearchValGetResponse(resp *http.Response) (res []SearchResultItem, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1871,7 +1871,7 @@ func decodeAPIItemSearchSearchValGetResponse(resp *http.Response) (res []SearchR
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemsBazaarTagsGetResponse(resp *http.Response) (res []string, err error) {
+func decodeAPIItemsBazaarTagsGetResponse(resp *http.Response) (res []string, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1922,7 +1922,7 @@ func decodeAPIItemsBazaarTagsGetResponse(resp *http.Response) (res []string, err
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemsGetResponse(resp *http.Response) (res []ItemMetadataElement, err error) {
+func decodeAPIItemsGetResponse(resp *http.Response) (res []ItemMetadataElement, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1971,7 +1971,7 @@ func decodeAPIItemsGetResponse(resp *http.Response) (res []ItemMetadataElement, 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIItemsNamesPostResponse(resp *http.Response) (res *APIItemsNamesPostOKApplicationJSON, err error) {
+func decodeAPIItemsNamesPostResponse(resp *http.Response) (res *APIItemsNamesPostOKApplicationJSON, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2012,7 +2012,7 @@ func decodeAPIItemsNamesPostResponse(resp *http.Response) (res *APIItemsNamesPos
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIKatDataGetResponse(resp *http.Response) (res []KatUpgradeCost, err error) {
+func decodeAPIKatDataGetResponse(resp *http.Response) (res []KatUpgradeCost, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2061,7 +2061,7 @@ func decodeAPIKatDataGetResponse(resp *http.Response) (res []KatUpgradeCost, err
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIKatProfitGetResponse(resp *http.Response) (res []KatFlip, err error) {
+func decodeAPIKatProfitGetResponse(resp *http.Response) (res []KatFlip, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2110,7 +2110,7 @@ func decodeAPIKatProfitGetResponse(resp *http.Response) (res []KatFlip, err erro
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIMayorGetResponse(resp *http.Response) (res []ModelElectionPeriod, err error) {
+func decodeAPIMayorGetResponse(resp *http.Response) (res []ModelElectionPeriod, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2159,7 +2159,7 @@ func decodeAPIMayorGetResponse(resp *http.Response) (res []ModelElectionPeriod, 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIMayorYearGetResponse(resp *http.Response) (res *ModelElectionPeriod, err error) {
+func decodeAPIMayorYearGetResponse(resp *http.Response) (res *ModelElectionPeriod, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2200,7 +2200,7 @@ func decodeAPIMayorYearGetResponse(resp *http.Response) (res *ModelElectionPerio
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIModCommandsGetResponse(resp *http.Response) (res []CommandListEntry, err error) {
+func decodeAPIModCommandsGetResponse(resp *http.Response) (res []CommandListEntry, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2249,7 +2249,7 @@ func decodeAPIModCommandsGetResponse(resp *http.Response) (res []CommandListEntr
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIModDescriptionModificationsPostResponse(resp *http.Response) (res APIModDescriptionModificationsPostRes, err error) {
+func decodeAPIModDescriptionModificationsPostResponse(resp *http.Response) (res APIModDescriptionModificationsPostRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2300,7 +2300,7 @@ func decodeAPIModDescriptionModificationsPostResponse(resp *http.Response) (res 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response APIModDescriptionModificationsPostApplicationJSONBadRequest
+			var response APIModDescriptionModificationsPostBadRequest
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -2335,7 +2335,7 @@ func decodeAPIModDescriptionModificationsPostResponse(resp *http.Response) (res 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response APIModDescriptionModificationsPostApplicationJSONInternalServerError
+			var response APIModDescriptionModificationsPostInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -2360,7 +2360,7 @@ func decodeAPIModDescriptionModificationsPostResponse(resp *http.Response) (res 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIModDescriptionPostResponse(resp *http.Response) (res APIModDescriptionPostRes, err error) {
+func decodeAPIModDescriptionPostResponse(resp *http.Response) (res APIModDescriptionPostRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2411,7 +2411,7 @@ func decodeAPIModDescriptionPostResponse(resp *http.Response) (res APIModDescrip
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response APIModDescriptionPostApplicationJSONBadRequest
+			var response APIModDescriptionPostBadRequest
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -2446,7 +2446,7 @@ func decodeAPIModDescriptionPostResponse(resp *http.Response) (res APIModDescrip
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response APIModDescriptionPostApplicationJSONInternalServerError
+			var response APIModDescriptionPostInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -2471,7 +2471,7 @@ func decodeAPIModDescriptionPostResponse(resp *http.Response) (res APIModDescrip
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIModItemUUIDGetResponse(resp *http.Response) (res APIModItemUUIDGetRes, err error) {
+func decodeAPIModItemUUIDGetResponse(resp *http.Response) (res APIModItemUUIDGetRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2530,7 +2530,7 @@ func decodeAPIModItemUUIDGetResponse(resp *http.Response) (res APIModItemUUIDGet
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIPlayerPlayerUuidAuctionsGetResponse(resp *http.Response) (res []AuctionResult, err error) {
+func decodeAPIPlayerPlayerUuidAuctionsGetResponse(resp *http.Response) (res []AuctionResult, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2579,7 +2579,7 @@ func decodeAPIPlayerPlayerUuidAuctionsGetResponse(resp *http.Response) (res []Au
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIPlayerPlayerUuidBidsGetResponse(resp *http.Response) (res []BidResult, err error) {
+func decodeAPIPlayerPlayerUuidBidsGetResponse(resp *http.Response) (res []BidResult, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2628,7 +2628,7 @@ func decodeAPIPlayerPlayerUuidBidsGetResponse(resp *http.Response) (res []BidRes
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIPlayerPlayerUuidNameGetResponse(resp *http.Response) (res APIPlayerPlayerUuidNameGetRes, err error) {
+func decodeAPIPlayerPlayerUuidNameGetResponse(resp *http.Response) (res APIPlayerPlayerUuidNameGetRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2687,7 +2687,7 @@ func decodeAPIPlayerPlayerUuidNameGetResponse(resp *http.Response) (res APIPlaye
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIPlayerPlayerUuidNamePostResponse(resp *http.Response) (res APIPlayerPlayerUuidNamePostRes, err error) {
+func decodeAPIPlayerPlayerUuidNamePostResponse(resp *http.Response) (res APIPlayerPlayerUuidNamePostRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2746,7 +2746,7 @@ func decodeAPIPlayerPlayerUuidNamePostResponse(resp *http.Response) (res APIPlay
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIPremiumPricesAdjustedPostResponse(resp *http.Response) (res *APIPremiumPricesAdjustedPostOK, err error) {
+func decodeAPIPremiumPricesAdjustedPostResponse(resp *http.Response) (res *APIPremiumPricesAdjustedPostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2755,7 +2755,7 @@ func decodeAPIPremiumPricesAdjustedPostResponse(resp *http.Response) (res *APIPr
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIPremiumUserOwnsPostResponse(resp *http.Response) (res *APIPremiumUserOwnsPostOKApplicationJSON, err error) {
+func decodeAPIPremiumUserOwnsPostResponse(resp *http.Response) (res *APIPremiumUserOwnsPostOKApplicationJSON, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2796,7 +2796,7 @@ func decodeAPIPremiumUserOwnsPostResponse(resp *http.Response) (res *APIPremiumU
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIPriceNbtPostResponse(resp *http.Response) (res []PriceEstimate, err error) {
+func decodeAPIPriceNbtPostResponse(resp *http.Response) (res []PriceEstimate, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2845,7 +2845,7 @@ func decodeAPIPriceNbtPostResponse(resp *http.Response) (res []PriceEstimate, er
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIReferralInfoGetResponse(resp *http.Response) (res *ReferralInfo, err error) {
+func decodeAPIReferralInfoGetResponse(resp *http.Response) (res *ReferralInfo, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2886,7 +2886,7 @@ func decodeAPIReferralInfoGetResponse(resp *http.Response) (res *ReferralInfo, e
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIReferralReferredByPostResponse(resp *http.Response) (res *APIReferralReferredByPostOK, err error) {
+func decodeAPIReferralReferredByPostResponse(resp *http.Response) (res *APIReferralReferredByPostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2895,7 +2895,7 @@ func decodeAPIReferralReferredByPostResponse(resp *http.Response) (res *APIRefer
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPISearchPlayerPlayerNameGetResponse(resp *http.Response) (res []PlayerResult, err error) {
+func decodeAPISearchPlayerPlayerNameGetResponse(resp *http.Response) (res []PlayerResult, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2944,7 +2944,7 @@ func decodeAPISearchPlayerPlayerNameGetResponse(resp *http.Response) (res []Play
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPISearchSearchValGetResponse(resp *http.Response) (res []SearchResultItem, err error) {
+func decodeAPISearchSearchValGetResponse(resp *http.Response) (res []SearchResultItem, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -2993,7 +2993,7 @@ func decodeAPISearchSearchValGetResponse(resp *http.Response) (res []SearchResul
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIServicePurchasePostResponse(resp *http.Response) (res *APIServicePurchasePostOK, err error) {
+func decodeAPIServicePurchasePostResponse(resp *http.Response) (res *APIServicePurchasePostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -3002,7 +3002,7 @@ func decodeAPIServicePurchasePostResponse(resp *http.Response) (res *APIServiceP
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPITopupOptionsGetResponse(resp *http.Response) (res []TopUpProduct, err error) {
+func decodeAPITopupOptionsGetResponse(resp *http.Response) (res []TopUpProduct, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -3051,7 +3051,7 @@ func decodeAPITopupOptionsGetResponse(resp *http.Response) (res []TopUpProduct, 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPITopupPaypalProductSlugPostResponse(resp *http.Response) (res *APITopupPaypalProductSlugPostOK, err error) {
+func decodeAPITopupPaypalProductSlugPostResponse(resp *http.Response) (res *APITopupPaypalProductSlugPostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -3060,7 +3060,7 @@ func decodeAPITopupPaypalProductSlugPostResponse(resp *http.Response) (res *APIT
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPITopupStripeProductSlugPostResponse(resp *http.Response) (res *APITopupStripeProductSlugPostOK, err error) {
+func decodeAPITopupStripeProductSlugPostResponse(resp *http.Response) (res *APITopupStripeProductSlugPostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -3069,7 +3069,7 @@ func decodeAPITopupStripeProductSlugPostResponse(resp *http.Response) (res *APIT
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIUserPrivacyGetResponse(resp *http.Response) (res *PrivacySettings, err error) {
+func decodeAPIUserPrivacyGetResponse(resp *http.Response) (res *PrivacySettings, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -3110,7 +3110,7 @@ func decodeAPIUserPrivacyGetResponse(resp *http.Response) (res *PrivacySettings,
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIUserPrivacyPostResponse(resp *http.Response) (res *APIUserPrivacyPostOK, err error) {
+func decodeAPIUserPrivacyPostResponse(resp *http.Response) (res *APIUserPrivacyPostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.

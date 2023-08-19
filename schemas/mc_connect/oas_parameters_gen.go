@@ -31,12 +31,16 @@ func unpackConnectMinecraftMcUuidGetParams(packed middleware.Parameters) (params
 	return params
 }
 
-func decodeConnectMinecraftMcUuidGetParams(args [1]string, r *http.Request) (params ConnectMinecraftMcUuidGetParams, _ error) {
+func decodeConnectMinecraftMcUuidGetParams(args [1]string, argsEscaped bool, r *http.Request) (params ConnectMinecraftMcUuidGetParams, _ error) {
 	// Decode path: mcUuid.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -92,12 +96,16 @@ func unpackConnectUserUserIdGetParams(packed middleware.Parameters) (params Conn
 	return params
 }
 
-func decodeConnectUserUserIdGetParams(args [1]string, r *http.Request) (params ConnectUserUserIdGetParams, _ error) {
+func decodeConnectUserUserIdGetParams(args [1]string, argsEscaped bool, r *http.Request) (params ConnectUserUserIdGetParams, _ error) {
 	// Decode path: userId.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -163,13 +171,17 @@ func unpackConnectUserUserIdPostParams(packed middleware.Parameters) (params Con
 	return params
 }
 
-func decodeConnectUserUserIdPostParams(args [1]string, r *http.Request) (params ConnectUserUserIdPostParams, _ error) {
+func decodeConnectUserUserIdPostParams(args [1]string, argsEscaped bool, r *http.Request) (params ConnectUserUserIdPostParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: userId.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -276,13 +288,17 @@ func unpackConnectUserUserIdVerifyPostParams(packed middleware.Parameters) (para
 	return params
 }
 
-func decodeConnectUserUserIdVerifyPostParams(args [1]string, r *http.Request) (params ConnectUserUserIdVerifyPostParams, _ error) {
+func decodeConnectUserUserIdVerifyPostParams(args [1]string, argsEscaped bool, r *http.Request) (params ConnectUserUserIdVerifyPostParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: userId.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -391,7 +407,7 @@ func unpackConnectUsersConnectedGetParams(packed middleware.Parameters) (params 
 	return params
 }
 
-func decodeConnectUsersConnectedGetParams(args [0]string, r *http.Request) (params ConnectUsersConnectedGetParams, _ error) {
+func decodeConnectUsersConnectedGetParams(args [0]string, argsEscaped bool, r *http.Request) (params ConnectUsersConnectedGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: amount.
 	{
@@ -516,7 +532,7 @@ func unpackConnectUsersGetParams(packed middleware.Parameters) (params ConnectUs
 	return params
 }
 
-func decodeConnectUsersGetParams(args [0]string, r *http.Request) (params ConnectUsersGetParams, _ error) {
+func decodeConnectUsersGetParams(args [0]string, argsEscaped bool, r *http.Request) (params ConnectUsersGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: amount.
 	{
@@ -631,7 +647,7 @@ func unpackConnectUsersIdsGetParams(packed middleware.Parameters) (params Connec
 	return params
 }
 
-func decodeConnectUsersIdsGetParams(args [0]string, r *http.Request) (params ConnectUsersIdsGetParams, _ error) {
+func decodeConnectUsersIdsGetParams(args [0]string, argsEscaped bool, r *http.Request) (params ConnectUsersIdsGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode query: externalIds.
 	if err := func() error {

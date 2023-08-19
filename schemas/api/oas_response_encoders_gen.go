@@ -853,7 +853,7 @@ func encodeAPIModDescriptionModificationsPostResponse(response APIModDescription
 		}
 		return nil
 
-	case *APIModDescriptionModificationsPostApplicationJSONBadRequest:
+	case *APIModDescriptionModificationsPostBadRequest:
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -865,7 +865,7 @@ func encodeAPIModDescriptionModificationsPostResponse(response APIModDescription
 		}
 		return nil
 
-	case *APIModDescriptionModificationsPostApplicationJSONInternalServerError:
+	case *APIModDescriptionModificationsPostInternalServerError:
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -896,7 +896,7 @@ func encodeAPIModDescriptionPostResponse(response APIModDescriptionPostRes, w ht
 		}
 		return nil
 
-	case *APIModDescriptionPostApplicationJSONBadRequest:
+	case *APIModDescriptionPostBadRequest:
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -908,7 +908,7 @@ func encodeAPIModDescriptionPostResponse(response APIModDescriptionPostRes, w ht
 		}
 		return nil
 
-	case *APIModDescriptionPostApplicationJSONInternalServerError:
+	case *APIModDescriptionPostInternalServerError:
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))

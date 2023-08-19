@@ -14,9 +14,11 @@ import (
 // calling handler that matches the path or returning not found error.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	elem := r.URL.Path
+	elemIsEscaped := false
 	if rawPath := r.URL.RawPath; rawPath != "" {
 		if normalized, ok := uri.NormalizeEscapedPath(rawPath); ok {
 			elem = normalized
+			elemIsEscaped = strings.ContainsRune(elem, '%')
 		}
 	}
 	if prefix := s.cfg.Prefix; len(prefix) > 0 {
@@ -64,7 +66,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					// Leaf node.
 					switch r.Method {
 					case "POST":
-						s.handleAPIFilterPostRequest([0]string{}, w, r)
+						s.handleAPIFilterPostRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "POST")
 					}
@@ -103,7 +105,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "GET":
 							s.handleAPIAuctionAuctionUuidGetRequest([1]string{
 								args[0],
-							}, w, r)
+							}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -124,7 +126,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleAPIAuctionAuctionUuidUIDGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -154,7 +156,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "POST":
-								s.handleAPIAuctionsActiveUUIDPostRequest([0]string{}, w, r)
+								s.handleAPIAuctionsActiveUUIDPostRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "POST")
 							}
@@ -172,7 +174,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleAPIAuctionsBatchGetRequest([0]string{}, w, r)
+								s.handleAPIAuctionsBatchGetRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -190,7 +192,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleAPIAuctionsSupplyLowGetRequest([0]string{}, w, r)
+								s.handleAPIAuctionsSupplyLowGetRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -252,7 +254,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "GET":
 											s.handleAPIAuctionsTagItemTagActiveBinGetRequest([1]string{
 												args[0],
-											}, w, r)
+											}, elemIsEscaped, w, r)
 										default:
 											s.notAllowed(w, r, "GET")
 										}
@@ -272,7 +274,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "GET":
 											s.handleAPIAuctionsTagItemTagActiveOverviewGetRequest([1]string{
 												args[0],
-											}, w, r)
+											}, elemIsEscaped, w, r)
 										default:
 											s.notAllowed(w, r, "GET")
 										}
@@ -293,7 +295,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "GET":
 										s.handleAPIAuctionsTagItemTagRecentOverviewGetRequest([1]string{
 											args[0],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "GET")
 									}
@@ -313,7 +315,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "GET":
 										s.handleAPIAuctionsTagItemTagSoldGetRequest([1]string{
 											args[0],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "GET")
 									}
@@ -366,7 +368,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "GET":
 										s.handleAPIAuctionsUIDUIDSoldGetRequest([1]string{
 											args[0],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "GET")
 									}
@@ -385,7 +387,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "POST":
-									s.handleAPIAuctionsUidsSoldPostRequest([0]string{}, w, r)
+									s.handleAPIAuctionsUidsSoldPostRequest([0]string{}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "POST")
 								}
@@ -439,7 +441,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleAPIBazaarItemHistoryItemTagStatusGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -484,7 +486,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleAPIBazaarItemTagHistoryGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -516,7 +518,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "GET":
 										s.handleAPIBazaarItemTagHistoryDayGetRequest([1]string{
 											args[0],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "GET")
 									}
@@ -536,7 +538,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "GET":
 										s.handleAPIBazaarItemTagHistoryHourGetRequest([1]string{
 											args[0],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "GET")
 									}
@@ -556,7 +558,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "GET":
 										s.handleAPIBazaarItemTagHistoryWeekGetRequest([1]string{
 											args[0],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "GET")
 									}
@@ -578,7 +580,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleAPIBazaarItemTagSnapshotGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -609,7 +611,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleAPICraftAPICraftGetRequest([0]string{}, w, r)
+							s.handleAPICraftAPICraftGetRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -627,7 +629,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleAPICraftProfitGetRequest([0]string{}, w, r)
+							s.handleAPICraftProfitGetRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -652,7 +654,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "GET":
 							s.handleAPICraftRecipeItemTagGetRequest([1]string{
 								args[0],
-							}, w, r)
+							}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -681,7 +683,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					if len(elem) == 0 {
 						switch r.Method {
 						case "POST":
-							s.handleAPIDataPlayerNamePostRequest([0]string{}, w, r)
+							s.handleAPIDataPlayerNamePostRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "POST")
 						}
@@ -700,7 +702,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "POST":
-								s.handleAPIDataPlayerNamesPostRequest([0]string{}, w, r)
+								s.handleAPIDataPlayerNamesPostRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "POST")
 							}
@@ -719,7 +721,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "POST":
-							s.handleAPIDataProxyPostRequest([0]string{}, w, r)
+							s.handleAPIDataProxyPostRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "POST")
 						}
@@ -749,7 +751,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleAPIFilterOptionsGetRequest([0]string{}, w, r)
+							s.handleAPIFilterOptionsGetRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -789,7 +791,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "GET":
-									s.handleAPIFlipSettingsOptionsGetRequest([0]string{}, w, r)
+									s.handleAPIFlipSettingsOptionsGetRequest([0]string{}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "GET")
 								}
@@ -825,7 +827,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "GET":
 										s.handleAPIFlipStatsFinderFinderNameGetRequest([1]string{
 											args[0],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "GET")
 									}
@@ -853,7 +855,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "GET":
 										s.handleAPIFlipStatsPlayerPlayerUuidGetRequest([1]string{
 											args[0],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "GET")
 									}
@@ -874,7 +876,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "GET":
 											s.handleAPIFlipStatsPlayerPlayerUuidHourGetRequest([1]string{
 												args[0],
-											}, w, r)
+											}, elemIsEscaped, w, r)
 										default:
 											s.notAllowed(w, r, "GET")
 										}
@@ -913,7 +915,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "POST":
 									s.handleAPIFlipTrackFoundAuctionIdPostRequest([1]string{
 										args[0],
-									}, w, r)
+									}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "POST")
 								}
@@ -938,7 +940,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "POST":
 									s.handleAPIFlipTrackPurchaseAuctionIdPostRequest([1]string{
 										args[0],
-									}, w, r)
+									}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "POST")
 								}
@@ -957,7 +959,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleAPIFlipUpdateWhenGetRequest([0]string{}, w, r)
+								s.handleAPIFlipUpdateWhenGetRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -1009,7 +1011,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleAPIItemPriceItemTagGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -1041,7 +1043,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "GET":
 										s.handleAPIItemPriceItemTagBinGetRequest([1]string{
 											args[0],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "GET")
 									}
@@ -1061,7 +1063,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "GET":
 										s.handleAPIItemPriceItemTagCurrentGetRequest([1]string{
 											args[0],
-										}, w, r)
+										}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "GET")
 									}
@@ -1092,7 +1094,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "GET":
 											s.handleAPIItemPriceItemTagHistoryDayGetRequest([1]string{
 												args[0],
-											}, w, r)
+											}, elemIsEscaped, w, r)
 										default:
 											s.notAllowed(w, r, "GET")
 										}
@@ -1112,7 +1114,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "GET":
 											s.handleAPIItemPriceItemTagHistoryFullGetRequest([1]string{
 												args[0],
-											}, w, r)
+											}, elemIsEscaped, w, r)
 										default:
 											s.notAllowed(w, r, "GET")
 										}
@@ -1132,7 +1134,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "GET":
 											s.handleAPIItemPriceItemTagHistoryMonthGetRequest([1]string{
 												args[0],
-											}, w, r)
+											}, elemIsEscaped, w, r)
 										default:
 											s.notAllowed(w, r, "GET")
 										}
@@ -1152,7 +1154,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "GET":
 											s.handleAPIItemPriceItemTagHistoryWeekGetRequest([1]string{
 												args[0],
-											}, w, r)
+											}, elemIsEscaped, w, r)
 										default:
 											s.notAllowed(w, r, "GET")
 										}
@@ -1180,7 +1182,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleAPIItemSearchSearchValGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -1225,7 +1227,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "GET":
 									s.handleAPIItemItemTagDetailsGetRequest([1]string{
 										args[0],
-									}, w, r)
+									}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "GET")
 								}
@@ -1245,7 +1247,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "GET":
 									s.handleAPIItemItemTagSimilarGetRequest([1]string{
 										args[0],
-									}, w, r)
+									}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "GET")
 								}
@@ -1264,7 +1266,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					if len(elem) == 0 {
 						switch r.Method {
 						case "GET":
-							s.handleAPIItemsGetRequest([0]string{}, w, r)
+							s.handleAPIItemsGetRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -1294,7 +1296,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "GET":
-									s.handleAPIItemsBazaarTagsGetRequest([0]string{}, w, r)
+									s.handleAPIItemsBazaarTagsGetRequest([0]string{}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "GET")
 								}
@@ -1312,7 +1314,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "POST":
-									s.handleAPIItemsNamesPostRequest([0]string{}, w, r)
+									s.handleAPIItemsNamesPostRequest([0]string{}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "POST")
 								}
@@ -1344,7 +1346,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleAPIKatDataGetRequest([0]string{}, w, r)
+							s.handleAPIKatDataGetRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -1362,7 +1364,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleAPIKatProfitGetRequest([0]string{}, w, r)
+							s.handleAPIKatProfitGetRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -1391,7 +1393,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					if len(elem) == 0 {
 						switch r.Method {
 						case "GET":
-							s.handleAPIMayorGetRequest([0]string{}, w, r)
+							s.handleAPIMayorGetRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -1417,7 +1419,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleAPIMayorYearGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -1447,7 +1449,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleAPIModCommandsGetRequest([0]string{}, w, r)
+								s.handleAPIModCommandsGetRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -1464,7 +1466,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						if len(elem) == 0 {
 							switch r.Method {
 							case "POST":
-								s.handleAPIModDescriptionPostRequest([0]string{}, w, r)
+								s.handleAPIModDescriptionPostRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "POST")
 							}
@@ -1483,7 +1485,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "POST":
-									s.handleAPIModDescriptionModificationsPostRequest([0]string{}, w, r)
+									s.handleAPIModDescriptionModificationsPostRequest([0]string{}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "POST")
 								}
@@ -1509,7 +1511,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleAPIModItemUUIDGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -1573,7 +1575,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "GET":
 									s.handleAPIPlayerPlayerUuidAuctionsGetRequest([1]string{
 										args[0],
-									}, w, r)
+									}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "GET")
 								}
@@ -1593,7 +1595,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "GET":
 									s.handleAPIPlayerPlayerUuidBidsGetRequest([1]string{
 										args[0],
-									}, w, r)
+									}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "GET")
 								}
@@ -1613,11 +1615,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "GET":
 									s.handleAPIPlayerPlayerUuidNameGetRequest([1]string{
 										args[0],
-									}, w, r)
+									}, elemIsEscaped, w, r)
 								case "POST":
 									s.handleAPIPlayerPlayerUuidNamePostRequest([1]string{
 										args[0],
-									}, w, r)
+									}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "GET,POST")
 								}
@@ -1659,7 +1661,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "POST":
-									s.handleAPIPremiumPricesAdjustedPostRequest([0]string{}, w, r)
+									s.handleAPIPremiumPricesAdjustedPostRequest([0]string{}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "POST")
 								}
@@ -1677,7 +1679,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "POST":
-									s.handleAPIPremiumUserOwnsPostRequest([0]string{}, w, r)
+									s.handleAPIPremiumUserOwnsPostRequest([0]string{}, elemIsEscaped, w, r)
 								default:
 									s.notAllowed(w, r, "POST")
 								}
@@ -1696,7 +1698,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "POST":
-								s.handleAPIPriceNbtPostRequest([0]string{}, w, r)
+								s.handleAPIPriceNbtPostRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "POST")
 							}
@@ -1727,7 +1729,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleAPIReferralInfoGetRequest([0]string{}, w, r)
+							s.handleAPIReferralInfoGetRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -1745,7 +1747,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "POST":
-							s.handleAPIReferralReferredByPostRequest([0]string{}, w, r)
+							s.handleAPIReferralReferredByPostRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "POST")
 						}
@@ -1793,7 +1795,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleAPISearchPlayerPlayerNameGetRequest([1]string{
 									args[0],
-								}, w, r)
+								}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -1812,7 +1814,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "GET":
 							s.handleAPISearchSearchValGetRequest([1]string{
 								args[0],
-							}, w, r)
+							}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -1830,7 +1832,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "POST":
-							s.handleAPIServicePurchasePostRequest([0]string{}, w, r)
+							s.handleAPIServicePurchasePostRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "POST")
 						}
@@ -1860,7 +1862,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleAPITopupOptionsGetRequest([0]string{}, w, r)
+							s.handleAPITopupOptionsGetRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -1885,7 +1887,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "POST":
 							s.handleAPITopupPaypalProductSlugPostRequest([1]string{
 								args[0],
-							}, w, r)
+							}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "POST")
 						}
@@ -1910,7 +1912,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "POST":
 							s.handleAPITopupStripeProductSlugPostRequest([1]string{
 								args[0],
-							}, w, r)
+							}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "POST")
 						}
@@ -1929,9 +1931,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					// Leaf node.
 					switch r.Method {
 					case "GET":
-						s.handleAPIUserPrivacyGetRequest([0]string{}, w, r)
+						s.handleAPIUserPrivacyGetRequest([0]string{}, elemIsEscaped, w, r)
 					case "POST":
-						s.handleAPIUserPrivacyPostRequest([0]string{}, w, r)
+						s.handleAPIUserPrivacyPostRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "GET,POST")
 					}

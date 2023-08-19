@@ -9,6 +9,7 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/metric"
 
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -17,7 +18,7 @@ import (
 // handleConnectMinecraftMcUuidGetRequest handles GET /Connect/minecraft/{mcUuid} operation.
 //
 // GET /Connect/minecraft/{mcUuid}
-func (s *Server) handleConnectMinecraftMcUuidGetRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleConnectMinecraftMcUuidGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	var otelAttrs []attribute.KeyValue
 
 	// Start a span for this request.
@@ -30,17 +31,18 @@ func (s *Server) handleConnectMinecraftMcUuidGetRequest(args [1]string, w http.R
 	startTime := time.Now()
 	defer func() {
 		elapsedDuration := time.Since(startTime)
-		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	s.requests.Add(ctx, 1, otelAttrs...)
+	s.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	var (
 		recordError = func(stage string, err error) {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, otelAttrs...)
+			s.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
@@ -48,7 +50,7 @@ func (s *Server) handleConnectMinecraftMcUuidGetRequest(args [1]string, w http.R
 			ID:   "",
 		}
 	)
-	params, err := decodeConnectMinecraftMcUuidGetParams(args, r)
+	params, err := decodeConnectMinecraftMcUuidGetParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -112,7 +114,7 @@ func (s *Server) handleConnectMinecraftMcUuidGetRequest(args [1]string, w http.R
 // handleConnectUserUserIdGetRequest handles GET /Connect/user/{userId} operation.
 //
 // GET /Connect/user/{userId}
-func (s *Server) handleConnectUserUserIdGetRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleConnectUserUserIdGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	var otelAttrs []attribute.KeyValue
 
 	// Start a span for this request.
@@ -125,17 +127,18 @@ func (s *Server) handleConnectUserUserIdGetRequest(args [1]string, w http.Respon
 	startTime := time.Now()
 	defer func() {
 		elapsedDuration := time.Since(startTime)
-		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	s.requests.Add(ctx, 1, otelAttrs...)
+	s.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	var (
 		recordError = func(stage string, err error) {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, otelAttrs...)
+			s.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
@@ -143,7 +146,7 @@ func (s *Server) handleConnectUserUserIdGetRequest(args [1]string, w http.Respon
 			ID:   "",
 		}
 	)
-	params, err := decodeConnectUserUserIdGetParams(args, r)
+	params, err := decodeConnectUserUserIdGetParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -207,7 +210,7 @@ func (s *Server) handleConnectUserUserIdGetRequest(args [1]string, w http.Respon
 // handleConnectUserUserIdPostRequest handles POST /Connect/user/{userId} operation.
 //
 // POST /Connect/user/{userId}
-func (s *Server) handleConnectUserUserIdPostRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleConnectUserUserIdPostRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	var otelAttrs []attribute.KeyValue
 
 	// Start a span for this request.
@@ -220,17 +223,18 @@ func (s *Server) handleConnectUserUserIdPostRequest(args [1]string, w http.Respo
 	startTime := time.Now()
 	defer func() {
 		elapsedDuration := time.Since(startTime)
-		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	s.requests.Add(ctx, 1, otelAttrs...)
+	s.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	var (
 		recordError = func(stage string, err error) {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, otelAttrs...)
+			s.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
@@ -238,7 +242,7 @@ func (s *Server) handleConnectUserUserIdPostRequest(args [1]string, w http.Respo
 			ID:   "",
 		}
 	)
-	params, err := decodeConnectUserUserIdPostParams(args, r)
+	params, err := decodeConnectUserUserIdPostParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -306,7 +310,7 @@ func (s *Server) handleConnectUserUserIdPostRequest(args [1]string, w http.Respo
 // handleConnectUserUserIdVerifyPostRequest handles POST /Connect/user/{userId}/verify operation.
 //
 // POST /Connect/user/{userId}/verify
-func (s *Server) handleConnectUserUserIdVerifyPostRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleConnectUserUserIdVerifyPostRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	var otelAttrs []attribute.KeyValue
 
 	// Start a span for this request.
@@ -319,17 +323,18 @@ func (s *Server) handleConnectUserUserIdVerifyPostRequest(args [1]string, w http
 	startTime := time.Now()
 	defer func() {
 		elapsedDuration := time.Since(startTime)
-		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	s.requests.Add(ctx, 1, otelAttrs...)
+	s.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	var (
 		recordError = func(stage string, err error) {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, otelAttrs...)
+			s.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
@@ -337,7 +342,7 @@ func (s *Server) handleConnectUserUserIdVerifyPostRequest(args [1]string, w http
 			ID:   "",
 		}
 	)
-	params, err := decodeConnectUserUserIdVerifyPostParams(args, r)
+	params, err := decodeConnectUserUserIdVerifyPostParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -407,7 +412,7 @@ func (s *Server) handleConnectUserUserIdVerifyPostRequest(args [1]string, w http
 // Get all users stored which may or may not have a connected account.
 //
 // GET /Connect/users/connected
-func (s *Server) handleConnectUsersConnectedGetRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleConnectUsersConnectedGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	var otelAttrs []attribute.KeyValue
 
 	// Start a span for this request.
@@ -420,17 +425,18 @@ func (s *Server) handleConnectUsersConnectedGetRequest(args [0]string, w http.Re
 	startTime := time.Now()
 	defer func() {
 		elapsedDuration := time.Since(startTime)
-		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	s.requests.Add(ctx, 1, otelAttrs...)
+	s.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	var (
 		recordError = func(stage string, err error) {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, otelAttrs...)
+			s.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
@@ -438,7 +444,7 @@ func (s *Server) handleConnectUsersConnectedGetRequest(args [0]string, w http.Re
 			ID:   "",
 		}
 	)
-	params, err := decodeConnectUsersConnectedGetParams(args, r)
+	params, err := decodeConnectUsersConnectedGetParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -508,7 +514,7 @@ func (s *Server) handleConnectUsersConnectedGetRequest(args [0]string, w http.Re
 // Get all users stored which may or may not have a connected account.
 //
 // GET /Connect/users
-func (s *Server) handleConnectUsersGetRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleConnectUsersGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	var otelAttrs []attribute.KeyValue
 
 	// Start a span for this request.
@@ -521,17 +527,18 @@ func (s *Server) handleConnectUsersGetRequest(args [0]string, w http.ResponseWri
 	startTime := time.Now()
 	defer func() {
 		elapsedDuration := time.Since(startTime)
-		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	s.requests.Add(ctx, 1, otelAttrs...)
+	s.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	var (
 		recordError = func(stage string, err error) {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, otelAttrs...)
+			s.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
@@ -539,7 +546,7 @@ func (s *Server) handleConnectUsersGetRequest(args [0]string, w http.ResponseWri
 			ID:   "",
 		}
 	)
-	params, err := decodeConnectUsersGetParams(args, r)
+	params, err := decodeConnectUsersGetParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -609,7 +616,7 @@ func (s *Server) handleConnectUsersGetRequest(args [0]string, w http.ResponseWri
 // Get all users which ids is in the list.
 //
 // GET /Connect/users/ids
-func (s *Server) handleConnectUsersIdsGetRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleConnectUsersIdsGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	var otelAttrs []attribute.KeyValue
 
 	// Start a span for this request.
@@ -622,17 +629,18 @@ func (s *Server) handleConnectUsersIdsGetRequest(args [0]string, w http.Response
 	startTime := time.Now()
 	defer func() {
 		elapsedDuration := time.Since(startTime)
-		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	s.requests.Add(ctx, 1, otelAttrs...)
+	s.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	var (
 		recordError = func(stage string, err error) {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, otelAttrs...)
+			s.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
@@ -640,7 +648,7 @@ func (s *Server) handleConnectUsersIdsGetRequest(args [0]string, w http.Response
 			ID:   "",
 		}
 	)
-	params, err := decodeConnectUsersIdsGetParams(args, r)
+	params, err := decodeConnectUsersIdsGetParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,

@@ -290,6 +290,14 @@ func (o *OptNilMinecraftUuidArray) SetTo(v []MinecraftUuid) {
 // IsSet returns true if value is Null.
 func (o OptNilMinecraftUuidArray) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilMinecraftUuidArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []MinecraftUuid
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilMinecraftUuidArray) Get() (v []MinecraftUuid, ok bool) {
 	if o.Null {
@@ -344,6 +352,14 @@ func (o *OptNilString) SetTo(v string) {
 
 // IsSet returns true if value is Null.
 func (o OptNilString) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilString) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v string
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilString) Get() (v string, ok bool) {

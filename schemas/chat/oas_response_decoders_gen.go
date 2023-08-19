@@ -14,7 +14,7 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func decodeAPIChatInternalClientPostResponse(resp *http.Response) (res APIChatInternalClientPostRes, err error) {
+func decodeAPIChatInternalClientPostResponse(resp *http.Response) (res APIChatInternalClientPostRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -140,7 +140,7 @@ func decodeAPIChatInternalClientPostResponse(resp *http.Response) (res APIChatIn
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIChatMuteDeleteResponse(resp *http.Response) (res APIChatMuteDeleteRes, err error) {
+func decodeAPIChatMuteDeleteResponse(resp *http.Response) (res APIChatMuteDeleteRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -326,7 +326,7 @@ func decodeAPIChatMuteDeleteResponse(resp *http.Response) (res APIChatMuteDelete
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIChatMutePostResponse(resp *http.Response) (res APIChatMutePostRes, err error) {
+func decodeAPIChatMutePostResponse(resp *http.Response) (res APIChatMutePostRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -512,7 +512,7 @@ func decodeAPIChatMutePostResponse(resp *http.Response) (res APIChatMutePostRes,
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeAPIChatSendPostResponse(resp *http.Response) (res APIChatSendPostRes, err error) {
+func decodeAPIChatSendPostResponse(resp *http.Response) (res APIChatSendPostRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.

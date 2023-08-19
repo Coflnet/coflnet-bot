@@ -33,12 +33,16 @@ func unpackAPIAuctionAuctionUuidGetParams(packed middleware.Parameters) (params 
 	return params
 }
 
-func decodeAPIAuctionAuctionUuidGetParams(args [1]string, r *http.Request) (params APIAuctionAuctionUuidGetParams, _ error) {
+func decodeAPIAuctionAuctionUuidGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIAuctionAuctionUuidGetParams, _ error) {
 	// Decode path: auctionUuid.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -95,12 +99,16 @@ func unpackAPIAuctionAuctionUuidUIDGetParams(packed middleware.Parameters) (para
 	return params
 }
 
-func decodeAPIAuctionAuctionUuidUIDGetParams(args [1]string, r *http.Request) (params APIAuctionAuctionUuidUIDGetParams, _ error) {
+func decodeAPIAuctionAuctionUuidUIDGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIAuctionAuctionUuidUIDGetParams, _ error) {
 	// Decode path: auctionUuid.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -170,7 +178,7 @@ func unpackAPIAuctionsBatchGetParams(packed middleware.Parameters) (params APIAu
 	return params
 }
 
-func decodeAPIAuctionsBatchGetParams(args [0]string, r *http.Request) (params APIAuctionsBatchGetParams, _ error) {
+func decodeAPIAuctionsBatchGetParams(args [0]string, argsEscaped bool, r *http.Request) (params APIAuctionsBatchGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: page.
 	{
@@ -295,13 +303,17 @@ func unpackAPIAuctionsTagItemTagActiveBinGetParams(packed middleware.Parameters)
 	return params
 }
 
-func decodeAPIAuctionsTagItemTagActiveBinGetParams(args [1]string, r *http.Request) (params APIAuctionsTagItemTagActiveBinGetParams, _ error) {
+func decodeAPIAuctionsTagItemTagActiveBinGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIAuctionsTagItemTagActiveBinGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -398,13 +410,17 @@ func unpackAPIAuctionsTagItemTagActiveOverviewGetParams(packed middleware.Parame
 	return params
 }
 
-func decodeAPIAuctionsTagItemTagActiveOverviewGetParams(args [1]string, r *http.Request) (params APIAuctionsTagItemTagActiveOverviewGetParams, _ error) {
+func decodeAPIAuctionsTagItemTagActiveOverviewGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIAuctionsTagItemTagActiveOverviewGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -501,13 +517,17 @@ func unpackAPIAuctionsTagItemTagRecentOverviewGetParams(packed middleware.Parame
 	return params
 }
 
-func decodeAPIAuctionsTagItemTagRecentOverviewGetParams(args [1]string, r *http.Request) (params APIAuctionsTagItemTagRecentOverviewGetParams, _ error) {
+func decodeAPIAuctionsTagItemTagRecentOverviewGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIAuctionsTagItemTagRecentOverviewGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -616,13 +636,17 @@ func unpackAPIAuctionsTagItemTagSoldGetParams(packed middleware.Parameters) (par
 	return params
 }
 
-func decodeAPIAuctionsTagItemTagSoldGetParams(args [1]string, r *http.Request) (params APIAuctionsTagItemTagSoldGetParams, _ error) {
+func decodeAPIAuctionsTagItemTagSoldGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIAuctionsTagItemTagSoldGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -771,12 +795,16 @@ func unpackAPIAuctionsUIDUIDSoldGetParams(packed middleware.Parameters) (params 
 	return params
 }
 
-func decodeAPIAuctionsUIDUIDSoldGetParams(args [1]string, r *http.Request) (params APIAuctionsUIDUIDSoldGetParams, _ error) {
+func decodeAPIAuctionsUIDUIDSoldGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIAuctionsUIDUIDSoldGetParams, _ error) {
 	// Decode path: uid.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -832,12 +860,16 @@ func unpackAPIBazaarItemHistoryItemTagStatusGetParams(packed middleware.Paramete
 	return params
 }
 
-func decodeAPIBazaarItemHistoryItemTagStatusGetParams(args [1]string, r *http.Request) (params APIBazaarItemHistoryItemTagStatusGetParams, _ error) {
+func decodeAPIBazaarItemHistoryItemTagStatusGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIBazaarItemHistoryItemTagStatusGetParams, _ error) {
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -894,12 +926,16 @@ func unpackAPIBazaarItemTagHistoryDayGetParams(packed middleware.Parameters) (pa
 	return params
 }
 
-func decodeAPIBazaarItemTagHistoryDayGetParams(args [1]string, r *http.Request) (params APIBazaarItemTagHistoryDayGetParams, _ error) {
+func decodeAPIBazaarItemTagHistoryDayGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIBazaarItemTagHistoryDayGetParams, _ error) {
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -976,13 +1012,17 @@ func unpackAPIBazaarItemTagHistoryGetParams(packed middleware.Parameters) (param
 	return params
 }
 
-func decodeAPIBazaarItemTagHistoryGetParams(args [1]string, r *http.Request) (params APIBazaarItemTagHistoryGetParams, _ error) {
+func decodeAPIBazaarItemTagHistoryGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIBazaarItemTagHistoryGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -1121,12 +1161,16 @@ func unpackAPIBazaarItemTagHistoryHourGetParams(packed middleware.Parameters) (p
 	return params
 }
 
-func decodeAPIBazaarItemTagHistoryHourGetParams(args [1]string, r *http.Request) (params APIBazaarItemTagHistoryHourGetParams, _ error) {
+func decodeAPIBazaarItemTagHistoryHourGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIBazaarItemTagHistoryHourGetParams, _ error) {
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -1183,12 +1227,16 @@ func unpackAPIBazaarItemTagHistoryWeekGetParams(packed middleware.Parameters) (p
 	return params
 }
 
-func decodeAPIBazaarItemTagHistoryWeekGetParams(args [1]string, r *http.Request) (params APIBazaarItemTagHistoryWeekGetParams, _ error) {
+func decodeAPIBazaarItemTagHistoryWeekGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIBazaarItemTagHistoryWeekGetParams, _ error) {
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -1256,13 +1304,17 @@ func unpackAPIBazaarItemTagSnapshotGetParams(packed middleware.Parameters) (para
 	return params
 }
 
-func decodeAPIBazaarItemTagSnapshotGetParams(args [1]string, r *http.Request) (params APIBazaarItemTagSnapshotGetParams, _ error) {
+func decodeAPIBazaarItemTagSnapshotGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIBazaarItemTagSnapshotGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -1371,7 +1423,7 @@ func unpackAPICraftProfitGetParams(packed middleware.Parameters) (params APICraf
 	return params
 }
 
-func decodeAPICraftProfitGetParams(args [0]string, r *http.Request) (params APICraftProfitGetParams, _ error) {
+func decodeAPICraftProfitGetParams(args [0]string, argsEscaped bool, r *http.Request) (params APICraftProfitGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode query: player.
 	if err := func() error {
@@ -1474,12 +1526,16 @@ func unpackAPICraftRecipeItemTagGetParams(packed middleware.Parameters) (params 
 	return params
 }
 
-func decodeAPICraftRecipeItemTagGetParams(args [1]string, r *http.Request) (params APICraftRecipeItemTagGetParams, _ error) {
+func decodeAPICraftRecipeItemTagGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APICraftRecipeItemTagGetParams, _ error) {
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -1537,7 +1593,7 @@ func unpackAPIDataPlayerNamePostParams(packed middleware.Parameters) (params API
 	return params
 }
 
-func decodeAPIDataPlayerNamePostParams(args [0]string, r *http.Request) (params APIDataPlayerNamePostParams, _ error) {
+func decodeAPIDataPlayerNamePostParams(args [0]string, argsEscaped bool, r *http.Request) (params APIDataPlayerNamePostParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode query: name.
 	if err := func() error {
@@ -1601,7 +1657,7 @@ func unpackAPIFilterOptionsGetParams(packed middleware.Parameters) (params APIFi
 	return params
 }
 
-func decodeAPIFilterOptionsGetParams(args [0]string, r *http.Request) (params APIFilterOptionsGetParams, _ error) {
+func decodeAPIFilterOptionsGetParams(args [0]string, argsEscaped bool, r *http.Request) (params APIFilterOptionsGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: itemTag.
 	{
@@ -1691,13 +1747,17 @@ func unpackAPIFlipStatsFinderFinderNameGetParams(packed middleware.Parameters) (
 	return params
 }
 
-func decodeAPIFlipStatsFinderFinderNameGetParams(args [1]string, r *http.Request) (params APIFlipStatsFinderFinderNameGetParams, _ error) {
+func decodeAPIFlipStatsFinderFinderNameGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIFlipStatsFinderFinderNameGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: finderName.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -1846,13 +1906,17 @@ func unpackAPIFlipStatsPlayerPlayerUuidGetParams(packed middleware.Parameters) (
 	return params
 }
 
-func decodeAPIFlipStatsPlayerPlayerUuidGetParams(args [1]string, r *http.Request) (params APIFlipStatsPlayerPlayerUuidGetParams, _ error) {
+func decodeAPIFlipStatsPlayerPlayerUuidGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIFlipStatsPlayerPlayerUuidGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: playerUuid.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -1927,9 +1991,9 @@ func decodeAPIFlipStatsPlayerPlayerUuidGetParams(args [1]string, r *http.Request
 				return err
 			}
 			if err := func() error {
-				if params.Days.Set {
+				if value, ok := params.Days.Get(); ok {
 					if err := func() error {
-						if err := (validate.Float{}).Validate(float64(params.Days.Value)); err != nil {
+						if err := (validate.Float{}).Validate(float64(value)); err != nil {
 							return errors.Wrap(err, "float")
 						}
 						return nil
@@ -1970,12 +2034,16 @@ func unpackAPIFlipStatsPlayerPlayerUuidHourGetParams(packed middleware.Parameter
 	return params
 }
 
-func decodeAPIFlipStatsPlayerPlayerUuidHourGetParams(args [1]string, r *http.Request) (params APIFlipStatsPlayerPlayerUuidHourGetParams, _ error) {
+func decodeAPIFlipStatsPlayerPlayerUuidHourGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIFlipStatsPlayerPlayerUuidHourGetParams, _ error) {
 	// Decode path: playerUuid.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -2065,13 +2133,17 @@ func unpackAPIFlipTrackFoundAuctionIdPostParams(packed middleware.Parameters) (p
 	return params
 }
 
-func decodeAPIFlipTrackFoundAuctionIdPostParams(args [1]string, r *http.Request) (params APIFlipTrackFoundAuctionIdPostParams, _ error) {
+func decodeAPIFlipTrackFoundAuctionIdPostParams(args [1]string, argsEscaped bool, r *http.Request) (params APIFlipTrackFoundAuctionIdPostParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: auctionId.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -2305,13 +2377,17 @@ func unpackAPIFlipTrackPurchaseAuctionIdPostParams(packed middleware.Parameters)
 	return params
 }
 
-func decodeAPIFlipTrackPurchaseAuctionIdPostParams(args [1]string, r *http.Request) (params APIFlipTrackPurchaseAuctionIdPostParams, _ error) {
+func decodeAPIFlipTrackPurchaseAuctionIdPostParams(args [1]string, argsEscaped bool, r *http.Request) (params APIFlipTrackPurchaseAuctionIdPostParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: auctionId.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -2541,12 +2617,16 @@ func unpackAPIItemItemTagDetailsGetParams(packed middleware.Parameters) (params 
 	return params
 }
 
-func decodeAPIItemItemTagDetailsGetParams(args [1]string, r *http.Request) (params APIItemItemTagDetailsGetParams, _ error) {
+func decodeAPIItemItemTagDetailsGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIItemItemTagDetailsGetParams, _ error) {
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -2602,12 +2682,16 @@ func unpackAPIItemItemTagSimilarGetParams(packed middleware.Parameters) (params 
 	return params
 }
 
-func decodeAPIItemItemTagSimilarGetParams(args [1]string, r *http.Request) (params APIItemItemTagSimilarGetParams, _ error) {
+func decodeAPIItemItemTagSimilarGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIItemItemTagSimilarGetParams, _ error) {
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -2674,13 +2758,17 @@ func unpackAPIItemPriceItemTagBinGetParams(packed middleware.Parameters) (params
 	return params
 }
 
-func decodeAPIItemPriceItemTagBinGetParams(args [1]string, r *http.Request) (params APIItemPriceItemTagBinGetParams, _ error) {
+func decodeAPIItemPriceItemTagBinGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIItemPriceItemTagBinGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -2778,13 +2866,17 @@ func unpackAPIItemPriceItemTagCurrentGetParams(packed middleware.Parameters) (pa
 	return params
 }
 
-func decodeAPIItemPriceItemTagCurrentGetParams(args [1]string, r *http.Request) (params APIItemPriceItemTagCurrentGetParams, _ error) {
+func decodeAPIItemPriceItemTagCurrentGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIItemPriceItemTagCurrentGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -2898,13 +2990,17 @@ func unpackAPIItemPriceItemTagGetParams(packed middleware.Parameters) (params AP
 	return params
 }
 
-func decodeAPIItemPriceItemTagGetParams(args [1]string, r *http.Request) (params APIItemPriceItemTagGetParams, _ error) {
+func decodeAPIItemPriceItemTagGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIItemPriceItemTagGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -3002,13 +3098,17 @@ func unpackAPIItemPriceItemTagHistoryDayGetParams(packed middleware.Parameters) 
 	return params
 }
 
-func decodeAPIItemPriceItemTagHistoryDayGetParams(args [1]string, r *http.Request) (params APIItemPriceItemTagHistoryDayGetParams, _ error) {
+func decodeAPIItemPriceItemTagHistoryDayGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIItemPriceItemTagHistoryDayGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -3095,12 +3195,16 @@ func unpackAPIItemPriceItemTagHistoryFullGetParams(packed middleware.Parameters)
 	return params
 }
 
-func decodeAPIItemPriceItemTagHistoryFullGetParams(args [1]string, r *http.Request) (params APIItemPriceItemTagHistoryFullGetParams, _ error) {
+func decodeAPIItemPriceItemTagHistoryFullGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIItemPriceItemTagHistoryFullGetParams, _ error) {
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -3168,13 +3272,17 @@ func unpackAPIItemPriceItemTagHistoryMonthGetParams(packed middleware.Parameters
 	return params
 }
 
-func decodeAPIItemPriceItemTagHistoryMonthGetParams(args [1]string, r *http.Request) (params APIItemPriceItemTagHistoryMonthGetParams, _ error) {
+func decodeAPIItemPriceItemTagHistoryMonthGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIItemPriceItemTagHistoryMonthGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -3272,13 +3380,17 @@ func unpackAPIItemPriceItemTagHistoryWeekGetParams(packed middleware.Parameters)
 	return params
 }
 
-func decodeAPIItemPriceItemTagHistoryWeekGetParams(args [1]string, r *http.Request) (params APIItemPriceItemTagHistoryWeekGetParams, _ error) {
+func decodeAPIItemPriceItemTagHistoryWeekGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIItemPriceItemTagHistoryWeekGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: itemTag.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -3365,12 +3477,16 @@ func unpackAPIItemSearchSearchValGetParams(packed middleware.Parameters) (params
 	return params
 }
 
-func decodeAPIItemSearchSearchValGetParams(args [1]string, r *http.Request) (params APIItemSearchSearchValGetParams, _ error) {
+func decodeAPIItemSearchSearchValGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIItemSearchSearchValGetParams, _ error) {
 	// Decode path: searchVal.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -3440,7 +3556,7 @@ func unpackAPIMayorGetParams(packed middleware.Parameters) (params APIMayorGetPa
 	return params
 }
 
-func decodeAPIMayorGetParams(args [0]string, r *http.Request) (params APIMayorGetParams, _ error) {
+func decodeAPIMayorGetParams(args [0]string, argsEscaped bool, r *http.Request) (params APIMayorGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode query: from.
 	if err := func() error {
@@ -3543,12 +3659,16 @@ func unpackAPIMayorYearGetParams(packed middleware.Parameters) (params APIMayorY
 	return params
 }
 
-func decodeAPIMayorYearGetParams(args [1]string, r *http.Request) (params APIMayorYearGetParams, _ error) {
+func decodeAPIMayorYearGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIMayorYearGetParams, _ error) {
 	// Decode path: year.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -3618,7 +3738,7 @@ func unpackAPIModDescriptionModificationsPostParams(packed middleware.Parameters
 	return params
 }
 
-func decodeAPIModDescriptionModificationsPostParams(args [0]string, r *http.Request) (params APIModDescriptionModificationsPostParams, _ error) {
+func decodeAPIModDescriptionModificationsPostParams(args [0]string, argsEscaped bool, r *http.Request) (params APIModDescriptionModificationsPostParams, _ error) {
 	h := uri.NewHeaderDecoder(r.Header)
 	// Decode header: conId.
 	if err := func() error {
@@ -3731,7 +3851,7 @@ func unpackAPIModDescriptionPostParams(packed middleware.Parameters) (params API
 	return params
 }
 
-func decodeAPIModDescriptionPostParams(args [0]string, r *http.Request) (params APIModDescriptionPostParams, _ error) {
+func decodeAPIModDescriptionPostParams(args [0]string, argsEscaped bool, r *http.Request) (params APIModDescriptionPostParams, _ error) {
 	h := uri.NewHeaderDecoder(r.Header)
 	// Decode header: conId.
 	if err := func() error {
@@ -3840,13 +3960,17 @@ func unpackAPIModItemUUIDGetParams(packed middleware.Parameters) (params APIModI
 	return params
 }
 
-func decodeAPIModItemUUIDGetParams(args [1]string, r *http.Request) (params APIModItemUUIDGetParams, _ error) {
+func decodeAPIModItemUUIDGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIModItemUUIDGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: uuid.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -3970,13 +4094,17 @@ func unpackAPIPlayerPlayerUuidAuctionsGetParams(packed middleware.Parameters) (p
 	return params
 }
 
-func decodeAPIPlayerPlayerUuidAuctionsGetParams(args [1]string, r *http.Request) (params APIPlayerPlayerUuidAuctionsGetParams, _ error) {
+func decodeAPIPlayerPlayerUuidAuctionsGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIPlayerPlayerUuidAuctionsGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: playerUuid.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -4130,13 +4258,17 @@ func unpackAPIPlayerPlayerUuidBidsGetParams(packed middleware.Parameters) (param
 	return params
 }
 
-func decodeAPIPlayerPlayerUuidBidsGetParams(args [1]string, r *http.Request) (params APIPlayerPlayerUuidBidsGetParams, _ error) {
+func decodeAPIPlayerPlayerUuidBidsGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIPlayerPlayerUuidBidsGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: playerUuid.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -4269,12 +4401,16 @@ func unpackAPIPlayerPlayerUuidNameGetParams(packed middleware.Parameters) (param
 	return params
 }
 
-func decodeAPIPlayerPlayerUuidNameGetParams(args [1]string, r *http.Request) (params APIPlayerPlayerUuidNameGetParams, _ error) {
+func decodeAPIPlayerPlayerUuidNameGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APIPlayerPlayerUuidNameGetParams, _ error) {
 	// Decode path: playerUuid.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -4331,12 +4467,16 @@ func unpackAPIPlayerPlayerUuidNamePostParams(packed middleware.Parameters) (para
 	return params
 }
 
-func decodeAPIPlayerPlayerUuidNamePostParams(args [1]string, r *http.Request) (params APIPlayerPlayerUuidNamePostParams, _ error) {
+func decodeAPIPlayerPlayerUuidNamePostParams(args [1]string, argsEscaped bool, r *http.Request) (params APIPlayerPlayerUuidNamePostParams, _ error) {
 	// Decode path: playerUuid.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -4393,12 +4533,16 @@ func unpackAPISearchPlayerPlayerNameGetParams(packed middleware.Parameters) (par
 	return params
 }
 
-func decodeAPISearchPlayerPlayerNameGetParams(args [1]string, r *http.Request) (params APISearchPlayerPlayerNameGetParams, _ error) {
+func decodeAPISearchPlayerPlayerNameGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APISearchPlayerPlayerNameGetParams, _ error) {
 	// Decode path: playerName.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -4466,13 +4610,17 @@ func unpackAPISearchSearchValGetParams(packed middleware.Parameters) (params API
 	return params
 }
 
-func decodeAPISearchSearchValGetParams(args [1]string, r *http.Request) (params APISearchSearchValGetParams, _ error) {
+func decodeAPISearchSearchValGetParams(args [1]string, argsEscaped bool, r *http.Request) (params APISearchSearchValGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: searchVal.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -4574,12 +4722,16 @@ func unpackAPITopupPaypalProductSlugPostParams(packed middleware.Parameters) (pa
 	return params
 }
 
-func decodeAPITopupPaypalProductSlugPostParams(args [1]string, r *http.Request) (params APITopupPaypalProductSlugPostParams, _ error) {
+func decodeAPITopupPaypalProductSlugPostParams(args [1]string, argsEscaped bool, r *http.Request) (params APITopupPaypalProductSlugPostParams, _ error) {
 	// Decode path: productSlug.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
@@ -4635,12 +4787,16 @@ func unpackAPITopupStripeProductSlugPostParams(packed middleware.Parameters) (pa
 	return params
 }
 
-func decodeAPITopupStripeProductSlugPostParams(args [1]string, r *http.Request) (params APITopupStripeProductSlugPostParams, _ error) {
+func decodeAPITopupStripeProductSlugPostParams(args [1]string, argsEscaped bool, r *http.Request) (params APITopupStripeProductSlugPostParams, _ error) {
 	// Decode path: productSlug.
 	if err := func() error {
-		param, err := url.PathUnescape(args[0])
-		if err != nil {
-			return errors.Wrap(err, "unescape path")
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{

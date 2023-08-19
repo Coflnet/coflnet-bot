@@ -13,9 +13,9 @@ import (
 func (s *ExternalTransaction) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Amount.Set {
+		if value, ok := s.Amount.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Amount.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -35,10 +35,11 @@ func (s *ExternalTransaction) Validate() error {
 	}
 	return nil
 }
+
 func (s *Group) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Slug.Set {
+		if value, ok := s.Slug.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -48,7 +49,7 @@ func (s *Group) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Slug.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -64,13 +65,13 @@ func (s *Group) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Products.Set {
+		if value, ok := s.Products.Get(); ok {
 			if err := func() error {
-				if s.Products.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Products.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -107,9 +108,9 @@ func (s *Group) Validate() error {
 func (s *OwnerShip) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Product.Set {
+		if value, ok := s.Product.Get(); ok {
 			if err := func() error {
-				if err := s.Product.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -129,12 +130,13 @@ func (s *OwnerShip) Validate() error {
 	}
 	return nil
 }
+
 func (s *PlanedTransaction) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Product.Set {
+		if value, ok := s.Product.Get(); ok {
 			if err := func() error {
-				if err := s.Product.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -150,9 +152,9 @@ func (s *PlanedTransaction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Amount.Set {
+		if value, ok := s.Amount.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Amount.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -168,7 +170,7 @@ func (s *PlanedTransaction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Reference.Set {
+		if value, ok := s.Reference.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -178,7 +180,7 @@ func (s *PlanedTransaction) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Reference.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -198,10 +200,11 @@ func (s *PlanedTransaction) Validate() error {
 	}
 	return nil
 }
+
 func (s *Product) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Title.Set {
+		if value, ok := s.Title.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -211,7 +214,7 @@ func (s *Product) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Title.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -227,7 +230,7 @@ func (s *Product) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Slug.Set {
+		if value, ok := s.Slug.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -237,7 +240,7 @@ func (s *Product) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Slug.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -253,9 +256,9 @@ func (s *Product) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Cost.Set {
+		if value, ok := s.Cost.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Cost.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -271,9 +274,9 @@ func (s *Product) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Type.Set {
+		if value, ok := s.Type.Get(); ok {
 			if err := func() error {
-				if err := s.Type.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -293,6 +296,7 @@ func (s *Product) Validate() error {
 	}
 	return nil
 }
+
 func (s ProductType) Validate() error {
 	switch s {
 	case "NONE":
@@ -313,10 +317,11 @@ func (s ProductType) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s *PurchaseableProduct) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Title.Set {
+		if value, ok := s.Title.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -326,7 +331,7 @@ func (s *PurchaseableProduct) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Title.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -342,7 +347,7 @@ func (s *PurchaseableProduct) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Slug.Set {
+		if value, ok := s.Slug.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -352,7 +357,7 @@ func (s *PurchaseableProduct) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Slug.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -368,9 +373,9 @@ func (s *PurchaseableProduct) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Cost.Set {
+		if value, ok := s.Cost.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Cost.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -386,9 +391,9 @@ func (s *PurchaseableProduct) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Type.Set {
+		if value, ok := s.Type.Get(); ok {
 			if err := func() error {
-				if err := s.Type.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -408,12 +413,13 @@ func (s *PurchaseableProduct) Validate() error {
 	}
 	return nil
 }
+
 func (s *Rule) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Requires.Set {
+		if value, ok := s.Requires.Get(); ok {
 			if err := func() error {
-				if err := s.Requires.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -429,9 +435,9 @@ func (s *Rule) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Targets.Set {
+		if value, ok := s.Targets.Get(); ok {
 			if err := func() error {
-				if err := s.Targets.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -447,9 +453,9 @@ func (s *Rule) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Flags.Set {
+		if value, ok := s.Flags.Get(); ok {
 			if err := func() error {
-				if err := s.Flags.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -465,9 +471,9 @@ func (s *Rule) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Amount.Set {
+		if value, ok := s.Amount.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Amount.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -487,12 +493,13 @@ func (s *Rule) Validate() error {
 	}
 	return nil
 }
+
 func (s *RuleCreate) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Flags.Set {
+		if value, ok := s.Flags.Get(); ok {
 			if err := func() error {
-				if err := s.Flags.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -508,9 +515,9 @@ func (s *RuleCreate) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Amount.Set {
+		if value, ok := s.Amount.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Amount.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -530,6 +537,7 @@ func (s *RuleCreate) Validate() error {
 	}
 	return nil
 }
+
 func (s RuleFlags) Validate() error {
 	switch s {
 	case "NONE":
@@ -550,12 +558,13 @@ func (s RuleFlags) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s *RuleResult) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.ModifiedProduct.Set {
+		if value, ok := s.ModifiedProduct.Get(); ok {
 			if err := func() error {
-				if err := s.ModifiedProduct.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -571,13 +580,13 @@ func (s *RuleResult) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Rules.Set {
+		if value, ok := s.Rules.Get(); ok {
 			if err := func() error {
-				if s.Rules.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Rules.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -610,16 +619,17 @@ func (s *RuleResult) Validate() error {
 	}
 	return nil
 }
+
 func (s *SystemState) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Products.Set {
+		if value, ok := s.Products.Get(); ok {
 			if err := func() error {
-				if s.Products.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Products.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -648,13 +658,13 @@ func (s *SystemState) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.TopUps.Set {
+		if value, ok := s.TopUps.Get(); ok {
 			if err := func() error {
-				if s.TopUps.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.TopUps.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -683,13 +693,13 @@ func (s *SystemState) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Rules.Set {
+		if value, ok := s.Rules.Get(); ok {
 			if err := func() error {
-				if s.Rules.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Rules.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -722,10 +732,11 @@ func (s *SystemState) Validate() error {
 	}
 	return nil
 }
+
 func (s *TopUpOptions) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.UserIp.Set {
+		if value, ok := s.UserIp.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -735,7 +746,7 @@ func (s *TopUpOptions) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.UserIp.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -751,7 +762,7 @@ func (s *TopUpOptions) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Locale.Set {
+		if value, ok := s.Locale.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -761,7 +772,7 @@ func (s *TopUpOptions) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Locale.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -777,7 +788,7 @@ func (s *TopUpOptions) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Fingerprint.Set {
+		if value, ok := s.Fingerprint.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -787,7 +798,7 @@ func (s *TopUpOptions) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Fingerprint.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -807,12 +818,13 @@ func (s *TopUpOptions) Validate() error {
 	}
 	return nil
 }
+
 func (s *TopUpProduct) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Price.Set {
+		if value, ok := s.Price.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Price.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -828,7 +840,7 @@ func (s *TopUpProduct) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.CurrencyCode.Set {
+		if value, ok := s.CurrencyCode.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -838,7 +850,7 @@ func (s *TopUpProduct) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.CurrencyCode.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -854,7 +866,7 @@ func (s *TopUpProduct) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.ProviderSlug.Set {
+		if value, ok := s.ProviderSlug.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -864,7 +876,7 @@ func (s *TopUpProduct) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.ProviderSlug.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -880,7 +892,7 @@ func (s *TopUpProduct) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Title.Set {
+		if value, ok := s.Title.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -890,7 +902,7 @@ func (s *TopUpProduct) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Title.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -906,7 +918,7 @@ func (s *TopUpProduct) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Slug.Set {
+		if value, ok := s.Slug.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -916,7 +928,7 @@ func (s *TopUpProduct) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Slug.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -932,9 +944,9 @@ func (s *TopUpProduct) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Cost.Set {
+		if value, ok := s.Cost.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Cost.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -950,9 +962,9 @@ func (s *TopUpProduct) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Type.Set {
+		if value, ok := s.Type.Get(); ok {
 			if err := func() error {
-				if err := s.Type.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -972,12 +984,13 @@ func (s *TopUpProduct) Validate() error {
 	}
 	return nil
 }
+
 func (s *TransactionEvent) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.ProductType.Set {
+		if value, ok := s.ProductType.Get(); ok {
 			if err := func() error {
-				if err := s.ProductType.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -993,9 +1006,9 @@ func (s *TransactionEvent) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Amount.Set {
+		if value, ok := s.Amount.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Amount.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1015,12 +1028,13 @@ func (s *TransactionEvent) Validate() error {
 	}
 	return nil
 }
+
 func (s *TransferRequest) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Amount.Set {
+		if value, ok := s.Amount.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Amount.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1040,10 +1054,11 @@ func (s *TransferRequest) Validate() error {
 	}
 	return nil
 }
+
 func (s *User) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.ExternalId.Set {
+		if value, ok := s.ExternalId.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -1053,7 +1068,7 @@ func (s *User) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.ExternalId.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -1069,9 +1084,9 @@ func (s *User) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Balance.Set {
+		if value, ok := s.Balance.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Balance.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1087,9 +1102,9 @@ func (s *User) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.AvailableBalance.Set {
+		if value, ok := s.AvailableBalance.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.AvailableBalance.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1105,13 +1120,13 @@ func (s *User) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Owns.Set {
+		if value, ok := s.Owns.Get(); ok {
 			if err := func() error {
-				if s.Owns.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Owns.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -1140,7 +1155,7 @@ func (s *User) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Country.Set {
+		if value, ok := s.Country.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -1150,7 +1165,7 @@ func (s *User) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Country.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -1166,7 +1181,7 @@ func (s *User) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Zip.Set {
+		if value, ok := s.Zip.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -1176,7 +1191,7 @@ func (s *User) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Zip.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -1192,7 +1207,7 @@ func (s *User) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.IP.Set {
+		if value, ok := s.IP.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -1202,7 +1217,7 @@ func (s *User) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.IP.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -1218,7 +1233,7 @@ func (s *User) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Locale.Set {
+		if value, ok := s.Locale.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -1228,7 +1243,7 @@ func (s *User) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Locale.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil

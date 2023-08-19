@@ -14,7 +14,7 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func decodeConnectMinecraftMcUuidGetResponse(resp *http.Response) (res *User, err error) {
+func decodeConnectMinecraftMcUuidGetResponse(resp *http.Response) (res *User, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -55,7 +55,7 @@ func decodeConnectMinecraftMcUuidGetResponse(resp *http.Response) (res *User, er
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeConnectUserUserIdGetResponse(resp *http.Response) (res *User, err error) {
+func decodeConnectUserUserIdGetResponse(resp *http.Response) (res *User, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -96,7 +96,7 @@ func decodeConnectUserUserIdGetResponse(resp *http.Response) (res *User, err err
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeConnectUserUserIdPostResponse(resp *http.Response) (res *ConnectionRequest, err error) {
+func decodeConnectUserUserIdPostResponse(resp *http.Response) (res *ConnectionRequest, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -137,7 +137,7 @@ func decodeConnectUserUserIdPostResponse(resp *http.Response) (res *ConnectionRe
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeConnectUserUserIdVerifyPostResponse(resp *http.Response) (res *ConnectUserUserIdVerifyPostOK, err error) {
+func decodeConnectUserUserIdVerifyPostResponse(resp *http.Response) (res *ConnectUserUserIdVerifyPostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -146,7 +146,7 @@ func decodeConnectUserUserIdVerifyPostResponse(resp *http.Response) (res *Connec
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeConnectUsersConnectedGetResponse(resp *http.Response) (res []User, err error) {
+func decodeConnectUsersConnectedGetResponse(resp *http.Response) (res []User, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -195,7 +195,7 @@ func decodeConnectUsersConnectedGetResponse(resp *http.Response) (res []User, er
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeConnectUsersGetResponse(resp *http.Response) (res []User, err error) {
+func decodeConnectUsersGetResponse(resp *http.Response) (res []User, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -244,7 +244,7 @@ func decodeConnectUsersGetResponse(resp *http.Response) (res []User, err error) 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeConnectUsersIdsGetResponse(resp *http.Response) (res []User, err error) {
+func decodeConnectUsersIdsGetResponse(resp *http.Response) (res []User, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.

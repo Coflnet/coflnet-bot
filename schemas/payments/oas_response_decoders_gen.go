@@ -16,7 +16,7 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func decodeApplyPostResponse(resp *http.Response) (res *ApplyPostOK, err error) {
+func decodeApplyPostResponse(resp *http.Response) (res *ApplyPostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -25,7 +25,7 @@ func decodeApplyPostResponse(resp *http.Response) (res *ApplyPostOK, err error) 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeCallbackPaypalPostResponse(resp *http.Response) (res *CallbackPaypalPostOK, err error) {
+func decodeCallbackPaypalPostResponse(resp *http.Response) (res *CallbackPaypalPostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -34,7 +34,7 @@ func decodeCallbackPaypalPostResponse(resp *http.Response) (res *CallbackPaypalP
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeCallbackStripePostResponse(resp *http.Response) (res *CallbackStripePostOK, err error) {
+func decodeCallbackStripePostResponse(resp *http.Response) (res *CallbackStripePostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -43,7 +43,7 @@ func decodeCallbackStripePostResponse(resp *http.Response) (res *CallbackStripeP
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeGroupGetResponse(resp *http.Response) (res []Group, err error) {
+func decodeGroupGetResponse(resp *http.Response) (res []Group, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -92,7 +92,7 @@ func decodeGroupGetResponse(resp *http.Response) (res []Group, err error) {
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeGroupGroupSlugDeleteResponse(resp *http.Response) (res *Group, err error) {
+func decodeGroupGroupSlugDeleteResponse(resp *http.Response) (res *Group, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -133,7 +133,7 @@ func decodeGroupGroupSlugDeleteResponse(resp *http.Response) (res *Group, err er
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeGroupGroupSlugGetResponse(resp *http.Response) (res *Group, err error) {
+func decodeGroupGroupSlugGetResponse(resp *http.Response) (res *Group, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -174,7 +174,7 @@ func decodeGroupGroupSlugGetResponse(resp *http.Response) (res *Group, err error
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeGroupGroupSlugProductsDeleteResponse(resp *http.Response) (res *Group, err error) {
+func decodeGroupGroupSlugProductsDeleteResponse(resp *http.Response) (res *Group, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -215,7 +215,7 @@ func decodeGroupGroupSlugProductsDeleteResponse(resp *http.Response) (res *Group
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeGroupGroupSlugProductsPostResponse(resp *http.Response) (res *Group, err error) {
+func decodeGroupGroupSlugProductsPostResponse(resp *http.Response) (res *Group, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -256,7 +256,7 @@ func decodeGroupGroupSlugProductsPostResponse(resp *http.Response) (res *Group, 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeGroupGroupSlugPutResponse(resp *http.Response) (res *Group, err error) {
+func decodeGroupGroupSlugPutResponse(resp *http.Response) (res *Group, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -297,7 +297,7 @@ func decodeGroupGroupSlugPutResponse(resp *http.Response) (res *Group, err error
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeGroupPostResponse(resp *http.Response) (res *Group, err error) {
+func decodeGroupPostResponse(resp *http.Response) (res *Group, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -338,7 +338,7 @@ func decodeGroupPostResponse(resp *http.Response) (res *Group, err error) {
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeProductsGetResponse(resp *http.Response) (res []PurchaseableProduct, err error) {
+func decodeProductsGetResponse(resp *http.Response) (res []PurchaseableProduct, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -387,7 +387,7 @@ func decodeProductsGetResponse(resp *http.Response) (res []PurchaseableProduct, 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeProductsPProductSlugGetResponse(resp *http.Response) (res *PurchaseableProduct, err error) {
+func decodeProductsPProductSlugGetResponse(resp *http.Response) (res *PurchaseableProduct, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -428,7 +428,7 @@ func decodeProductsPProductSlugGetResponse(resp *http.Response) (res *Purchaseab
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeProductsPutResponse(resp *http.Response) (res *PurchaseableProduct, err error) {
+func decodeProductsPutResponse(resp *http.Response) (res *PurchaseableProduct, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -469,7 +469,7 @@ func decodeProductsPutResponse(resp *http.Response) (res *PurchaseableProduct, e
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeProductsServiceServiceSlugCountGetResponse(resp *http.Response) (res int32, err error) {
+func decodeProductsServiceServiceSlugCountGetResponse(resp *http.Response) (res int32, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -512,7 +512,7 @@ func decodeProductsServiceServiceSlugCountGetResponse(resp *http.Response) (res 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeProductsServiceServiceSlugIdsGetResponse(resp *http.Response) (res []string, err error) {
+func decodeProductsServiceServiceSlugIdsGetResponse(resp *http.Response) (res []string, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -563,7 +563,7 @@ func decodeProductsServiceServiceSlugIdsGetResponse(resp *http.Response) (res []
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeProductsServiceServiceSlugOwnedGetResponse(resp *http.Response) (res []OwnershipTimeFrame, err error) {
+func decodeProductsServiceServiceSlugOwnedGetResponse(resp *http.Response) (res []OwnershipTimeFrame, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -612,7 +612,7 @@ func decodeProductsServiceServiceSlugOwnedGetResponse(resp *http.Response) (res 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeProductsServicesGetResponse(resp *http.Response) (res []PurchaseableProduct, err error) {
+func decodeProductsServicesGetResponse(resp *http.Response) (res []PurchaseableProduct, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -661,7 +661,7 @@ func decodeProductsServicesGetResponse(resp *http.Response) (res []PurchaseableP
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeProductsTopupGetResponse(resp *http.Response) (res []TopUpProduct, err error) {
+func decodeProductsTopupGetResponse(resp *http.Response) (res []TopUpProduct, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -710,7 +710,7 @@ func decodeProductsTopupGetResponse(resp *http.Response) (res []TopUpProduct, er
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeProductsTopupPutResponse(resp *http.Response) (res *TopUpProduct, err error) {
+func decodeProductsTopupPutResponse(resp *http.Response) (res *TopUpProduct, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -751,7 +751,7 @@ func decodeProductsTopupPutResponse(resp *http.Response) (res *TopUpProduct, err
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeProductsUserUserIdGetResponse(resp *http.Response) (res []RuleResult, err error) {
+func decodeProductsUserUserIdGetResponse(resp *http.Response) (res []RuleResult, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -800,7 +800,7 @@ func decodeProductsUserUserIdGetResponse(resp *http.Response) (res []RuleResult,
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeRulesGetResponse(resp *http.Response) (res []Rule, err error) {
+func decodeRulesGetResponse(resp *http.Response) (res []Rule, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -849,7 +849,7 @@ func decodeRulesGetResponse(resp *http.Response) (res []Rule, err error) {
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeRulesPostResponse(resp *http.Response) (res *Rule, err error) {
+func decodeRulesPostResponse(resp *http.Response) (res *Rule, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -890,7 +890,7 @@ func decodeRulesPostResponse(resp *http.Response) (res *Rule, err error) {
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeRulesRuleSlugDeleteResponse(resp *http.Response) (res *Rule, err error) {
+func decodeRulesRuleSlugDeleteResponse(resp *http.Response) (res *Rule, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -931,7 +931,7 @@ func decodeRulesRuleSlugDeleteResponse(resp *http.Response) (res *Rule, err erro
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeRulesRuleSlugGetResponse(resp *http.Response) (res *Rule, err error) {
+func decodeRulesRuleSlugGetResponse(resp *http.Response) (res *Rule, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -972,7 +972,7 @@ func decodeRulesRuleSlugGetResponse(resp *http.Response) (res *Rule, err error) 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeTopUpCompensatePostResponse(resp *http.Response) (res *Int32Int32ValueTuple, err error) {
+func decodeTopUpCompensatePostResponse(resp *http.Response) (res *Int32Int32ValueTuple, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1013,7 +1013,7 @@ func decodeTopUpCompensatePostResponse(resp *http.Response) (res *Int32Int32Valu
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeTopUpCustomPostResponse(resp *http.Response) (res *TopUpIdResponse, err error) {
+func decodeTopUpCustomPostResponse(resp *http.Response) (res *TopUpIdResponse, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1054,7 +1054,7 @@ func decodeTopUpCustomPostResponse(resp *http.Response) (res *TopUpIdResponse, e
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeTopUpOptionsGetResponse(resp *http.Response) (res []TopUpProduct, err error) {
+func decodeTopUpOptionsGetResponse(resp *http.Response) (res []TopUpProduct, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1103,7 +1103,7 @@ func decodeTopUpOptionsGetResponse(resp *http.Response) (res []TopUpProduct, err
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeTopUpPaypalPostResponse(resp *http.Response) (res *TopUpIdResponse, err error) {
+func decodeTopUpPaypalPostResponse(resp *http.Response) (res *TopUpIdResponse, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1144,7 +1144,7 @@ func decodeTopUpPaypalPostResponse(resp *http.Response) (res *TopUpIdResponse, e
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeTopUpStripePostResponse(resp *http.Response) (res *TopUpIdResponse, err error) {
+func decodeTopUpStripePostResponse(resp *http.Response) (res *TopUpIdResponse, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1185,7 +1185,7 @@ func decodeTopUpStripePostResponse(resp *http.Response) (res *TopUpIdResponse, e
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeTransactionPlanedUUserIdGetResponse(resp *http.Response) (res []ExternalTransaction, err error) {
+func decodeTransactionPlanedUUserIdGetResponse(resp *http.Response) (res []ExternalTransaction, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1234,7 +1234,7 @@ func decodeTransactionPlanedUUserIdGetResponse(resp *http.Response) (res []Exter
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeTransactionPlanedUUserIdPostResponse(resp *http.Response) (res *PlanedTransaction, err error) {
+func decodeTransactionPlanedUUserIdPostResponse(resp *http.Response) (res *PlanedTransaction, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1275,7 +1275,7 @@ func decodeTransactionPlanedUUserIdPostResponse(resp *http.Response) (res *Plane
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeTransactionPlanedUUserIdTTransactionIdDeleteResponse(resp *http.Response) (res *PlanedTransaction, err error) {
+func decodeTransactionPlanedUUserIdTTransactionIdDeleteResponse(resp *http.Response) (res *PlanedTransaction, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1316,7 +1316,7 @@ func decodeTransactionPlanedUUserIdTTransactionIdDeleteResponse(resp *http.Respo
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeTransactionPlanedUUserIdTTransactionIdPutResponse(resp *http.Response) (res *PlanedTransaction, err error) {
+func decodeTransactionPlanedUUserIdTTransactionIdPutResponse(resp *http.Response) (res *PlanedTransaction, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1357,7 +1357,7 @@ func decodeTransactionPlanedUUserIdTTransactionIdPutResponse(resp *http.Response
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeTransactionSendPostResponse(resp *http.Response) (res *TransactionSendPostOK, err error) {
+func decodeTransactionSendPostResponse(resp *http.Response) (res *TransactionSendPostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1366,7 +1366,7 @@ func decodeTransactionSendPostResponse(resp *http.Response) (res *TransactionSen
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeTransactionUUserIdGetResponse(resp *http.Response) (res []ExternalTransaction, err error) {
+func decodeTransactionUUserIdGetResponse(resp *http.Response) (res []ExternalTransaction, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1415,7 +1415,7 @@ func decodeTransactionUUserIdGetResponse(resp *http.Response) (res []ExternalTra
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeUserUserIdGetResponse(resp *http.Response) (res *User, err error) {
+func decodeUserUserIdGetResponse(resp *http.Response) (res *User, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1456,7 +1456,7 @@ func decodeUserUserIdGetResponse(resp *http.Response) (res *User, err error) {
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeUserUserIdOwnsLongestPostResponse(resp *http.Response) (res time.Time, err error) {
+func decodeUserUserIdOwnsLongestPostResponse(resp *http.Response) (res time.Time, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1499,7 +1499,7 @@ func decodeUserUserIdOwnsLongestPostResponse(resp *http.Response) (res time.Time
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeUserUserIdOwnsPostResponse(resp *http.Response) (res []OwnerShip, err error) {
+func decodeUserUserIdOwnsPostResponse(resp *http.Response) (res []OwnerShip, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1548,7 +1548,7 @@ func decodeUserUserIdOwnsPostResponse(resp *http.Response) (res []OwnerShip, err
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeUserUserIdOwnsProductSlugUntilGetResponse(resp *http.Response) (res time.Time, err error) {
+func decodeUserUserIdOwnsProductSlugUntilGetResponse(resp *http.Response) (res time.Time, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1591,7 +1591,7 @@ func decodeUserUserIdOwnsProductSlugUntilGetResponse(resp *http.Response) (res t
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeUserUserIdOwnsUntilPostResponse(resp *http.Response) (res UserUserIdOwnsUntilPostOKApplicationJSON, err error) {
+func decodeUserUserIdOwnsUntilPostResponse(resp *http.Response) (res UserUserIdOwnsUntilPostOKApplicationJSON, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1632,7 +1632,7 @@ func decodeUserUserIdOwnsUntilPostResponse(resp *http.Response) (res UserUserIdO
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeUserUserIdPostResponse(resp *http.Response) (res *User, err error) {
+func decodeUserUserIdPostResponse(resp *http.Response) (res *User, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1673,7 +1673,7 @@ func decodeUserUserIdPostResponse(resp *http.Response) (res *User, err error) {
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeUserUserIdPurchaseProductSlugPostResponse(resp *http.Response) (res *User, err error) {
+func decodeUserUserIdPurchaseProductSlugPostResponse(resp *http.Response) (res *User, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1714,7 +1714,7 @@ func decodeUserUserIdPurchaseProductSlugPostResponse(resp *http.Response) (res *
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeUserUserIdServicePurchaseProductSlugPostResponse(resp *http.Response) (res *User, err error) {
+func decodeUserUserIdServicePurchaseProductSlugPostResponse(resp *http.Response) (res *User, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1755,7 +1755,7 @@ func decodeUserUserIdServicePurchaseProductSlugPostResponse(resp *http.Response)
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeUserUserIdTransactionIdDeleteResponse(resp *http.Response) (res *User, err error) {
+func decodeUserUserIdTransactionIdDeleteResponse(resp *http.Response) (res *User, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1796,7 +1796,7 @@ func decodeUserUserIdTransactionIdDeleteResponse(resp *http.Response) (res *User
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeUserUserIdTransferPostResponse(resp *http.Response) (res *TransactionEvent, err error) {
+func decodeUserUserIdTransferPostResponse(resp *http.Response) (res *TransactionEvent, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.

@@ -13,9 +13,9 @@ import (
 func (s *MinecraftUuid) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.User.Set {
+		if value, ok := s.User.Get(); ok {
 			if err := func() error {
-				if err := s.User.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -39,13 +39,13 @@ func (s *MinecraftUuid) Validate() error {
 func (s *User) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Accounts.Set {
+		if value, ok := s.Accounts.Get(); ok {
 			if err := func() error {
-				if s.Accounts.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Accounts.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err

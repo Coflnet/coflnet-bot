@@ -75,7 +75,6 @@ func (s *APIAuctionsUidsSoldPostOKApplicationJSON) Decode(d *jx.Decoder) error {
 		default:
 			return d.Skip()
 		}
-		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode APIAuctionsUidsSoldPostOKApplicationJSON")
 	}
@@ -160,7 +159,6 @@ func (s *APICraftAPICraftGetOKApplicationJSON) Decode(d *jx.Decoder) error {
 		default:
 			return d.Skip()
 		}
-		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode APICraftAPICraftGetOKApplicationJSON")
 	}
@@ -205,7 +203,6 @@ func (s *APICraftRecipeItemTagGetOKApplicationJSON) Decode(d *jx.Decoder) error 
 		default:
 			return d.Skip()
 		}
-		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode APICraftRecipeItemTagGetOKApplicationJSON")
 	}
@@ -290,7 +287,6 @@ func (s *APIItemsNamesPostOKApplicationJSON) Decode(d *jx.Decoder) error {
 		default:
 			return d.Skip()
 		}
-		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode APIItemsNamesPostOKApplicationJSON")
 	}
@@ -311,17 +307,17 @@ func (s *APIItemsNamesPostOKApplicationJSON) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes APIModDescriptionModificationsPostApplicationJSONBadRequest as json.
-func (s *APIModDescriptionModificationsPostApplicationJSONBadRequest) Encode(e *jx.Encoder) {
+// Encode encodes APIModDescriptionModificationsPostBadRequest as json.
+func (s *APIModDescriptionModificationsPostBadRequest) Encode(e *jx.Encoder) {
 	unwrapped := (*ErrorResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes APIModDescriptionModificationsPostApplicationJSONBadRequest from json.
-func (s *APIModDescriptionModificationsPostApplicationJSONBadRequest) Decode(d *jx.Decoder) error {
+// Decode decodes APIModDescriptionModificationsPostBadRequest from json.
+func (s *APIModDescriptionModificationsPostBadRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode APIModDescriptionModificationsPostApplicationJSONBadRequest to nil")
+		return errors.New("invalid: unable to decode APIModDescriptionModificationsPostBadRequest to nil")
 	}
 	var unwrapped ErrorResponse
 	if err := func() error {
@@ -332,34 +328,34 @@ func (s *APIModDescriptionModificationsPostApplicationJSONBadRequest) Decode(d *
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = APIModDescriptionModificationsPostApplicationJSONBadRequest(unwrapped)
+	*s = APIModDescriptionModificationsPostBadRequest(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *APIModDescriptionModificationsPostApplicationJSONBadRequest) MarshalJSON() ([]byte, error) {
+func (s *APIModDescriptionModificationsPostBadRequest) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIModDescriptionModificationsPostApplicationJSONBadRequest) UnmarshalJSON(data []byte) error {
+func (s *APIModDescriptionModificationsPostBadRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes APIModDescriptionModificationsPostApplicationJSONInternalServerError as json.
-func (s *APIModDescriptionModificationsPostApplicationJSONInternalServerError) Encode(e *jx.Encoder) {
+// Encode encodes APIModDescriptionModificationsPostInternalServerError as json.
+func (s *APIModDescriptionModificationsPostInternalServerError) Encode(e *jx.Encoder) {
 	unwrapped := (*ErrorResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes APIModDescriptionModificationsPostApplicationJSONInternalServerError from json.
-func (s *APIModDescriptionModificationsPostApplicationJSONInternalServerError) Decode(d *jx.Decoder) error {
+// Decode decodes APIModDescriptionModificationsPostInternalServerError from json.
+func (s *APIModDescriptionModificationsPostInternalServerError) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode APIModDescriptionModificationsPostApplicationJSONInternalServerError to nil")
+		return errors.New("invalid: unable to decode APIModDescriptionModificationsPostInternalServerError to nil")
 	}
 	var unwrapped ErrorResponse
 	if err := func() error {
@@ -370,19 +366,19 @@ func (s *APIModDescriptionModificationsPostApplicationJSONInternalServerError) D
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = APIModDescriptionModificationsPostApplicationJSONInternalServerError(unwrapped)
+	*s = APIModDescriptionModificationsPostInternalServerError(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *APIModDescriptionModificationsPostApplicationJSONInternalServerError) MarshalJSON() ([]byte, error) {
+func (s *APIModDescriptionModificationsPostInternalServerError) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIModDescriptionModificationsPostApplicationJSONInternalServerError) UnmarshalJSON(data []byte) error {
+func (s *APIModDescriptionModificationsPostInternalServerError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -449,17 +445,17 @@ func (s *APIModDescriptionModificationsPostOKApplicationJSON) UnmarshalJSON(data
 	return s.Decode(d)
 }
 
-// Encode encodes APIModDescriptionPostApplicationJSONBadRequest as json.
-func (s *APIModDescriptionPostApplicationJSONBadRequest) Encode(e *jx.Encoder) {
+// Encode encodes APIModDescriptionPostBadRequest as json.
+func (s *APIModDescriptionPostBadRequest) Encode(e *jx.Encoder) {
 	unwrapped := (*ErrorResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes APIModDescriptionPostApplicationJSONBadRequest from json.
-func (s *APIModDescriptionPostApplicationJSONBadRequest) Decode(d *jx.Decoder) error {
+// Decode decodes APIModDescriptionPostBadRequest from json.
+func (s *APIModDescriptionPostBadRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode APIModDescriptionPostApplicationJSONBadRequest to nil")
+		return errors.New("invalid: unable to decode APIModDescriptionPostBadRequest to nil")
 	}
 	var unwrapped ErrorResponse
 	if err := func() error {
@@ -470,34 +466,34 @@ func (s *APIModDescriptionPostApplicationJSONBadRequest) Decode(d *jx.Decoder) e
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = APIModDescriptionPostApplicationJSONBadRequest(unwrapped)
+	*s = APIModDescriptionPostBadRequest(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *APIModDescriptionPostApplicationJSONBadRequest) MarshalJSON() ([]byte, error) {
+func (s *APIModDescriptionPostBadRequest) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIModDescriptionPostApplicationJSONBadRequest) UnmarshalJSON(data []byte) error {
+func (s *APIModDescriptionPostBadRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes APIModDescriptionPostApplicationJSONInternalServerError as json.
-func (s *APIModDescriptionPostApplicationJSONInternalServerError) Encode(e *jx.Encoder) {
+// Encode encodes APIModDescriptionPostInternalServerError as json.
+func (s *APIModDescriptionPostInternalServerError) Encode(e *jx.Encoder) {
 	unwrapped := (*ErrorResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes APIModDescriptionPostApplicationJSONInternalServerError from json.
-func (s *APIModDescriptionPostApplicationJSONInternalServerError) Decode(d *jx.Decoder) error {
+// Decode decodes APIModDescriptionPostInternalServerError from json.
+func (s *APIModDescriptionPostInternalServerError) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode APIModDescriptionPostApplicationJSONInternalServerError to nil")
+		return errors.New("invalid: unable to decode APIModDescriptionPostInternalServerError to nil")
 	}
 	var unwrapped ErrorResponse
 	if err := func() error {
@@ -508,19 +504,19 @@ func (s *APIModDescriptionPostApplicationJSONInternalServerError) Decode(d *jx.D
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = APIModDescriptionPostApplicationJSONInternalServerError(unwrapped)
+	*s = APIModDescriptionPostInternalServerError(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *APIModDescriptionPostApplicationJSONInternalServerError) MarshalJSON() ([]byte, error) {
+func (s *APIModDescriptionPostInternalServerError) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *APIModDescriptionPostApplicationJSONInternalServerError) UnmarshalJSON(data []byte) error {
+func (s *APIModDescriptionPostInternalServerError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -733,7 +729,6 @@ func (s *APIPremiumUserOwnsPostOKApplicationJSON) Decode(d *jx.Decoder) error {
 		default:
 			return d.Skip()
 		}
-		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode APIPremiumUserOwnsPostOKApplicationJSON")
 	}
@@ -3292,7 +3287,6 @@ func (s *FilterQueryFilters) Decode(d *jx.Decoder) error {
 		default:
 			return d.Skip()
 		}
-		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode FilterQueryFilters")
 	}
@@ -3986,7 +3980,6 @@ func (s *FlipSettingsFilters) Decode(d *jx.Decoder) error {
 		default:
 			return d.Skip()
 		}
-		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode FlipSettingsFilters")
 	}
@@ -5742,7 +5735,6 @@ func (s *ListEntryFilter) Decode(d *jx.Decoder) error {
 		default:
 			return d.Skip()
 		}
-		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode ListEntryFilter")
 	}
@@ -6607,7 +6599,6 @@ func (s *NbtDataData) Decode(d *jx.Decoder) error {
 		default:
 			return d.Skip()
 		}
-		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode NbtDataData")
 	}
@@ -10964,7 +10955,6 @@ func (s *SaveAuctionFlatNbt) Decode(d *jx.Decoder) error {
 		default:
 			return d.Skip()
 		}
-		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode SaveAuctionFlatNbt")
 	}

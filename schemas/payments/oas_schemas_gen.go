@@ -504,6 +504,14 @@ func (o *OptNilOwnerShipArray) SetTo(v []OwnerShip) {
 // IsSet returns true if value is Null.
 func (o OptNilOwnerShipArray) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilOwnerShipArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []OwnerShip
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilOwnerShipArray) Get() (v []OwnerShip, ok bool) {
 	if o.Null {
@@ -558,6 +566,14 @@ func (o *OptNilProductArray) SetTo(v []Product) {
 
 // IsSet returns true if value is Null.
 func (o OptNilProductArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilProductArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []Product
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilProductArray) Get() (v []Product, ok bool) {
@@ -614,6 +630,14 @@ func (o *OptNilPurchaseableProductArray) SetTo(v []PurchaseableProduct) {
 // IsSet returns true if value is Null.
 func (o OptNilPurchaseableProductArray) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilPurchaseableProductArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []PurchaseableProduct
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilPurchaseableProductArray) Get() (v []PurchaseableProduct, ok bool) {
 	if o.Null {
@@ -668,6 +692,14 @@ func (o *OptNilRuleArray) SetTo(v []Rule) {
 
 // IsSet returns true if value is Null.
 func (o OptNilRuleArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilRuleArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []Rule
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilRuleArray) Get() (v []Rule, ok bool) {
@@ -724,6 +756,14 @@ func (o *OptNilRuleCreateArray) SetTo(v []RuleCreate) {
 // IsSet returns true if value is Null.
 func (o OptNilRuleCreateArray) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilRuleCreateArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []RuleCreate
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilRuleCreateArray) Get() (v []RuleCreate, ok bool) {
 	if o.Null {
@@ -778,6 +818,14 @@ func (o *OptNilString) SetTo(v string) {
 
 // IsSet returns true if value is Null.
 func (o OptNilString) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilString) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v string
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilString) Get() (v string, ok bool) {
@@ -834,6 +882,14 @@ func (o *OptNilSystemStateGroups) SetTo(v SystemStateGroups) {
 // IsSet returns true if value is Null.
 func (o OptNilSystemStateGroups) IsNull() bool { return o.Null }
 
+// SetNull sets value to null.
+func (o *OptNilSystemStateGroups) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v SystemStateGroups
+	o.Value = v
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilSystemStateGroups) Get() (v SystemStateGroups, ok bool) {
 	if o.Null {
@@ -888,6 +944,14 @@ func (o *OptNilTopUpProductArray) SetTo(v []TopUpProduct) {
 
 // IsSet returns true if value is Null.
 func (o OptNilTopUpProductArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilTopUpProductArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []TopUpProduct
+	o.Value = v
+}
 
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilTopUpProductArray) Get() (v []TopUpProduct, ok bool) {

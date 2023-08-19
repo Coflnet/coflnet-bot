@@ -11,11 +11,12 @@ import (
 )
 
 func (s APIModDescriptionModificationsPostOKApplicationJSON) Validate() error {
-	if s == nil {
+	alias := ([][]DescModification)(s)
+	if alias == nil {
 		return errors.New("nil is invalid value")
 	}
 	var failures []validate.FieldError
-	for i, elem := range s {
+	for i, elem := range alias {
 		if err := func() error {
 			if elem == nil {
 				return errors.New("nil is invalid value")
@@ -50,12 +51,14 @@ func (s APIModDescriptionModificationsPostOKApplicationJSON) Validate() error {
 	}
 	return nil
 }
+
 func (s APIModDescriptionPostOKApplicationJSON) Validate() error {
-	if s == nil {
+	alias := ([][]string)(s)
+	if alias == nil {
 		return errors.New("nil is invalid value")
 	}
 	var failures []validate.FieldError
-	for i, elem := range s {
+	for i, elem := range alias {
 		if err := func() error {
 			if elem == nil {
 				return errors.New("nil is invalid value")
@@ -73,12 +76,13 @@ func (s APIModDescriptionPostOKApplicationJSON) Validate() error {
 	}
 	return nil
 }
+
 func (s *AveragePrice) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Min.Set {
+		if value, ok := s.Min.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Min.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -94,9 +98,9 @@ func (s *AveragePrice) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Max.Set {
+		if value, ok := s.Max.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Max.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -112,9 +116,9 @@ func (s *AveragePrice) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Avg.Set {
+		if value, ok := s.Avg.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Avg.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -134,12 +138,13 @@ func (s *AveragePrice) Validate() error {
 	}
 	return nil
 }
+
 func (s *BuyOrder) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.PricePerUnit.Set {
+		if value, ok := s.PricePerUnit.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.PricePerUnit.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -159,6 +164,7 @@ func (s *BuyOrder) Validate() error {
 	}
 	return nil
 }
+
 func (s Category) Validate() error {
 	switch s {
 	case "UNKNOWN":
@@ -179,12 +185,13 @@ func (s Category) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s *ColorEnchant) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Type.Set {
+		if value, ok := s.Type.Get(); ok {
 			if err := func() error {
-				if err := s.Type.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -204,16 +211,17 @@ func (s *ColorEnchant) Validate() error {
 	}
 	return nil
 }
+
 func (s *ColorSaveAuction) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Enchantments.Set {
+		if value, ok := s.Enchantments.Get(); ok {
 			if err := func() error {
-				if s.Enchantments.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Enchantments.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -242,7 +250,7 @@ func (s *ColorSaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Tag.Set {
+		if value, ok := s.Tag.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -252,7 +260,7 @@ func (s *ColorSaveAuction) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Tag.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -268,7 +276,7 @@ func (s *ColorSaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.ItemName.Set {
+		if value, ok := s.ItemName.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -278,7 +286,7 @@ func (s *ColorSaveAuction) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.ItemName.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -294,9 +302,9 @@ func (s *ColorSaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Coop.Set {
+		if value, ok := s.Coop.Get(); ok {
 			if err := func() error {
-				if s.Coop.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				return nil
@@ -312,9 +320,9 @@ func (s *ColorSaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.CoopMembers.Set {
+		if value, ok := s.CoopMembers.Get(); ok {
 			if err := func() error {
-				if s.CoopMembers.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				return nil
@@ -330,9 +338,9 @@ func (s *ColorSaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Bids.Set {
+		if value, ok := s.Bids.Get(); ok {
 			if err := func() error {
-				if s.Bids.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				return nil
@@ -348,9 +356,9 @@ func (s *ColorSaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Reforge.Set {
+		if value, ok := s.Reforge.Get(); ok {
 			if err := func() error {
-				if err := s.Reforge.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -366,9 +374,9 @@ func (s *ColorSaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Category.Set {
+		if value, ok := s.Category.Get(); ok {
 			if err := func() error {
-				if err := s.Category.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -384,9 +392,9 @@ func (s *ColorSaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Tier.Set {
+		if value, ok := s.Tier.Get(); ok {
 			if err := func() error {
-				if err := s.Tier.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -406,12 +414,13 @@ func (s *ColorSaveAuction) Validate() error {
 	}
 	return nil
 }
+
 func (s *CurrentPrice) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Sell.Set {
+		if value, ok := s.Sell.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Sell.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -427,9 +436,9 @@ func (s *CurrentPrice) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Buy.Set {
+		if value, ok := s.Buy.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Buy.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -449,12 +458,13 @@ func (s *CurrentPrice) Validate() error {
 	}
 	return nil
 }
+
 func (s *DescModification) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Type.Set {
+		if value, ok := s.Type.Get(); ok {
 			if err := func() error {
-				if err := s.Type.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -474,6 +484,7 @@ func (s *DescModification) Validate() error {
 	}
 	return nil
 }
+
 func (s DescriptionField) Validate() error {
 	switch s {
 	case "NONE":
@@ -506,16 +517,17 @@ func (s DescriptionField) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s *DescriptionSetting) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Fields.Set {
+		if value, ok := s.Fields.Get(); ok {
 			if err := func() error {
-				if s.Fields.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Fields.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if elem == nil {
 							return errors.New("nil is invalid value")
@@ -565,12 +577,13 @@ func (s *DescriptionSetting) Validate() error {
 	}
 	return nil
 }
+
 func (s *Enchantment) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Type.Set {
+		if value, ok := s.Type.Get(); ok {
 			if err := func() error {
-				if err := s.Type.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -590,6 +603,7 @@ func (s *Enchantment) Validate() error {
 	}
 	return nil
 }
+
 func (s EnchantmentType) Validate() error {
 	switch s {
 	case "unknown":
@@ -846,12 +860,13 @@ func (s EnchantmentType) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s *FilterOptions) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Options.Set {
+		if value, ok := s.Options.Get(); ok {
 			if err := func() error {
-				if s.Options.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				return nil
@@ -867,9 +882,9 @@ func (s *FilterOptions) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Type.Set {
+		if value, ok := s.Type.Get(); ok {
 			if err := func() error {
-				if err := s.Type.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -889,12 +904,13 @@ func (s *FilterOptions) Validate() error {
 	}
 	return nil
 }
+
 func (s *FilterQuery) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Auction.Set {
+		if value, ok := s.Auction.Get(); ok {
 			if err := func() error {
-				if err := s.Auction.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -914,6 +930,7 @@ func (s *FilterQuery) Validate() error {
 	}
 	return nil
 }
+
 func (s FilterType) Validate() error {
 	switch s {
 	case 1:
@@ -940,6 +957,7 @@ func (s FilterType) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s FinderType) Validate() error {
 	switch s {
 	case 0:
@@ -968,12 +986,13 @@ func (s FinderType) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s *FlipDetails) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Finder.Set {
+		if value, ok := s.Finder.Get(); ok {
 			if err := func() error {
-				if err := s.Finder.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -989,9 +1008,9 @@ func (s *FlipDetails) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.PropertyChanges.Set {
+		if value, ok := s.PropertyChanges.Get(); ok {
 			if err := func() error {
-				if s.PropertyChanges.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				return nil
@@ -1011,16 +1030,17 @@ func (s *FlipDetails) Validate() error {
 	}
 	return nil
 }
+
 func (s *FlipSettings) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Blacklist.Set {
+		if value, ok := s.Blacklist.Get(); ok {
 			if err := func() error {
-				if s.Blacklist.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Blacklist.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -1049,13 +1069,13 @@ func (s *FlipSettings) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Whitelist.Set {
+		if value, ok := s.Whitelist.Get(); ok {
 			if err := func() error {
-				if s.Whitelist.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Whitelist.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -1084,9 +1104,9 @@ func (s *FlipSettings) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Mod.Set {
+		if value, ok := s.Mod.Get(); ok {
 			if err := func() error {
-				if err := s.Mod.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -1102,9 +1122,9 @@ func (s *FlipSettings) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Finders.Set {
+		if value, ok := s.Finders.Get(); ok {
 			if err := func() error {
-				if err := s.Finders.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -1120,9 +1140,9 @@ func (s *FlipSettings) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.MinVolume.Set {
+		if value, ok := s.MinVolume.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.MinVolume.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1142,16 +1162,17 @@ func (s *FlipSettings) Validate() error {
 	}
 	return nil
 }
+
 func (s *FlipSumary) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Flips.Set {
+		if value, ok := s.Flips.Get(); ok {
 			if err := func() error {
-				if s.Flips.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Flips.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -1184,12 +1205,13 @@ func (s *FlipSumary) Validate() error {
 	}
 	return nil
 }
+
 func (s *GraphResult) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.MaxBuy.Set {
+		if value, ok := s.MaxBuy.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.MaxBuy.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1205,9 +1227,9 @@ func (s *GraphResult) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.MaxSell.Set {
+		if value, ok := s.MaxSell.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.MaxSell.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1223,9 +1245,9 @@ func (s *GraphResult) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.MinBuy.Set {
+		if value, ok := s.MinBuy.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.MinBuy.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1241,9 +1263,9 @@ func (s *GraphResult) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.MinSell.Set {
+		if value, ok := s.MinSell.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.MinSell.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1259,9 +1281,9 @@ func (s *GraphResult) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Buy.Set {
+		if value, ok := s.Buy.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Buy.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1277,9 +1299,9 @@ func (s *GraphResult) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Sell.Set {
+		if value, ok := s.Sell.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Sell.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1299,12 +1321,13 @@ func (s *GraphResult) Validate() error {
 	}
 	return nil
 }
+
 func (s *Ingredient) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Cost.Set {
+		if value, ok := s.Cost.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Cost.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1324,12 +1347,13 @@ func (s *Ingredient) Validate() error {
 	}
 	return nil
 }
+
 func (s *InventoryBatchLookup) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Uuids.Set {
+		if value, ok := s.Uuids.Get(); ok {
 			if err := func() error {
-				if s.Uuids.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				return nil
@@ -1349,12 +1373,13 @@ func (s *InventoryBatchLookup) Validate() error {
 	}
 	return nil
 }
+
 func (s *InventoryData) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Settings.Set {
+		if value, ok := s.Settings.Get(); ok {
 			if err := func() error {
-				if err := s.Settings.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -1374,6 +1399,7 @@ func (s *InventoryData) Validate() error {
 	}
 	return nil
 }
+
 func (s ItemCategory) Validate() error {
 	switch s {
 	case "UNKNOWN":
@@ -1484,6 +1510,7 @@ func (s ItemCategory) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s ItemFlags) Validate() error {
 	switch s {
 	case "NONE":
@@ -1504,12 +1531,13 @@ func (s ItemFlags) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s *ItemMetadataElement) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Flags.Set {
+		if value, ok := s.Flags.Get(); ok {
 			if err := func() error {
-				if err := s.Flags.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -1529,12 +1557,13 @@ func (s *ItemMetadataElement) Validate() error {
 	}
 	return nil
 }
+
 func (s *KatFlip) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Volume.Set {
+		if value, ok := s.Volume.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Volume.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1550,9 +1579,9 @@ func (s *KatFlip) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.UpgradeCost.Set {
+		if value, ok := s.UpgradeCost.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.UpgradeCost.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1568,9 +1597,9 @@ func (s *KatFlip) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.MaterialCost.Set {
+		if value, ok := s.MaterialCost.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.MaterialCost.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1586,9 +1615,9 @@ func (s *KatFlip) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.CoreData.Set {
+		if value, ok := s.CoreData.Get(); ok {
 			if err := func() error {
-				if err := s.CoreData.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -1604,9 +1633,9 @@ func (s *KatFlip) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.TargetRarity.Set {
+		if value, ok := s.TargetRarity.Get(); ok {
 			if err := func() error {
-				if err := s.TargetRarity.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -1622,9 +1651,9 @@ func (s *KatFlip) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Profit.Set {
+		if value, ok := s.Profit.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Profit.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1644,12 +1673,13 @@ func (s *KatFlip) Validate() error {
 	}
 	return nil
 }
+
 func (s *KatUpgradeCost) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.BaseRarity.Set {
+		if value, ok := s.BaseRarity.Get(); ok {
 			if err := func() error {
-				if err := s.BaseRarity.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -1669,12 +1699,13 @@ func (s *KatUpgradeCost) Validate() error {
 	}
 	return nil
 }
+
 func (s *ListEntry) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Tags.Set {
+		if value, ok := s.Tags.Get(); ok {
 			if err := func() error {
-				if s.Tags.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				return nil
@@ -1694,12 +1725,13 @@ func (s *ListEntry) Validate() error {
 	}
 	return nil
 }
+
 func (s *ModSettings) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.TimerScale.Set {
+		if value, ok := s.TimerScale.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.TimerScale.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1719,6 +1751,7 @@ func (s *ModSettings) Validate() error {
 	}
 	return nil
 }
+
 func (s ModType) Validate() error {
 	switch s {
 	case "NONE":
@@ -1735,12 +1768,13 @@ func (s ModType) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s *ModelCandidate) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Perks.Set {
+		if value, ok := s.Perks.Get(); ok {
 			if err := func() error {
-				if s.Perks.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				return nil
@@ -1760,16 +1794,17 @@ func (s *ModelCandidate) Validate() error {
 	}
 	return nil
 }
+
 func (s *ModelElectionPeriod) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Candidates.Set {
+		if value, ok := s.Candidates.Get(); ok {
 			if err := func() error {
-				if s.Candidates.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Candidates.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -1798,9 +1833,9 @@ func (s *ModelElectionPeriod) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Winner.Set {
+		if value, ok := s.Winner.Get(); ok {
 			if err := func() error {
-				if err := s.Winner.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -1824,9 +1859,9 @@ func (s *ModelElectionPeriod) Validate() error {
 func (s *PriceEstimate) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Volume.Set {
+		if value, ok := s.Volume.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Volume.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1846,12 +1881,13 @@ func (s *PriceEstimate) Validate() error {
 	}
 	return nil
 }
+
 func (s *PriceSumary) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Mean.Set {
+		if value, ok := s.Mean.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Mean.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1867,9 +1903,9 @@ func (s *PriceSumary) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Volume.Set {
+		if value, ok := s.Volume.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Volume.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1889,12 +1925,13 @@ func (s *PriceSumary) Validate() error {
 	}
 	return nil
 }
+
 func (s *PrivacySettings) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.CommandPrefixes.Set {
+		if value, ok := s.CommandPrefixes.Get(); ok {
 			if err := func() error {
-				if s.CommandPrefixes.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				return nil
@@ -1914,6 +1951,7 @@ func (s *PrivacySettings) Validate() error {
 	}
 	return nil
 }
+
 func (s ProductType) Validate() error {
 	switch s {
 	case "NONE":
@@ -1934,12 +1972,13 @@ func (s ProductType) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s *ProfitableCraft) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.SellPrice.Set {
+		if value, ok := s.SellPrice.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.SellPrice.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1955,9 +1994,9 @@ func (s *ProfitableCraft) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.CraftCost.Set {
+		if value, ok := s.CraftCost.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.CraftCost.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -1973,13 +2012,13 @@ func (s *ProfitableCraft) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Ingredients.Set {
+		if value, ok := s.Ingredients.Get(); ok {
 			if err := func() error {
-				if s.Ingredients.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Ingredients.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -2008,9 +2047,9 @@ func (s *ProfitableCraft) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Volume.Set {
+		if value, ok := s.Volume.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Volume.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -2026,9 +2065,9 @@ func (s *ProfitableCraft) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Median.Set {
+		if value, ok := s.Median.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Median.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -2048,6 +2087,7 @@ func (s *ProfitableCraft) Validate() error {
 	}
 	return nil
 }
+
 func (s Reforge) Validate() error {
 	switch s {
 	case "None":
@@ -2300,10 +2340,11 @@ func (s Reforge) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s *SaveAuction) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Tag.Set {
+		if value, ok := s.Tag.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -2313,7 +2354,7 @@ func (s *SaveAuction) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Tag.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -2329,7 +2370,7 @@ func (s *SaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.ItemName.Set {
+		if value, ok := s.ItemName.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -2339,7 +2380,7 @@ func (s *SaveAuction) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.ItemName.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -2355,9 +2396,9 @@ func (s *SaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Coop.Set {
+		if value, ok := s.Coop.Get(); ok {
 			if err := func() error {
-				if s.Coop.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				return nil
@@ -2373,9 +2414,9 @@ func (s *SaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.CoopMembers.Set {
+		if value, ok := s.CoopMembers.Get(); ok {
 			if err := func() error {
-				if s.CoopMembers.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				return nil
@@ -2391,9 +2432,9 @@ func (s *SaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Bids.Set {
+		if value, ok := s.Bids.Get(); ok {
 			if err := func() error {
-				if s.Bids.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				return nil
@@ -2409,13 +2450,13 @@ func (s *SaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Enchantments.Set {
+		if value, ok := s.Enchantments.Get(); ok {
 			if err := func() error {
-				if s.Enchantments.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.Enchantments.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -2444,9 +2485,9 @@ func (s *SaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Reforge.Set {
+		if value, ok := s.Reforge.Get(); ok {
 			if err := func() error {
-				if err := s.Reforge.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -2462,9 +2503,9 @@ func (s *SaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Category.Set {
+		if value, ok := s.Category.Get(); ok {
 			if err := func() error {
-				if err := s.Category.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -2480,9 +2521,9 @@ func (s *SaveAuction) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Tier.Set {
+		if value, ok := s.Tier.Get(); ok {
 			if err := func() error {
-				if err := s.Tier.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -2502,12 +2543,13 @@ func (s *SaveAuction) Validate() error {
 	}
 	return nil
 }
+
 func (s *SearchResultItem) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Tier.Set {
+		if value, ok := s.Tier.Get(); ok {
 			if err := func() error {
-				if err := s.Tier.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -2527,12 +2569,13 @@ func (s *SearchResultItem) Validate() error {
 	}
 	return nil
 }
+
 func (s *SellOrder) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.PricePerUnit.Set {
+		if value, ok := s.PricePerUnit.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.PricePerUnit.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -2552,12 +2595,13 @@ func (s *SellOrder) Validate() error {
 	}
 	return nil
 }
+
 func (s *SkyblockItem) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.NpcSellPrice.Set {
+		if value, ok := s.NpcSellPrice.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.NpcSellPrice.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -2573,9 +2617,9 @@ func (s *SkyblockItem) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Flags.Set {
+		if value, ok := s.Flags.Get(); ok {
 			if err := func() error {
-				if err := s.Flags.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -2591,9 +2635,9 @@ func (s *SkyblockItem) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Tier.Set {
+		if value, ok := s.Tier.Get(); ok {
 			if err := func() error {
-				if err := s.Tier.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -2609,9 +2653,9 @@ func (s *SkyblockItem) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Category.Set {
+		if value, ok := s.Category.Get(); ok {
 			if err := func() error {
-				if err := s.Category.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -2631,12 +2675,13 @@ func (s *SkyblockItem) Validate() error {
 	}
 	return nil
 }
+
 func (s *StorageQuickStatus) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.BuyPrice.Set {
+		if value, ok := s.BuyPrice.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.BuyPrice.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -2652,9 +2697,9 @@ func (s *StorageQuickStatus) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.SellPrice.Set {
+		if value, ok := s.SellPrice.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.SellPrice.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -2670,13 +2715,13 @@ func (s *StorageQuickStatus) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.BuyOrders.Set {
+		if value, ok := s.BuyOrders.Get(); ok {
 			if err := func() error {
-				if s.BuyOrders.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.BuyOrders.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -2705,13 +2750,13 @@ func (s *StorageQuickStatus) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.SellOrders.Set {
+		if value, ok := s.SellOrders.Get(); ok {
 			if err := func() error {
-				if s.SellOrders.Value == nil {
+				if value == nil {
 					return errors.New("nil is invalid value")
 				}
 				var failures []validate.FieldError
-				for i, elem := range s.SellOrders.Value {
+				for i, elem := range value {
 					if err := func() error {
 						if err := elem.Validate(); err != nil {
 							return err
@@ -2744,12 +2789,13 @@ func (s *StorageQuickStatus) Validate() error {
 	}
 	return nil
 }
+
 func (s *SupplyElement) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Volume.Set {
+		if value, ok := s.Volume.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Volume.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -2769,6 +2815,7 @@ func (s *SupplyElement) Validate() error {
 	}
 	return nil
 }
+
 func (s Tier) Validate() error {
 	switch s {
 	case "UNKNOWN":
@@ -2795,12 +2842,13 @@ func (s Tier) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
 func (s *TopUpProduct) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Type.Set {
+		if value, ok := s.Type.Get(); ok {
 			if err := func() error {
-				if err := s.Type.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -2816,9 +2864,9 @@ func (s *TopUpProduct) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Price.Set {
+		if value, ok := s.Price.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Price.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -2834,9 +2882,9 @@ func (s *TopUpProduct) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Cost.Set {
+		if value, ok := s.Cost.Get(); ok {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Cost.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil

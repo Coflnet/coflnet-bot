@@ -9,105 +9,137 @@ import (
 )
 
 func (s *APIChatInternalClientPostApplicationJSON) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*ClientThing)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatInternalClientPostApplicationJSONOK) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*CientCreationResponse)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatInternalClientPostTextJSON) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*ClientThing)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatInternalClientPostTextJSONOK) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*CientCreationResponse)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatMuteDeleteApplicationJSON) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*UnMute)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatMuteDeleteApplicationJSONOK) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*UnMute)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatMuteDeleteTextJSON) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*UnMute)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatMuteDeleteTextJSONOK) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*UnMute)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatMutePostApplicationJSON) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*Mute)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatMutePostApplicationJSONOK) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*Mute)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatMutePostTextJSON) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*Mute)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatMutePostTextJSONOK) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*Mute)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatSendPostApplicationJSON) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*ChatMessage)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatSendPostApplicationJSONOK) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*ChatMessage)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatSendPostTextJSON) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*ChatMessage)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *APIChatSendPostTextJSONOK) Validate() error {
-	if err := s.Validate(); err != nil {
+	alias := (*ChatMessage)(s)
+	if err := alias.Validate(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (s *ChatMessage) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.UUID.Set {
+		if value, ok := s.UUID.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -117,7 +149,7 @@ func (s *ChatMessage) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.UUID.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -133,7 +165,7 @@ func (s *ChatMessage) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Name.Set {
+		if value, ok := s.Name.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -143,7 +175,7 @@ func (s *ChatMessage) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Name.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -163,12 +195,13 @@ func (s *ChatMessage) Validate() error {
 	}
 	return nil
 }
+
 func (s *CientCreationResponse) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Client.Set {
+		if value, ok := s.Client.Get(); ok {
 			if err := func() error {
-				if err := s.Client.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -188,10 +221,11 @@ func (s *CientCreationResponse) Validate() error {
 	}
 	return nil
 }
+
 func (s *ClientThing) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Name.Set {
+		if value, ok := s.Name.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -201,7 +235,7 @@ func (s *ClientThing) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Name.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -221,10 +255,11 @@ func (s *ClientThing) Validate() error {
 	}
 	return nil
 }
+
 func (s *Mute) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.UUID.Set {
+		if value, ok := s.UUID.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -234,7 +269,7 @@ func (s *Mute) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.UUID.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -250,7 +285,7 @@ func (s *Mute) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Muter.Set {
+		if value, ok := s.Muter.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -260,7 +295,7 @@ func (s *Mute) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.Muter.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -276,7 +311,7 @@ func (s *Mute) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.UnMuter.Set {
+		if value, ok := s.UnMuter.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -286,7 +321,7 @@ func (s *Mute) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.UnMuter.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -302,9 +337,9 @@ func (s *Mute) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Status.Set {
+		if value, ok := s.Status.Get(); ok {
 			if err := func() error {
-				if err := s.Status.Value.Validate(); err != nil {
+				if err := value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -324,6 +359,7 @@ func (s *Mute) Validate() error {
 	}
 	return nil
 }
+
 func (s MuteStatus) Validate() error {
 	switch s {
 	case 0:
@@ -346,7 +382,7 @@ func (s MuteStatus) Validate() error {
 func (s *UnMute) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.UUID.Set {
+		if value, ok := s.UUID.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -356,7 +392,7 @@ func (s *UnMute) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.UUID.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil
@@ -372,7 +408,7 @@ func (s *UnMute) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.UnMuter.Set {
+		if value, ok := s.UnMuter.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
 					MinLength:    0,
@@ -382,7 +418,7 @@ func (s *UnMute) Validate() error {
 					Email:        false,
 					Hostname:     false,
 					Regex:        nil,
-				}).Validate(string(s.UnMuter.Value)); err != nil {
+				}).Validate(string(value)); err != nil {
 					return errors.Wrap(err, "string")
 				}
 				return nil

@@ -5,15 +5,18 @@ package payments
 import (
 	"context"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/go-faster/errors"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/metric"
 
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/uri"
+	"github.com/ogen-go/ogen/validate"
 )
 
 // Client implements OAS client.
@@ -26,12 +29,19 @@ var _ Handler = struct {
 	*Client
 }{}
 
+func trimTrailingSlashes(u *url.URL) {
+	u.Path = strings.TrimRight(u.Path, "/")
+	u.RawPath = strings.TrimRight(u.RawPath, "/")
+}
+
 // NewClient initializes new Client defined by OAS.
 func NewClient(serverURL string, opts ...ClientOption) (*Client, error) {
 	u, err := url.Parse(serverURL)
 	if err != nil {
 		return nil, err
 	}
+	trimTrailingSlashes(u)
+
 	c, err := newClientConfig(opts...).baseClient()
 	if err != nil {
 		return nil, err
@@ -84,12 +94,13 @@ func (c *Client) sendApplyPost(ctx context.Context, request *SystemState) (res *
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "ApplyPost",
@@ -101,17 +112,19 @@ func (c *Client) sendApplyPost(ctx context.Context, request *SystemState) (res *
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Apply"
+	var pathParts [1]string
+	pathParts[0] = "/Apply"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -152,12 +165,13 @@ func (c *Client) sendCallbackPaypalPost(ctx context.Context) (res *CallbackPaypa
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "CallbackPaypalPost",
@@ -169,17 +183,19 @@ func (c *Client) sendCallbackPaypalPost(ctx context.Context) (res *CallbackPaypa
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Callback/paypal"
+	var pathParts [1]string
+	pathParts[0] = "/Callback/paypal"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -217,12 +233,13 @@ func (c *Client) sendCallbackStripePost(ctx context.Context) (res *CallbackStrip
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "CallbackStripePost",
@@ -234,17 +251,19 @@ func (c *Client) sendCallbackStripePost(ctx context.Context) (res *CallbackStrip
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Callback/stripe"
+	var pathParts [1]string
+	pathParts[0] = "/Callback/stripe"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -280,12 +299,13 @@ func (c *Client) sendGroupGet(ctx context.Context, params GroupGetParams) (res [
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "GroupGet",
@@ -297,14 +317,16 @@ func (c *Client) sendGroupGet(ctx context.Context, params GroupGetParams) (res [
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Group"
+	var pathParts [1]string
+	pathParts[0] = "/Group"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -345,7 +367,7 @@ func (c *Client) sendGroupGet(ctx context.Context, params GroupGetParams) (res [
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -381,12 +403,13 @@ func (c *Client) sendGroupGroupSlugDelete(ctx context.Context, params GroupGroup
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "GroupGroupSlugDelete",
@@ -398,14 +421,15 @@ func (c *Client) sendGroupGroupSlugDelete(ctx context.Context, params GroupGroup
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Group/"
+	var pathParts [2]string
+	pathParts[0] = "/Group/"
 	{
 		// Encode "groupSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -418,11 +442,16 @@ func (c *Client) sendGroupGroupSlugDelete(ctx context.Context, params GroupGroup
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "DELETE", u, nil)
+	r, err := ht.NewRequest(ctx, "DELETE", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -458,12 +487,13 @@ func (c *Client) sendGroupGroupSlugGet(ctx context.Context, params GroupGroupSlu
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "GroupGroupSlugGet",
@@ -475,14 +505,15 @@ func (c *Client) sendGroupGroupSlugGet(ctx context.Context, params GroupGroupSlu
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Group/"
+	var pathParts [2]string
+	pathParts[0] = "/Group/"
 	{
 		// Encode "groupSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -495,11 +526,16 @@ func (c *Client) sendGroupGroupSlugGet(ctx context.Context, params GroupGroupSlu
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -544,12 +580,13 @@ func (c *Client) sendGroupGroupSlugProductsDelete(ctx context.Context, request [
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "GroupGroupSlugProductsDelete",
@@ -561,14 +598,15 @@ func (c *Client) sendGroupGroupSlugProductsDelete(ctx context.Context, request [
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Group/"
+	var pathParts [3]string
+	pathParts[0] = "/Group/"
 	{
 		// Encode "groupSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -581,12 +619,17 @@ func (c *Client) sendGroupGroupSlugProductsDelete(ctx context.Context, request [
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/products"
+	pathParts[2] = "/products"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "DELETE", u, nil)
+	r, err := ht.NewRequest(ctx, "DELETE", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -634,12 +677,13 @@ func (c *Client) sendGroupGroupSlugProductsPost(ctx context.Context, request []s
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "GroupGroupSlugProductsPost",
@@ -651,14 +695,15 @@ func (c *Client) sendGroupGroupSlugProductsPost(ctx context.Context, request []s
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Group/"
+	var pathParts [3]string
+	pathParts[0] = "/Group/"
 	{
 		// Encode "groupSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -671,12 +716,17 @@ func (c *Client) sendGroupGroupSlugProductsPost(ctx context.Context, request []s
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/products"
+	pathParts[2] = "/products"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -724,12 +774,13 @@ func (c *Client) sendGroupGroupSlugPut(ctx context.Context, request *Group, para
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "GroupGroupSlugPut",
@@ -741,14 +792,15 @@ func (c *Client) sendGroupGroupSlugPut(ctx context.Context, request *Group, para
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Group/"
+	var pathParts [2]string
+	pathParts[0] = "/Group/"
 	{
 		// Encode "groupSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -761,11 +813,16 @@ func (c *Client) sendGroupGroupSlugPut(ctx context.Context, request *Group, para
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "PUT", u, nil)
+	r, err := ht.NewRequest(ctx, "PUT", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -813,12 +870,13 @@ func (c *Client) sendGroupPost(ctx context.Context, request *Group) (res *Group,
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "GroupPost",
@@ -830,17 +888,19 @@ func (c *Client) sendGroupPost(ctx context.Context, request *Group) (res *Group,
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Group"
+	var pathParts [1]string
+	pathParts[0] = "/Group"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -881,12 +941,13 @@ func (c *Client) sendProductsGet(ctx context.Context, params ProductsGetParams) 
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "ProductsGet",
@@ -898,14 +959,16 @@ func (c *Client) sendProductsGet(ctx context.Context, params ProductsGetParams) 
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Products"
+	var pathParts [1]string
+	pathParts[0] = "/Products"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -946,7 +1009,7 @@ func (c *Client) sendProductsGet(ctx context.Context, params ProductsGetParams) 
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -984,12 +1047,13 @@ func (c *Client) sendProductsPProductSlugGet(ctx context.Context, params Product
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "ProductsPProductSlugGet",
@@ -1001,14 +1065,15 @@ func (c *Client) sendProductsPProductSlugGet(ctx context.Context, params Product
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Products/p/"
+	var pathParts [2]string
+	pathParts[0] = "/Products/p/"
 	{
 		// Encode "productSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -1021,11 +1086,16 @@ func (c *Client) sendProductsPProductSlugGet(ctx context.Context, params Product
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1073,12 +1143,13 @@ func (c *Client) sendProductsPut(ctx context.Context, request *PurchaseableProdu
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "ProductsPut",
@@ -1090,17 +1161,19 @@ func (c *Client) sendProductsPut(ctx context.Context, request *PurchaseableProdu
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Products"
+	var pathParts [1]string
+	pathParts[0] = "/Products"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "PUT", u, nil)
+	r, err := ht.NewRequest(ctx, "PUT", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1141,12 +1214,13 @@ func (c *Client) sendProductsServiceServiceSlugCountGet(ctx context.Context, par
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "ProductsServiceServiceSlugCountGet",
@@ -1158,14 +1232,15 @@ func (c *Client) sendProductsServiceServiceSlugCountGet(ctx context.Context, par
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Products/service/"
+	var pathParts [3]string
+	pathParts[0] = "/Products/service/"
 	{
 		// Encode "serviceSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -1178,12 +1253,17 @@ func (c *Client) sendProductsServiceServiceSlugCountGet(ctx context.Context, par
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/count"
+	pathParts[2] = "/count"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1221,12 +1301,13 @@ func (c *Client) sendProductsServiceServiceSlugIdsGet(ctx context.Context, param
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "ProductsServiceServiceSlugIdsGet",
@@ -1238,14 +1319,15 @@ func (c *Client) sendProductsServiceServiceSlugIdsGet(ctx context.Context, param
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Products/service/"
+	var pathParts [3]string
+	pathParts[0] = "/Products/service/"
 	{
 		// Encode "serviceSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -1258,12 +1340,17 @@ func (c *Client) sendProductsServiceServiceSlugIdsGet(ctx context.Context, param
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/ids"
+	pathParts[2] = "/ids"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1301,12 +1388,13 @@ func (c *Client) sendProductsServiceServiceSlugOwnedGet(ctx context.Context, par
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "ProductsServiceServiceSlugOwnedGet",
@@ -1318,14 +1406,15 @@ func (c *Client) sendProductsServiceServiceSlugOwnedGet(ctx context.Context, par
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Products/service/"
+	var pathParts [3]string
+	pathParts[0] = "/Products/service/"
 	{
 		// Encode "serviceSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -1338,9 +1427,14 @@ func (c *Client) sendProductsServiceServiceSlugOwnedGet(ctx context.Context, par
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/owned"
+	pathParts[2] = "/owned"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -1381,7 +1475,7 @@ func (c *Client) sendProductsServiceServiceSlugOwnedGet(ctx context.Context, par
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1419,12 +1513,13 @@ func (c *Client) sendProductsServicesGet(ctx context.Context, params ProductsSer
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "ProductsServicesGet",
@@ -1436,14 +1531,16 @@ func (c *Client) sendProductsServicesGet(ctx context.Context, params ProductsSer
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Products/services"
+	var pathParts [1]string
+	pathParts[0] = "/Products/services"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -1484,7 +1581,7 @@ func (c *Client) sendProductsServicesGet(ctx context.Context, params ProductsSer
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1522,12 +1619,13 @@ func (c *Client) sendProductsTopupGet(ctx context.Context, params ProductsTopupG
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "ProductsTopupGet",
@@ -1539,14 +1637,16 @@ func (c *Client) sendProductsTopupGet(ctx context.Context, params ProductsTopupG
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Products/topup"
+	var pathParts [1]string
+	pathParts[0] = "/Products/topup"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -1587,7 +1687,7 @@ func (c *Client) sendProductsTopupGet(ctx context.Context, params ProductsTopupG
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1635,12 +1735,13 @@ func (c *Client) sendProductsTopupPut(ctx context.Context, request *TopUpProduct
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "ProductsTopupPut",
@@ -1652,17 +1753,19 @@ func (c *Client) sendProductsTopupPut(ctx context.Context, request *TopUpProduct
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Products/topup"
+	var pathParts [1]string
+	pathParts[0] = "/Products/topup"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "PUT", u, nil)
+	r, err := ht.NewRequest(ctx, "PUT", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1703,12 +1806,13 @@ func (c *Client) sendProductsUserUserIdGet(ctx context.Context, params ProductsU
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "ProductsUserUserIdGet",
@@ -1720,14 +1824,15 @@ func (c *Client) sendProductsUserUserIdGet(ctx context.Context, params ProductsU
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Products/user/"
+	var pathParts [2]string
+	pathParts[0] = "/Products/user/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -1740,8 +1845,13 @@ func (c *Client) sendProductsUserUserIdGet(ctx context.Context, params ProductsU
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -1771,7 +1881,7 @@ func (c *Client) sendProductsUserUserIdGet(ctx context.Context, params ProductsU
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1809,12 +1919,13 @@ func (c *Client) sendRulesGet(ctx context.Context, params RulesGetParams) (res [
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "RulesGet",
@@ -1826,14 +1937,16 @@ func (c *Client) sendRulesGet(ctx context.Context, params RulesGetParams) (res [
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Rules"
+	var pathParts [1]string
+	pathParts[0] = "/Rules"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -1874,7 +1987,7 @@ func (c *Client) sendRulesGet(ctx context.Context, params RulesGetParams) (res [
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1921,12 +2034,13 @@ func (c *Client) sendRulesPost(ctx context.Context, request *RuleCreate) (res *R
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "RulesPost",
@@ -1938,17 +2052,19 @@ func (c *Client) sendRulesPost(ctx context.Context, request *RuleCreate) (res *R
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Rules"
+	var pathParts [1]string
+	pathParts[0] = "/Rules"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -1989,12 +2105,13 @@ func (c *Client) sendRulesRuleSlugDelete(ctx context.Context, params RulesRuleSl
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "RulesRuleSlugDelete",
@@ -2006,14 +2123,15 @@ func (c *Client) sendRulesRuleSlugDelete(ctx context.Context, params RulesRuleSl
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Rules/"
+	var pathParts [2]string
+	pathParts[0] = "/Rules/"
 	{
 		// Encode "ruleSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2026,11 +2144,16 @@ func (c *Client) sendRulesRuleSlugDelete(ctx context.Context, params RulesRuleSl
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "DELETE", u, nil)
+	r, err := ht.NewRequest(ctx, "DELETE", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2068,12 +2191,13 @@ func (c *Client) sendRulesRuleSlugGet(ctx context.Context, params RulesRuleSlugG
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "RulesRuleSlugGet",
@@ -2085,14 +2209,15 @@ func (c *Client) sendRulesRuleSlugGet(ctx context.Context, params RulesRuleSlugG
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Rules/"
+	var pathParts [2]string
+	pathParts[0] = "/Rules/"
 	{
 		// Encode "ruleSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2105,11 +2230,16 @@ func (c *Client) sendRulesRuleSlugGet(ctx context.Context, params RulesRuleSlugG
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2147,12 +2277,13 @@ func (c *Client) sendTopUpCompensatePost(ctx context.Context, request *Compensat
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "TopUpCompensatePost",
@@ -2164,17 +2295,19 @@ func (c *Client) sendTopUpCompensatePost(ctx context.Context, request *Compensat
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/TopUp/compensate"
+	var pathParts [1]string
+	pathParts[0] = "/TopUp/compensate"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2215,12 +2348,13 @@ func (c *Client) sendTopUpCustomPost(ctx context.Context, request *CustomTopUp, 
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "TopUpCustomPost",
@@ -2232,14 +2366,16 @@ func (c *Client) sendTopUpCustomPost(ctx context.Context, request *CustomTopUp, 
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/TopUp/custom"
+	var pathParts [1]string
+	pathParts[0] = "/TopUp/custom"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -2263,7 +2399,7 @@ func (c *Client) sendTopUpCustomPost(ctx context.Context, request *CustomTopUp, 
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2304,12 +2440,13 @@ func (c *Client) sendTopUpOptionsGet(ctx context.Context) (res []TopUpProduct, e
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "TopUpOptionsGet",
@@ -2321,17 +2458,19 @@ func (c *Client) sendTopUpOptionsGet(ctx context.Context) (res []TopUpProduct, e
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/TopUp/options"
+	var pathParts [1]string
+	pathParts[0] = "/TopUp/options"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2378,12 +2517,13 @@ func (c *Client) sendTopUpPaypalPost(ctx context.Context, request *TopUpOptions,
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "TopUpPaypalPost",
@@ -2395,14 +2535,16 @@ func (c *Client) sendTopUpPaypalPost(ctx context.Context, request *TopUpOptions,
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/TopUp/paypal"
+	var pathParts [1]string
+	pathParts[0] = "/TopUp/paypal"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -2443,7 +2585,7 @@ func (c *Client) sendTopUpPaypalPost(ctx context.Context, request *TopUpOptions,
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2493,12 +2635,13 @@ func (c *Client) sendTopUpStripePost(ctx context.Context, request *TopUpOptions,
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "TopUpStripePost",
@@ -2510,14 +2653,16 @@ func (c *Client) sendTopUpStripePost(ctx context.Context, request *TopUpOptions,
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/TopUp/stripe"
+	var pathParts [1]string
+	pathParts[0] = "/TopUp/stripe"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -2558,7 +2703,7 @@ func (c *Client) sendTopUpStripePost(ctx context.Context, request *TopUpOptions,
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2597,12 +2742,13 @@ func (c *Client) sendTransactionPlanedUUserIdGet(ctx context.Context, params Tra
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "TransactionPlanedUUserIdGet",
@@ -2614,14 +2760,15 @@ func (c *Client) sendTransactionPlanedUUserIdGet(ctx context.Context, params Tra
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Transaction/planed/u/"
+	var pathParts [2]string
+	pathParts[0] = "/Transaction/planed/u/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2634,11 +2781,16 @@ func (c *Client) sendTransactionPlanedUUserIdGet(ctx context.Context, params Tra
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2683,12 +2835,13 @@ func (c *Client) sendTransactionPlanedUUserIdPost(ctx context.Context, request *
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "TransactionPlanedUUserIdPost",
@@ -2700,14 +2853,15 @@ func (c *Client) sendTransactionPlanedUUserIdPost(ctx context.Context, request *
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Transaction/planed/u/"
+	var pathParts [2]string
+	pathParts[0] = "/Transaction/planed/u/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2720,11 +2874,16 @@ func (c *Client) sendTransactionPlanedUUserIdPost(ctx context.Context, request *
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2763,12 +2922,13 @@ func (c *Client) sendTransactionPlanedUUserIdTTransactionIdDelete(ctx context.Co
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "TransactionPlanedUUserIdTTransactionIdDelete",
@@ -2780,14 +2940,15 @@ func (c *Client) sendTransactionPlanedUUserIdTTransactionIdDelete(ctx context.Co
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Transaction/planed/u/"
+	var pathParts [4]string
+	pathParts[0] = "/Transaction/planed/u/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2800,9 +2961,13 @@ func (c *Client) sendTransactionPlanedUUserIdTTransactionIdDelete(ctx context.Co
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/t/"
+	pathParts[2] = "/t/"
 	{
 		// Encode "transactionId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2815,11 +2980,16 @@ func (c *Client) sendTransactionPlanedUUserIdTTransactionIdDelete(ctx context.Co
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "DELETE", u, nil)
+	r, err := ht.NewRequest(ctx, "DELETE", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2864,12 +3034,13 @@ func (c *Client) sendTransactionPlanedUUserIdTTransactionIdPut(ctx context.Conte
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "TransactionPlanedUUserIdTTransactionIdPut",
@@ -2881,14 +3052,15 @@ func (c *Client) sendTransactionPlanedUUserIdTTransactionIdPut(ctx context.Conte
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Transaction/planed/u/"
+	var pathParts [4]string
+	pathParts[0] = "/Transaction/planed/u/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2901,9 +3073,13 @@ func (c *Client) sendTransactionPlanedUUserIdTTransactionIdPut(ctx context.Conte
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/t/"
+	pathParts[2] = "/t/"
 	{
 		// Encode "transactionId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -2916,11 +3092,16 @@ func (c *Client) sendTransactionPlanedUUserIdTTransactionIdPut(ctx context.Conte
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "PUT", u, nil)
+	r, err := ht.NewRequest(ctx, "PUT", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -2968,12 +3149,13 @@ func (c *Client) sendTransactionSendPost(ctx context.Context, request *Transacti
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "TransactionSendPost",
@@ -2985,17 +3167,19 @@ func (c *Client) sendTransactionSendPost(ctx context.Context, request *Transacti
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Transaction/send"
+	var pathParts [1]string
+	pathParts[0] = "/Transaction/send"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3034,12 +3218,13 @@ func (c *Client) sendTransactionUUserIdGet(ctx context.Context, params Transacti
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "TransactionUUserIdGet",
@@ -3051,14 +3236,15 @@ func (c *Client) sendTransactionUUserIdGet(ctx context.Context, params Transacti
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/Transaction/u/"
+	var pathParts [2]string
+	pathParts[0] = "/Transaction/u/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3071,11 +3257,16 @@ func (c *Client) sendTransactionUUserIdGet(ctx context.Context, params Transacti
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3113,12 +3304,13 @@ func (c *Client) sendUserUserIdGet(ctx context.Context, params UserUserIdGetPara
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "UserUserIdGet",
@@ -3130,14 +3322,15 @@ func (c *Client) sendUserUserIdGet(ctx context.Context, params UserUserIdGetPara
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/User/"
+	var pathParts [2]string
+	pathParts[0] = "/User/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3150,11 +3343,16 @@ func (c *Client) sendUserUserIdGet(ctx context.Context, params UserUserIdGetPara
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3193,6 +3391,17 @@ func (c *Client) sendUserUserIdOwnsLongestPost(ctx context.Context, request []st
 		if request == nil {
 			return errors.New("nil is invalid value")
 		}
+		if err := (validate.Array{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    0,
+			MaxLengthSet: false,
+		}).ValidateLength(len(request)); err != nil {
+			return errors.Wrap(err, "array")
+		}
+		if err := validate.UniqueItems(request); err != nil {
+			return errors.Wrap(err, "array")
+		}
 		return nil
 	}(); err != nil {
 		return res, errors.Wrap(err, "validate")
@@ -3201,12 +3410,13 @@ func (c *Client) sendUserUserIdOwnsLongestPost(ctx context.Context, request []st
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "UserUserIdOwnsLongestPost",
@@ -3218,14 +3428,15 @@ func (c *Client) sendUserUserIdOwnsLongestPost(ctx context.Context, request []st
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/User/"
+	var pathParts [3]string
+	pathParts[0] = "/User/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3238,12 +3449,17 @@ func (c *Client) sendUserUserIdOwnsLongestPost(ctx context.Context, request []st
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/owns/longest"
+	pathParts[2] = "/owns/longest"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3287,6 +3503,17 @@ func (c *Client) sendUserUserIdOwnsPost(ctx context.Context, request []string, p
 		if request == nil {
 			return errors.New("nil is invalid value")
 		}
+		if err := (validate.Array{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    0,
+			MaxLengthSet: false,
+		}).ValidateLength(len(request)); err != nil {
+			return errors.Wrap(err, "array")
+		}
+		if err := validate.UniqueItems(request); err != nil {
+			return errors.Wrap(err, "array")
+		}
 		return nil
 	}(); err != nil {
 		return res, errors.Wrap(err, "validate")
@@ -3295,12 +3522,13 @@ func (c *Client) sendUserUserIdOwnsPost(ctx context.Context, request []string, p
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "UserUserIdOwnsPost",
@@ -3312,14 +3540,15 @@ func (c *Client) sendUserUserIdOwnsPost(ctx context.Context, request []string, p
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/User/"
+	var pathParts [3]string
+	pathParts[0] = "/User/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3332,12 +3561,17 @@ func (c *Client) sendUserUserIdOwnsPost(ctx context.Context, request []string, p
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/owns"
+	pathParts[2] = "/owns"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3378,12 +3612,13 @@ func (c *Client) sendUserUserIdOwnsProductSlugUntilGet(ctx context.Context, para
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "UserUserIdOwnsProductSlugUntilGet",
@@ -3395,14 +3630,15 @@ func (c *Client) sendUserUserIdOwnsProductSlugUntilGet(ctx context.Context, para
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/User/"
+	var pathParts [5]string
+	pathParts[0] = "/User/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3415,9 +3651,13 @@ func (c *Client) sendUserUserIdOwnsProductSlugUntilGet(ctx context.Context, para
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/owns/"
+	pathParts[2] = "/owns/"
 	{
 		// Encode "productSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3430,12 +3670,17 @@ func (c *Client) sendUserUserIdOwnsProductSlugUntilGet(ctx context.Context, para
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
 	}
-	u.Path += "/until"
+	pathParts[4] = "/until"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3474,6 +3719,17 @@ func (c *Client) sendUserUserIdOwnsUntilPost(ctx context.Context, request []stri
 		if request == nil {
 			return errors.New("nil is invalid value")
 		}
+		if err := (validate.Array{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    0,
+			MaxLengthSet: false,
+		}).ValidateLength(len(request)); err != nil {
+			return errors.Wrap(err, "array")
+		}
+		if err := validate.UniqueItems(request); err != nil {
+			return errors.Wrap(err, "array")
+		}
 		return nil
 	}(); err != nil {
 		return res, errors.Wrap(err, "validate")
@@ -3482,12 +3738,13 @@ func (c *Client) sendUserUserIdOwnsUntilPost(ctx context.Context, request []stri
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "UserUserIdOwnsUntilPost",
@@ -3499,14 +3756,15 @@ func (c *Client) sendUserUserIdOwnsUntilPost(ctx context.Context, request []stri
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/User/"
+	var pathParts [3]string
+	pathParts[0] = "/User/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3519,12 +3777,17 @@ func (c *Client) sendUserUserIdOwnsUntilPost(ctx context.Context, request []stri
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/owns/until"
+	pathParts[2] = "/owns/until"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3565,12 +3828,13 @@ func (c *Client) sendUserUserIdPost(ctx context.Context, params UserUserIdPostPa
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "UserUserIdPost",
@@ -3582,14 +3846,15 @@ func (c *Client) sendUserUserIdPost(ctx context.Context, params UserUserIdPostPa
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/User/"
+	var pathParts [2]string
+	pathParts[0] = "/User/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3602,11 +3867,16 @@ func (c *Client) sendUserUserIdPost(ctx context.Context, params UserUserIdPostPa
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3644,12 +3914,13 @@ func (c *Client) sendUserUserIdPurchaseProductSlugPost(ctx context.Context, para
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "UserUserIdPurchaseProductSlugPost",
@@ -3661,14 +3932,15 @@ func (c *Client) sendUserUserIdPurchaseProductSlugPost(ctx context.Context, para
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/User/"
+	var pathParts [4]string
+	pathParts[0] = "/User/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3681,9 +3953,13 @@ func (c *Client) sendUserUserIdPurchaseProductSlugPost(ctx context.Context, para
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/purchase/"
+	pathParts[2] = "/purchase/"
 	{
 		// Encode "productSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3696,8 +3972,13 @@ func (c *Client) sendUserUserIdPurchaseProductSlugPost(ctx context.Context, para
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -3721,7 +4002,7 @@ func (c *Client) sendUserUserIdPurchaseProductSlugPost(ctx context.Context, para
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3759,12 +4040,13 @@ func (c *Client) sendUserUserIdServicePurchaseProductSlugPost(ctx context.Contex
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "UserUserIdServicePurchaseProductSlugPost",
@@ -3776,14 +4058,15 @@ func (c *Client) sendUserUserIdServicePurchaseProductSlugPost(ctx context.Contex
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/User/"
+	var pathParts [4]string
+	pathParts[0] = "/User/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3796,9 +4079,13 @@ func (c *Client) sendUserUserIdServicePurchaseProductSlugPost(ctx context.Contex
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/service/purchase/"
+	pathParts[2] = "/service/purchase/"
 	{
 		// Encode "productSlug" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3811,8 +4098,13 @@ func (c *Client) sendUserUserIdServicePurchaseProductSlugPost(ctx context.Contex
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
@@ -3853,7 +4145,7 @@ func (c *Client) sendUserUserIdServicePurchaseProductSlugPost(ctx context.Contex
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3891,12 +4183,13 @@ func (c *Client) sendUserUserIdTransactionIdDelete(ctx context.Context, params U
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "UserUserIdTransactionIdDelete",
@@ -3908,14 +4201,15 @@ func (c *Client) sendUserUserIdTransactionIdDelete(ctx context.Context, params U
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/User/"
+	var pathParts [4]string
+	pathParts[0] = "/User/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3928,9 +4222,13 @@ func (c *Client) sendUserUserIdTransactionIdDelete(ctx context.Context, params U
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/"
+	pathParts[2] = "/"
 	{
 		// Encode "transactionId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -3943,11 +4241,16 @@ func (c *Client) sendUserUserIdTransactionIdDelete(ctx context.Context, params U
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
 	}
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "DELETE", u, nil)
+	r, err := ht.NewRequest(ctx, "DELETE", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -3994,12 +4297,13 @@ func (c *Client) sendUserUserIdTransferPost(ctx context.Context, request *Transf
 	// Run stopwatch.
 	startTime := time.Now()
 	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
-	c.requests.Add(ctx, 1, otelAttrs...)
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "UserUserIdTransferPost",
@@ -4011,14 +4315,15 @@ func (c *Client) sendUserUserIdTransferPost(ctx context.Context, request *Transf
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, otelAttrs...)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
 		span.End()
 	}()
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	u.Path += "/User/"
+	var pathParts [3]string
+	pathParts[0] = "/User/"
 	{
 		// Encode "userId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -4031,12 +4336,17 @@ func (c *Client) sendUserUserIdTransferPost(ctx context.Context, request *Transf
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
-		u.Path += e.Result()
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
 	}
-	u.Path += "/transfer"
+	pathParts[2] = "/transfer"
+	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
