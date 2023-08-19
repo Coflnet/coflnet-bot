@@ -25,6 +25,12 @@ const (
 	FlipChannel        = "flip"
 )
 
+type DiscordMessage struct {
+	Message string `json:"message"`
+	Channel string `json:"channel"`
+	Webhook string `json:"webhook"`
+}
+
 func SendMessageToFeedback(msg string) error {
 	return sendMessageToChannel(msg, FeedbackChannel)
 }

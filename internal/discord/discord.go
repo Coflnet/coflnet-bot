@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,7 +21,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"golang.org/x/exp/slog"
 )
 
 const (
@@ -31,9 +31,8 @@ func NewDiscordHandler(mute *MuteCommand, unmute *UnmuteCommand) *DiscordHandler
 	instance, err := InitSession()
 
 	if err != nil {
-		panic(err)
+		slog.Error("error when initializing discord session", slog.String("error", err.Error()))
 	}
-
 	instance.muteCommand = mute
 	instance.unmuteCommand = unmute
 
@@ -41,7 +40,7 @@ func NewDiscordHandler(mute *MuteCommand, unmute *UnmuteCommand) *DiscordHandler
 }
 
 type Discord interface {
-	SendMessage(msg *DiscordMessage) error
+	SendMessage(msg *discord.DiscordMessage) error
 }
 
 type DiscordHandler struct {
@@ -54,12 +53,6 @@ type DiscordHandler struct {
 	messagesReceived chan discordgo.Message
 
 	tracer trace.Tracer
-}
-
-type DiscordMessage struct {
-	Message string `json:"message"`
-	Channel string `json:"channel"`
-	Webhook string `json:"webhook"`
 }
 
 type WebhookRequest struct {
@@ -120,7 +113,7 @@ func InitSession() (DiscordHandler, error) {
 }
 
 // SendMessage sends a discord message to the discord server
-func (d *DiscordHandler) SendMessage(ctx context.Context, msg *DiscordMessage) error {
+func (d *DiscordHandler) SendMessage(ctx context.Context, msg *discord.DiscordMessage) error {
 	_, span := d.tracer.Start(ctx, "send-discord-message")
 	defer span.End()
 	slog.Debug("sending a discord message")
@@ -171,7 +164,7 @@ func (d *DiscordHandler) SendMessage(ctx context.Context, msg *DiscordMessage) e
 	return nil
 }
 
-// returns a channel which contains all messages received from discord, or error if such a channel already exists
+// DiscordMessagesSent returns a channel which contains all messages received from discord, or error if such a channel already exists
 func (d *DiscordHandler) DiscordMessagesSent(ctx context.Context) (<-chan discordgo.Message, error) {
 	if d.messagesReceived == nil {
 		d.messagesReceived = make(chan discordgo.Message, 100)
