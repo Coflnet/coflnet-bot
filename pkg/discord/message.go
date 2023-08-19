@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
+	"log/slog"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type DiscordMessageToSend struct {
@@ -25,7 +27,7 @@ const (
 	FlipChannel        = "flip"
 )
 
-type DiscordMessage struct {
+type Message struct {
 	Message string `json:"message"`
 	Channel string `json:"channel"`
 	Webhook string `json:"webhook"`
@@ -100,4 +102,48 @@ func getEnv(k string) (string, error) {
 		return "", fmt.Errorf("%s not set", k)
 	}
 	return v, nil
+}
+
+func SendMessageToChannel(content string, channel string) error {
+
+	// prepare a http post request
+	msg := Message{
+		Channel: channel,
+		Message: content,
+	}
+
+	// send the message
+	base := os.Getenv("DISCORD_BOT_BASE_URL")
+	if base == "" {
+		return fmt.Errorf("DISCORD_BOT_BASE_URL is not set")
+	}
+
+	url := fmt.Sprintf("%s/api/webhook/message", base)
+
+	payload, err := json.Marshal(msg)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", url, strings.NewReader(string(payload)))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		err = res.Body.Close()
+		if err != nil {
+			slog.Error("could not close body", err)
+		}
+	}()
+
+	slog.Debug("discord webhook response status code", "code", res.StatusCode)
+	return nil
 }
