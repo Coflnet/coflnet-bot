@@ -24,10 +24,13 @@ func (d *DiscordHandler) RegisterCommands() error {
 		d.muteCommand,
 		d.unmuteCommand,
 	}
+	slog.Info(fmt.Sprintf("mute command is: %v", d.muteCommand))
+	slog.Info(fmt.Sprintf("unmute command is: %v", d.unmuteCommand))
 
 	// convert the custom commands into discordgo commands
 	commands := make([]*discordgo.ApplicationCommand, 0)
 	commandHandlers := map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){}
+
 	for _, v := range customCommands {
 		commands = append(commands, v.CreateCommand())
 		commandHandlers[v.Name()] = v.HandleCommand

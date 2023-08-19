@@ -12,7 +12,6 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/db"
 	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/processor"
-	"github.com/Coflnet/coflnet-bot/internal/redis"
 	"github.com/Coflnet/coflnet-bot/internal/usecase"
 )
 
@@ -24,7 +23,7 @@ func wireApp() *App {
 	dbDB := db.NewDB()
 	userRepo := db.NewUserRepo(dbDB)
 	userHandler := usecase.NewUserHandler(mcConnectApi, paymentApi, userRepo)
-	redisHandler := redis.NewRedisHandler()
+	redisHandler := usecase.NewRedisHandler()
 	chatApi := coflnet.NewChatApi()
 	apiClient := coflnet.NewApiClient()
 	muteCommand := discord.NewMuteCommand(chatApi, apiClient)

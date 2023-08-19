@@ -68,6 +68,14 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
+	if m == nil {
+		slog.Warn("mute command is nil")
+		return
+	}
+	if m.tracer == nil {
+		slog.Warn("tracer is nil")
+		return
+	}
 	ctx, span := m.tracer.Start(ctx, "handle-mute-command")
 	defer span.End()
 

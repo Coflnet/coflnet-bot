@@ -6,14 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log/slog"
-	"net/http"
-	"os"
-	"os/signal"
-	"regexp"
-	"sync"
-	"time"
-
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/Coflnet/coflnet-bot/pkg/discord"
@@ -21,6 +13,12 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"log/slog"
+	"net/http"
+	"os"
+	"os/signal"
+	"regexp"
+	"sync"
 )
 
 const (
@@ -28,13 +26,11 @@ const (
 )
 
 func NewDiscordHandler(mute *MuteCommand, unmute *UnmuteCommand) *DiscordHandler {
-	instance, err := InitSession()
 
+	instance, err := InitSession(mute, unmute)
 	if err != nil {
 		slog.Error("error when initializing discord session", slog.String("error", err.Error()))
 	}
-	instance.muteCommand = mute
-	instance.unmuteCommand = unmute
 
 	return &instance
 }
@@ -71,10 +67,12 @@ func (d *DiscordHandler) Close() {
 	d.session.Close()
 }
 
-func InitSession() (DiscordHandler, error) {
+func InitSession(mute *MuteCommand, unmute *UnmuteCommand) (DiscordHandler, error) {
 
 	d := DiscordHandler{
-		tracer: otel.Tracer(discordHandlerTracerName),
+		tracer:        otel.Tracer(discordHandlerTracerName),
+		muteCommand:   mute,
+		unmuteCommand: unmute,
 	}
 
 	var err error
@@ -89,11 +87,18 @@ func InitSession() (DiscordHandler, error) {
 	sessionOpen.Add(1)
 
 	go func() {
-		d.session.Open()
-		defer d.session.Close()
-		time.Sleep(1 * time.Second)
+		err = d.session.Open()
+		if err != nil {
+			slog.Error("error when opening discord session", err)
+		}
+		defer func() {
+			err = d.session.Close()
+			if err != nil {
+				slog.Warn("error when closing discord session", err)
+			}
+		}()
 
-		err := d.RegisterCommands()
+		err = d.RegisterCommands()
 		if err != nil {
 			slog.Error("error when registering commands", err)
 			panic(err)

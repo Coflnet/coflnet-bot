@@ -12,7 +12,6 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/metrics"
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
-	"github.com/Coflnet/coflnet-bot/internal/redis"
 	"github.com/Coflnet/coflnet-bot/internal/usecase"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/Coflnet/coflnet-bot/schemas/chat"
@@ -25,11 +24,10 @@ import (
 )
 
 const (
-	chatProcessor         = "chat-processor"
 	coflDiscordClientName = "cofl-discord"
 )
 
-func NewChatProcessor(u *usecase.UserHandler, r *redis.RedisHandler, d *discord.DiscordHandler, c *coflnet.ChatApi) *ChatProcessor {
+func NewChatProcessor(u *usecase.UserHandler, r *usecase.RedisHandler, d *discord.DiscordHandler, c *coflnet.ChatApi) *ChatProcessor {
 	return &ChatProcessor{
 		userHandler:       u,
 		redisHandler:      r,
@@ -39,61 +37,57 @@ func NewChatProcessor(u *usecase.UserHandler, r *redis.RedisHandler, d *discord.
 	}
 }
 
+// ChatProcessor handles all the chat messages from redis pubsub and discord and transfers them to the other platform
 type ChatProcessor struct {
-	redisHandler      *redis.RedisHandler
+	redisHandler      *usecase.RedisHandler
 	discordHandler    *discord.DiscordHandler
 	userHandler       *usecase.UserHandler
 	coflnetChatClient *coflnet.ChatApi
 	tracer            trace.Tracer
 }
 
-func (r *ChatProcessor) StartProcessing() error {
+func (p *ChatProcessor) StartProcessing() error {
 	slog.Info("starting chat processor")
 
 	var errCh chan error
+	ctx := context.Background()
 
 	go func() {
 		slog.Info("starting redis chat processor")
-		err := r.startRedisChatProcessor()
+		err := p.startRedisChatProcessor(ctx)
 		slog.Error("redis chat processor stopped", err)
-
 		errCh <- err
 	}()
 
 	go func() {
 		slog.Info("starting discord chat processor")
-		err := r.startDiscordChatProcessor()
+		err := p.startDiscordChatProcessor(ctx)
 		slog.Error("discord chat processor stopped", err)
-
 		errCh <- err
 	}()
 
 	return <-errCh
 }
 
-func (r *ChatProcessor) startRedisChatProcessor() error {
-	ctx := context.Background()
-
-	slog.Info("start receiving redis chat messages")
-	msgs := r.redisHandler.ReceiveChatPubSubMessage(ctx)
-
+func (p *ChatProcessor) startRedisChatProcessor(ctx context.Context) error {
+	msgs := p.redisHandler.ReceiveChatPubSubMessage(ctx)
 	slog.Info("listening for redis chat messages")
+
 	for msg := range msgs {
 
 		go func(msg *redisgo.Message) {
-			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			msgCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 
-			ctx, span := r.tracer.Start(ctx, "process-redis-chat-message")
+			msgCtx, span := p.tracer.Start(msgCtx, "process-redis-chat-message")
 			defer span.End()
-
 			span.SetAttributes(attribute.String("message", msg.Payload))
 			span.SetAttributes(attribute.String("channel", msg.Channel))
 
-			err := r.processRedisMessage(ctx, msg)
+			err := p.processRedisMessage(msgCtx, msg)
 			if err != nil {
 				span.RecordError(err)
-				slog.Error("error processing message", err)
+				slog.Warn("error processing a message from redis", "err", err)
 			}
 		}(msg)
 	}
@@ -101,12 +95,8 @@ func (r *ChatProcessor) startRedisChatProcessor() error {
 	return errors.New("redis chat pubsub channel closed")
 }
 
-func (r *ChatProcessor) startDiscordChatProcessor() error {
-
-	ctx := context.Background()
-	slog.Info("starting discord chat processor")
-
-	msgs, err := r.discordHandler.DiscordMessagesSent(ctx)
+func (p *ChatProcessor) startDiscordChatProcessor(ctx context.Context) error {
+	msgs, err := p.discordHandler.DiscordMessagesSent(ctx)
 	if err != nil {
 		slog.Error("error getting discord messages", err)
 		return err
@@ -114,17 +104,13 @@ func (r *ChatProcessor) startDiscordChatProcessor() error {
 
 	for msg := range msgs {
 		go func(msg discordgo.Message) {
-			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			msgCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 
-			ctx, span := r.tracer.Start(ctx, "process-discord-chat-message")
+			msgCtx, span := p.tracer.Start(msgCtx, "process-discord-chat-message")
 			defer span.End()
 
-			err := r.processDiscordMessage(ctx, &msg)
-			if err != nil {
-				span.RecordError(err)
-				slog.Error("error processing message", err)
-			}
+			p.processDiscordMessage(ctx, &msg)
 		}(msg)
 	}
 
@@ -132,14 +118,11 @@ func (r *ChatProcessor) startDiscordChatProcessor() error {
 }
 
 // processDiscordMessage processes every incoming discord message
-func (p *ChatProcessor) processDiscordMessage(ctx context.Context, msg *discordgo.Message) error {
-
+func (p *ChatProcessor) processDiscordMessage(ctx context.Context, msg *discordgo.Message) {
 	ctx, span := p.tracer.Start(ctx, "process-discord-message")
 	defer span.End()
-	defer metrics.DiscordMessagesProcessed.Inc()
-	slog.Debug(fmt.Sprintf("processing discord message from %s with content %s", msg.Author.Username, msg.Content))
 
-	// create a error channel for potential errors in go routines
+	// create an error channel for potential errors in go routines
 	wg := &sync.WaitGroup{}
 
 	// save the message to the database
@@ -176,19 +159,9 @@ func (p *ChatProcessor) processDiscordMessage(ctx context.Context, msg *discordg
 		}()
 	}
 
-	// refresh the user
-	go func(user *discordgo.User) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		ctx, span := p.tracer.Start(ctx, "trigger-refresh-user")
-		defer span.End()
-
-		p.userHandler.RefreshUserByDiscordUser(ctx, user)
-	}(msg.Author)
-
 	wg.Wait()
 	slog.Debug("finished processing discord message from %s with content %s", msg.Author.Username, msg.Content)
-	return nil
+	metrics.DiscordMessagesProcessed.Inc()
 }
 
 // processRedisMessage processes every incoming redis message

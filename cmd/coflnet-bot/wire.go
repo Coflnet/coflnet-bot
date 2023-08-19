@@ -9,7 +9,6 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/db"
 	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/processor"
-	"github.com/Coflnet/coflnet-bot/internal/redis"
 	"github.com/Coflnet/coflnet-bot/internal/usecase"
 	"github.com/google/wire"
 )
@@ -19,7 +18,7 @@ func wireApp() *App {
 		wire.NewSet(db.NewDB, db.NewUserRepo),
 		wire.NewSet(discord.NewMuteCommand, discord.NewUnmuteCommand),
 		wire.NewSet(coflnet.NewMcConnectApi, coflnet.NewPaymentApi, coflnet.NewChatApi, coflnet.NewApiClient),
-		wire.NewSet(discord.NewDiscordHandler, redis.NewRedisHandler),
+		wire.NewSet(discord.NewDiscordHandler, usecase.NewRedisHandler),
 		wire.NewSet(usecase.NewUserHandler),
 		wire.NewSet(processor.NewChatProcessor, processor.NewDiscordMessageProcessor),
 		wire.NewSet(api.NewUserController, api.NewWebhookController, api.NewApiController),

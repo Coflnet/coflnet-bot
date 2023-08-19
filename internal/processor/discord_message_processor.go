@@ -8,6 +8,7 @@ import (
 
 	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
+	pubdiscord "github.com/Coflnet/coflnet-bot/pkg/discord"
 	kafkago "github.com/segmentio/kafka-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -105,7 +106,7 @@ func (p *DiscordMessageProcessor) processMessage(ctx context.Context, msg *kafka
 	defer span.End()
 
 	// deserialize message
-	var m *discord.DiscordMessage
+	var m *pubdiscord.Message
 	err := json.Unmarshal(msg.Value, &m)
 	if err != nil {
 		slog.Error("error unmarshalling message %s", err)
@@ -124,25 +125,4 @@ func (p *DiscordMessageProcessor) processMessage(ctx context.Context, msg *kafka
 
 	slog.Info("send a message to discord %s", msg.Key)
 	return nil
-}
-
-func (p *DiscordMessageProcessor) WriteTestMessage() error {
-	ctx := context.Background()
-	msg := &discord.DiscordMessage{
-		Message: "test",
-		Channel: "test",
-	}
-
-	d, err := json.Marshal(msg)
-	if err != nil {
-		slog.Error("error marshalling message %s", err)
-		return err
-	}
-
-	km := kafkago.Message{
-		Key:   []byte("test"),
-		Value: d,
-	}
-
-	return p.kafkaProcessor.WriteMessage(ctx, km)
 }
