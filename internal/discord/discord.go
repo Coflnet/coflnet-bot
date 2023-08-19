@@ -40,7 +40,7 @@ func NewDiscordHandler(mute *MuteCommand, unmute *UnmuteCommand) *DiscordHandler
 }
 
 type Discord interface {
-	SendMessage(msg *discord.DiscordMessage) error
+	SendMessage(msg *discord.Message) error
 }
 
 type DiscordHandler struct {
@@ -113,7 +113,7 @@ func InitSession() (DiscordHandler, error) {
 }
 
 // SendMessage sends a discord message to the discord server
-func (d *DiscordHandler) SendMessage(ctx context.Context, msg *discord.DiscordMessage) error {
+func (d *DiscordHandler) SendMessage(ctx context.Context, msg *discord.Message) error {
 	_, span := d.tracer.Start(ctx, "send-discord-message")
 	defer span.End()
 	slog.Debug("sending a discord message")
