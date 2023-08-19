@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/Coflnet/coflnet-bot/internal/discord"
+	pubdiscord "github.com/Coflnet/coflnet-bot/pkg/discord"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,7 +22,7 @@ func (con *WebhookController) RegisterRoutes(router *gin.RouterGroup) {
 
 func (con *WebhookController) messageWebhook(c *gin.Context) {
 	// read the message body
-	var message discord.DiscordMessage
+	var message pubdiscord.Message
 
 	err := c.BindJSON(&message)
 	if err != nil {
