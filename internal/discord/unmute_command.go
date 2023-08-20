@@ -9,7 +9,6 @@ import (
 
 	"github.com/Coflnet/coflnet-bot/internal/coflnet"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
-	"github.com/Coflnet/coflnet-bot/schemas/chat"
 	"github.com/bwmarrin/discordgo"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -117,36 +116,6 @@ func (m *UnmuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interac
 			span.RecordError(err)
 		}
 		return
-	}
-
-	for _, userUUID := range userUUIDs {
-		slog.Info(fmt.Sprintf("unmuting %s for %s; Muter: %s", user, reason, i.Member.User.Username))
-		_, err = m.chatApi.UnmuteUser(ctx, &chat.APIChatMuteDeleteTextJSON{
-			UUID: chat.OptNilString{
-				Value: userUUID,
-				Set:   true,
-			},
-			Reason: chat.OptNilString{
-				Value: reason,
-				Set:   true,
-			},
-		})
-
-		if err != nil {
-			slog.Error("failed to unmute user", err)
-			span.RecordError(err)
-			if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("❌ failed to unmute user %s; error: %s", user, span.SpanContext().TraceID()), msg.ID, s, i); err != nil {
-				slog.Error("failed to edit followup message", err)
-				span.RecordError(err)
-			}
-			return
-		}
-
-		slog.Info("update the followup message")
-		if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("✅ %s unmuted", user), msg.ID, s, i); err != nil {
-			slog.Error("failed to edit follup message", err)
-			span.RecordError(err)
-		}
 	}
 
 	span.SetAttributes(attribute.String("unmuted-uuids", strings.Join(userUUIDs, ", ")))

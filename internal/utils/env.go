@@ -187,3 +187,11 @@ func MongoHost() string {
 func CoflnetBotBaseUrl() (string, error) {
 	return optionalEnvVar("COFLNET_BOT_BASE_URL")
 }
+
+func ChatApiKey() string {
+	return getEnv("CHAT_API_KEY")
+}
+
+func StrPtr(s string) *string {
+	return &s
+}

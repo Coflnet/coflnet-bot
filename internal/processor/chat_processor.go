@@ -14,7 +14,6 @@ import (
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/Coflnet/coflnet-bot/internal/usecase"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
-	"github.com/Coflnet/coflnet-bot/schemas/chat"
 	"github.com/bwmarrin/discordgo"
 	redisgo "github.com/go-redis/redis/v8"
 	"go.opentelemetry.io/otel"
@@ -245,28 +244,7 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 	}
 
 	slog.Info(fmt.Sprintf("sending discord message from %s(%s) to chat api, message: %s", msg.Author, user.UUID(), msg.Content))
-	param := &chat.APIChatSendPostTextJSON{
-		Message: chat.OptNilString{
-			Value: msg.Content,
-			Set:   true,
-		},
-		UUID: chat.OptNilString{
-			Value: user.UUID(),
-			Set:   true,
-		},
-		ClientName: chat.OptNilString{
-			Value: coflDiscordClientName,
-			Set:   true,
-		},
-		Name: chat.OptNilString{
-			Value: playerName,
-			Set:   true,
-		},
-	}
-
-	j, _ := param.MarshalJSON()
-	fmt.Println(string(j))
-	_, err = p.coflnetChatClient.SendMessage(ctx, param)
+	err = p.coflnetChatClient.SendMessage(ctx, msg.Content, user.UUID(), coflDiscordClientName, playerName)
 
 	if err != nil {
 		slog.Error("error sending discord message to chat api", err)

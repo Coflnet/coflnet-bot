@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Coflnet/coflnet-bot/codegen/chat"
 	"github.com/Coflnet/coflnet-bot/internal/coflnet"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
-	"github.com/Coflnet/coflnet-bot/schemas/chat"
 	"github.com/bwmarrin/discordgo"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -105,7 +105,7 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
 	message := optionMap["message"].StringValue()
 	span.SetAttributes(attribute.String("message", message))
 
-	// the the muter
+	// get the muter
 	muter := i.Member.User.Username
 	span.SetAttributes(attribute.String("muter", muter))
 
@@ -115,10 +115,10 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
 
 	// check if the user is at least mod
 	if !utils.IsUserHelper(i.Member.Roles) && !utils.IsUserMod(i.Member.Roles) {
-		err := errors.New(fmt.Sprintf("User %s is not a mod", i.Member.User.Username))
+		err = errors.New(fmt.Sprintf("User %s is not a mod", i.Member.User.Username))
 		slog.Warn("failed to mute user", err)
 		span.RecordError(err)
-		if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("❌ failed to mute user %s; you are not authorized; error: %s", user, span.SpanContext().TraceID()), msg.ID, s, i); err != nil {
+		if _, err = m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("❌ failed to mute user %s; you are not authorized; error: %s", user, span.SpanContext().TraceID()), msg.ID, s, i); err != nil {
 			slog.Error("failed to edit followup message", err)
 			span.RecordError(err)
 		}
@@ -143,12 +143,9 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
 
 	for _, userUUID := range userUUIDs {
 		slog.Info(fmt.Sprintf("muting %s for %s; Muter: %s", user, reason, muter))
-		mute, err := m.chatApi.MuteUser(ctx, &chat.APIChatMutePostTextJSON{
-			Muter:   chat.NewOptNilString(muter),
-			Reason:  chat.NewOptNilString(reason),
-			Message: chat.NewOptNilString(message),
-			UUID:    chat.NewOptNilString(userUUID),
-		})
+
+		var mute *chat.Mute
+		mute, err = m.chatApi.MuteUser(ctx, userUUID, muter, message, reason)
 
 		if err != nil {
 			slog.Error("failed to mute user", err)
@@ -162,8 +159,8 @@ func (m *MuteCommand) HandleCommand(s *discordgo.Session, i *discordgo.Interacti
 		}
 
 		slog.Info("update the followup message")
-		if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("✅ muted %s until %s", user, mute.Expires.Value), msg.ID, s, i); err != nil {
-			slog.Error("failed to edit follup message", err)
+		if _, err := m.baseCommand.editFollowupMessage(ctx, fmt.Sprintf("✅ muted %s until %s", user, mute.Expires), msg.ID, s, i); err != nil {
+			slog.Error("failed to edit followup message", err)
 			span.RecordError(err)
 		}
 
