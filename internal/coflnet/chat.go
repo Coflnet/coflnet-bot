@@ -27,7 +27,7 @@ func NewChatApi() *ChatApi {
 		return instance
 	}
 
-	instance.apiClient, err = chat.NewClientWithResponses(chatBaseUrl, nil)
+	instance.apiClient, err = chat.NewClientWithResponses(chatBaseUrl)
 	if err != nil {
 		slog.Error("error creating chat api client", err)
 	}
