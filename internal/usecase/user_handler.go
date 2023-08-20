@@ -211,7 +211,7 @@ func (u *UserHandler) createUserFromMinecraftUUID(ctx context.Context, uuid stri
 		MinecraftUuids: []string{uuid},
 		PreferredUUID:  uuid,
 		LastRefresh:    time.Now(),
-		UserId:         int(mcUser.ID.Value),
+		UserId:         int(*mcUser.Id),
 	}
 
 	err = u.userRepo.InsertEmptyModelUser(ctx, modelUser)

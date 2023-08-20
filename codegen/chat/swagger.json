@@ -13,7 +13,7 @@
         "summary": "Tracks a flip",
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "authorization",
             "in": "header",
             "description": "",
             "schema": {
@@ -116,17 +116,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ClientThing"
+                "$ref": "#/components/schemas/ModelClient"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ClientThing"
+                "$ref": "#/components/schemas/ModelClient"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ClientThing"
+                "$ref": "#/components/schemas/ModelClient"
               }
             }
           }
@@ -183,7 +183,7 @@
         "summary": "Create a new mute for an user",
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "authorization",
             "in": "header",
             "description": "",
             "schema": {
@@ -281,7 +281,7 @@
         "summary": "Create a new mute for an user",
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "authorization",
             "in": "header",
             "description": "",
             "schema": {
@@ -415,7 +415,7 @@
         "type": "object",
         "properties": {
           "client": {
-            "$ref": "#/components/schemas/ClientThing"
+            "$ref": "#/components/schemas/ModelClient"
           },
           "apiKey": {
             "type": "string",
@@ -425,7 +425,25 @@
         "additionalProperties": false,
         "description": "Contains the client and its api key (only place where the api key is visible)"
       },
-      "ClientThing": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "trace": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ModelClient": {
         "type": "object",
         "properties": {
           "name": {
@@ -462,24 +480,6 @@
         },
         "additionalProperties": false,
         "description": "Client software capeable of sending messages"
-      },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "slug": {
-            "type": "string",
-            "nullable": true
-          },
-          "message": {
-            "type": "string",
-            "nullable": true
-          },
-          "trace": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
       },
       "Mute": {
         "type": "object",

@@ -27,27 +27,6 @@ const (
 	N8  MuteStatus = 8
 )
 
-// ChatClient Client software capeable of sending messages
-type ChatClient struct {
-	// Contact User who is responsible for this client
-	Contact *string `json:"contact"`
-
-	// Created When this was created
-	Created *time.Time `json:"created,omitempty"`
-
-	// Name Uuid of the target user
-	Name *string `json:"name"`
-
-	// Quota Per minute send quota
-	Quota *int32 `json:"quota,omitempty"`
-
-	// WebHook Webhook to post new messages too
-	WebHook *string `json:"webHook"`
-
-	// WebhookAuth Auth header value for the webhook
-	WebhookAuth *string `json:"webhookAuth"`
-}
-
 // ChatMessage defines model for ChatMessage.
 type ChatMessage struct {
 	// ClientName What client software sent this message
@@ -71,7 +50,7 @@ type CientCreationResponse struct {
 	ApiKey *string `json:"apiKey"`
 
 	// Client Client software capeable of sending messages
-	Client *ChatClient `json:"client,omitempty"`
+	Client *ModelClient `json:"client,omitempty"`
 }
 
 // ErrorResponse defines model for ErrorResponse.
@@ -79,6 +58,27 @@ type ErrorResponse struct {
 	Message *string `json:"message"`
 	Slug    *string `json:"slug"`
 	Trace   *string `json:"trace"`
+}
+
+// ModelClient Client software capeable of sending messages
+type ModelClient struct {
+	// Contact User who is responsible for this client
+	Contact *string `json:"contact"`
+
+	// Created When this was created
+	Created *time.Time `json:"created,omitempty"`
+
+	// Name Uuid of the target user
+	Name *string `json:"name"`
+
+	// Quota Per minute send quota
+	Quota *int32 `json:"quota,omitempty"`
+
+	// WebHook Webhook to post new messages too
+	WebHook *string `json:"webHook"`
+
+	// WebhookAuth Auth header value for the webhook
+	WebhookAuth *string `json:"webhookAuth"`
 }
 
 // Mute defines model for Mute.
@@ -143,10 +143,16 @@ type PostApiChatSendParams struct {
 }
 
 // PostApiChatInternalClientApplicationWildcardPlusJSONRequestBody defines body for PostApiChatInternalClient for application/*+json ContentType.
-type PostApiChatInternalClientApplicationWildcardPlusJSONRequestBody = ChatClient
+type PostApiChatInternalClientApplicationWildcardPlusJSONRequestBody = ModelClient
 
 // PostApiChatInternalClientJSONRequestBody defines body for PostApiChatInternalClient for application/json ContentType.
-type PostApiChatInternalClientJSONRequestBody = ChatClient
+type PostApiChatInternalClientJSONRequestBody = ModelClient
+
+// DeleteApiChatMuteApplicationWildcardPlusJSONRequestBody defines body for DeleteApiChatMute for application/*+json ContentType.
+type DeleteApiChatMuteApplicationWildcardPlusJSONRequestBody = UnMute
+
+// DeleteApiChatMuteJSONRequestBody defines body for DeleteApiChatMute for application/json ContentType.
+type DeleteApiChatMuteJSONRequestBody = UnMute
 
 // PostApiChatMuteApplicationWildcardPlusJSONRequestBody defines body for PostApiChatMute for application/*+json ContentType.
 type PostApiChatMuteApplicationWildcardPlusJSONRequestBody = Mute
@@ -240,8 +246,12 @@ type ClientInterface interface {
 
 	PostApiChatInternalClient(ctx context.Context, body PostApiChatInternalClientJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteApiChatMute request
-	DeleteApiChatMute(ctx context.Context, params *DeleteApiChatMuteParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteApiChatMuteWithBody request with any body
+	DeleteApiChatMuteWithBody(ctx context.Context, params *DeleteApiChatMuteParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteApiChatMuteWithApplicationWildcardPlusJSONBody(ctx context.Context, params *DeleteApiChatMuteParams, body DeleteApiChatMuteApplicationWildcardPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteApiChatMute(ctx context.Context, params *DeleteApiChatMuteParams, body DeleteApiChatMuteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostApiChatMuteWithBody request with any body
 	PostApiChatMuteWithBody(ctx context.Context, params *PostApiChatMuteParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -294,8 +304,32 @@ func (c *Client) PostApiChatInternalClient(ctx context.Context, body PostApiChat
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteApiChatMute(ctx context.Context, params *DeleteApiChatMuteParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteApiChatMuteRequest(c.Server, params)
+func (c *Client) DeleteApiChatMuteWithBody(ctx context.Context, params *DeleteApiChatMuteParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteApiChatMuteRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteApiChatMuteWithApplicationWildcardPlusJSONBody(ctx context.Context, params *DeleteApiChatMuteParams, body DeleteApiChatMuteApplicationWildcardPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteApiChatMuteRequestWithApplicationWildcardPlusJSONBody(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteApiChatMute(ctx context.Context, params *DeleteApiChatMuteParams, body DeleteApiChatMuteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteApiChatMuteRequest(c.Server, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -429,8 +463,30 @@ func NewPostApiChatInternalClientRequestWithBody(server string, contentType stri
 	return req, nil
 }
 
-// NewDeleteApiChatMuteRequest generates requests for DeleteApiChatMute
-func NewDeleteApiChatMuteRequest(server string, params *DeleteApiChatMuteParams) (*http.Request, error) {
+// NewDeleteApiChatMuteRequestWithApplicationWildcardPlusJSONBody calls the generic DeleteApiChatMute builder with application/*+json body
+func NewDeleteApiChatMuteRequestWithApplicationWildcardPlusJSONBody(server string, params *DeleteApiChatMuteParams, body DeleteApiChatMuteApplicationWildcardPlusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteApiChatMuteRequestWithBody(server, params, "application/*+json", bodyReader)
+}
+
+// NewDeleteApiChatMuteRequest calls the generic DeleteApiChatMute builder with application/json body
+func NewDeleteApiChatMuteRequest(server string, params *DeleteApiChatMuteParams, body DeleteApiChatMuteJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteApiChatMuteRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewDeleteApiChatMuteRequestWithBody generates requests for DeleteApiChatMute with any type of body
+func NewDeleteApiChatMuteRequestWithBody(server string, params *DeleteApiChatMuteParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -448,10 +504,12 @@ func NewDeleteApiChatMuteRequest(server string, params *DeleteApiChatMuteParams)
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	if params != nil {
 
@@ -653,8 +711,12 @@ type ClientWithResponsesInterface interface {
 
 	PostApiChatInternalClientWithResponse(ctx context.Context, body PostApiChatInternalClientJSONRequestBody, reqEditors ...RequestEditorFn) (*PostApiChatInternalClientResponse, error)
 
-	// DeleteApiChatMuteWithResponse request
-	DeleteApiChatMuteWithResponse(ctx context.Context, params *DeleteApiChatMuteParams, reqEditors ...RequestEditorFn) (*DeleteApiChatMuteResponse, error)
+	// DeleteApiChatMuteWithBodyWithResponse request with any body
+	DeleteApiChatMuteWithBodyWithResponse(ctx context.Context, params *DeleteApiChatMuteParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteApiChatMuteResponse, error)
+
+	DeleteApiChatMuteWithApplicationWildcardPlusJSONBodyWithResponse(ctx context.Context, params *DeleteApiChatMuteParams, body DeleteApiChatMuteApplicationWildcardPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteApiChatMuteResponse, error)
+
+	DeleteApiChatMuteWithResponse(ctx context.Context, params *DeleteApiChatMuteParams, body DeleteApiChatMuteJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteApiChatMuteResponse, error)
 
 	// PostApiChatMuteWithBodyWithResponse request with any body
 	PostApiChatMuteWithBodyWithResponse(ctx context.Context, params *PostApiChatMuteParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostApiChatMuteResponse, error)
@@ -791,9 +853,25 @@ func (c *ClientWithResponses) PostApiChatInternalClientWithResponse(ctx context.
 	return ParsePostApiChatInternalClientResponse(rsp)
 }
 
-// DeleteApiChatMuteWithResponse request returning *DeleteApiChatMuteResponse
-func (c *ClientWithResponses) DeleteApiChatMuteWithResponse(ctx context.Context, params *DeleteApiChatMuteParams, reqEditors ...RequestEditorFn) (*DeleteApiChatMuteResponse, error) {
-	rsp, err := c.DeleteApiChatMute(ctx, params, reqEditors...)
+// DeleteApiChatMuteWithBodyWithResponse request with arbitrary body returning *DeleteApiChatMuteResponse
+func (c *ClientWithResponses) DeleteApiChatMuteWithBodyWithResponse(ctx context.Context, params *DeleteApiChatMuteParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteApiChatMuteResponse, error) {
+	rsp, err := c.DeleteApiChatMuteWithBody(ctx, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteApiChatMuteResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteApiChatMuteWithApplicationWildcardPlusJSONBodyWithResponse(ctx context.Context, params *DeleteApiChatMuteParams, body DeleteApiChatMuteApplicationWildcardPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteApiChatMuteResponse, error) {
+	rsp, err := c.DeleteApiChatMuteWithApplicationWildcardPlusJSONBody(ctx, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteApiChatMuteResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteApiChatMuteWithResponse(ctx context.Context, params *DeleteApiChatMuteParams, body DeleteApiChatMuteJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteApiChatMuteResponse, error) {
+	rsp, err := c.DeleteApiChatMute(ctx, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
