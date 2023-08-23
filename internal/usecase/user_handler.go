@@ -207,6 +207,11 @@ func (u *UserHandler) createUserFromMinecraftUUID(ctx context.Context, uuid stri
 		return nil, err
 	}
 
+    if mcUser == nil {
+        slog.Error("mc connect api returned nil user", "uuid", uuid)
+        return nil, errors.New("mc connect api returned nil user")
+    }
+
 	modelUser := &model.User{
 		MinecraftUuids: []string{uuid},
 		PreferredUUID:  uuid,
