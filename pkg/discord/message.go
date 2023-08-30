@@ -31,6 +31,13 @@ type Message struct {
 	Message string `json:"message"`
 	Channel string `json:"channel"`
 	Webhook string `json:"webhook"`
+    AllowedMentions AllowedMentions `json:"allowed_mentions"`
+}
+
+type AllowedMentions struct {
+    Parse []string `json:"parse"`
+    Users []string `json:"users"`
+    Roles []string `json:"roles"`
 }
 
 func SendMessageToFeedback(msg string) error {
@@ -110,6 +117,11 @@ func SendMessageToChannel(content string, channel string) error {
 	msg := Message{
 		Channel: channel,
 		Message: content,
+        AllowedMentions: AllowedMentions{
+            Parse: []string{"users", "roles"},
+            Users: []string{},
+            Roles: []string{},
+        },
 	}
 
 	// send the message
