@@ -142,20 +142,22 @@ func (p *ChatProcessor) processDiscordMessage(ctx context.Context, msg *discordg
 	// send the message to redis chat channel if the message was sent in the in game channel
 	if p.shouldMessageBeForwardedToChat(msg) {
 
-		slog.Debug("message was sent in in game channel, forwarding message to redis chat channel")
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			slog.Debug("sending discord message to redis chat channel")
+		slog.Debug("sending discord message to redis chat channel", "user", msg.Author.ID, "content", msg.Content)
 
-			err := p.sendDiscordMessageToChatAPI(ctx, msg)
+		err := p.sendDiscordMessageToChatAPI(ctx, msg)
+		if err != nil {
+			slog.Error("error sending discord message to redis chat channel", err)
+			span.RecordError(err)
+
+			// send a error message to the user
+			_, err = p.discordHandler.AnswerDiscordMessage(fmt.Sprintf("an error occurred while sending the message to the chat api, create a bug report with the report id: %s", span.SpanContext().TraceID()), msg)
 			if err != nil {
-				slog.Error("error sending discord message to redis chat channel", err)
+				slog.Error("error sending error message to user", "err", err, "user", msg.Author.ID)
 				span.RecordError(err)
 			}
+		}
 
-			metrics.MessagesForwardedToRedisChatChannel.Inc()
-		}()
+		metrics.MessagesForwardedToRedisChatChannel.Inc()
 	}
 
 	wg.Wait()

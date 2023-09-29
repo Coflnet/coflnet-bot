@@ -33,18 +33,6 @@ type UserHandler struct {
 	userRepo     *db.UserRepo
 }
 
-func (u *UserHandler) RefreshUserById(ctx context.Context, id int) error {
-	ctx, span := u.tracer.Start(ctx, "refresh-user-by-id")
-	defer span.End()
-	span.SetAttributes(attribute.Int("id", id))
-
-	return nil
-}
-
-func (u *UserHandler) RefreshUserByDiscordId() error {
-	return errors.New("not implemented")
-}
-
 func (u *UserHandler) RefreshUserByUUID(ctx context.Context, uuid string) error {
 	ctx, span := u.tracer.Start(ctx, "refresh-user-by-uuid")
 	defer span.End()
@@ -83,49 +71,6 @@ func (u *UserHandler) RefreshUserByUUID(ctx context.Context, uuid string) error 
 			return err
 		}
 	}
-
-	return nil
-}
-
-func (u *UserHandler) RefreshUserByDiscordUser(ctx context.Context, user *discordgo.User) error {
-	ctx, span := u.tracer.Start(ctx, "refresh-user-by-discord-user")
-	defer span.End()
-
-	span.SetAttributes(attribute.String("discord-id", user.ID))
-	span.SetAttributes(attribute.String("discord-username", user.Username))
-	span.SetAttributes(attribute.String("discord-discriminator", user.Discriminator))
-
-	// check if there is a user associated with the discord username and discriminator
-	// if yes replace it with the new system
-
-	err := u.checkForDeprecatedUsernameDiscriminator(ctx, *user)
-	if err != nil {
-		slog.Error(fmt.Sprintf("failed to check for deprecated username and discriminator; traceId: %s", span.SpanContext().TraceID()), err)
-		span.RecordError(err)
-		return err
-	}
-
-	// check if there is a user associated with the discord id
-	dbUser, err := u.userRepo.SearchUserByDiscordId(ctx, user.ID)
-	if err != nil {
-		// check if it is a user not found error
-		if _, ok := err.(*model.UserNotFoundError); ok {
-			dbUser, err = u.createUserFromDiscordUser(ctx, user)
-			if err != nil {
-				slog.Error(fmt.Sprintf("failed to create user from discord user; traceId: %s", span.SpanContext().TraceID()), err)
-				span.RecordError(err)
-				return err
-			}
-		}
-	}
-
-	// update all the properties of the user
-	if dbUser == nil || dbUser.UserId == 0 {
-		slog.Warn(fmt.Sprintf("user with discord username %s has no cofl user id, can not continue", user.Username))
-		return nil
-	}
-
-	slog.Warn(fmt.Sprintf("user with discord username %s has cofl user id %d, can continue", user.Username, dbUser.UserId))
 
 	return nil
 }
@@ -207,15 +152,15 @@ func (u *UserHandler) createUserFromMinecraftUUID(ctx context.Context, uuid stri
 		return nil, err
 	}
 
-    if mcUser == nil {
-        slog.Error("mc connect api returned nil user", "uuid", uuid)
-        return nil, errors.New("mc connect api returned nil user")
-    }
+	if mcUser == nil {
+		slog.Error("mc connect api returned nil user", "uuid", uuid)
+		return nil, errors.New("mc connect api returned nil user")
+	}
 
-    if mcUser.Id == nil {
-        slog.Error("user has not id", "uuid", uuid)
-        return nil, errors.New("user has not id")
-    }
+	if mcUser.Id == nil {
+		slog.Error("user has not id", "uuid", uuid)
+		return nil, errors.New("user has not id")
+	}
 
 	modelUser := &model.User{
 		MinecraftUuids: []string{uuid},
