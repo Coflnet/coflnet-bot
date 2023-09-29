@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/Coflnet/coflnet-bot/internal/coflnet"
 	"github.com/Coflnet/coflnet-bot/internal/db"
+	"github.com/Coflnet/coflnet-bot/internal/hypixel"
 	"github.com/Coflnet/coflnet-bot/internal/model"
 	"github.com/bwmarrin/discordgo"
 	"go.opentelemetry.io/otel"
@@ -50,13 +52,14 @@ func (u *UserHandler) RefreshUserByUUID(ctx context.Context, uuid string) error 
 	// create a empty user if there is no user with the given uuid
 	if len(users) == 0 {
 		slog.Info(fmt.Sprintf("user with uuid %s not found; traceId: %s", uuid, span.SpanContext().TraceID()))
-		_, err := u.createUserFromMinecraftUUID(ctx, uuid)
+		user, err := u.createUserFromMinecraftUUID(ctx, uuid)
 		if err != nil {
 			slog.Error(fmt.Sprintf("failed to create user from minecraft uuid; traceId: %s", span.SpanContext().TraceID()), err)
 			span.RecordError(err)
 			return err
 		}
 		slog.Info(fmt.Sprintf("created user with uuid %s; traceId: %s", uuid, span.SpanContext().TraceID()))
+		users = []*model.User{user}
 	} else {
 		slog.Info(fmt.Sprintf("a user with the uuid %s was found, no need to create a new one; traceId: %s", uuid, span.SpanContext().TraceID()))
 	}
@@ -211,7 +214,26 @@ func (u *UserHandler) RefreshUser(ctx context.Context, user *model.User) error {
 	slog.Info(fmt.Sprintf("user %d owns %d products", user.UserId, len(ownedProducts)))
 
 	// load the hypixel information
-	slog.Warn("loading hypixel information is not implemented")
+	slog.Warn("loading hypixel information..")
+	wg := &sync.WaitGroup{}
+	for _, uuid := range user.MinecraftUuids {
+		wg.Add(1)
+		go func(uuid string) {
+			defer wg.Done()
+
+			hypixelData, err := hypixel.PlayerData(uuid)
+			if err != nil {
+				slog.Warn("failed to load hypixel data", "uuid", uuid, "error", err)
+				span.RecordError(err)
+				return
+			}
+
+			slog.Info("loaded hypixel data", "uuid", uuid)
+			discordId := hypixelData.Player.SocialMedia.Links.Discord
+			slog.Info("loaded discord id for user", "discord_id", discordId, "uuid", uuid)
+		}(uuid)
+	}
+	wg.Wait()
 
 	// load the roles the user should have
 	slog.Warn("loading roles is not implemented")
