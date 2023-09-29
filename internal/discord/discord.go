@@ -6,6 +6,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
+	"net/http"
+	"os"
+	"os/signal"
+	"regexp"
+	"sync"
+	"time"
+
 	"github.com/Coflnet/coflnet-bot/internal/mongo"
 	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"github.com/Coflnet/coflnet-bot/pkg/discord"
@@ -13,12 +21,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"log/slog"
-	"net/http"
-	"os"
-	"os/signal"
-	"regexp"
-	"sync"
 )
 
 const (
@@ -49,6 +51,9 @@ type DiscordHandler struct {
 	messagesReceived chan discordgo.Message
 
 	tracer trace.Tracer
+
+	allUsers        []*discordgo.Member
+	lastUserRefresh time.Time
 }
 
 type WebhookRequest struct {
@@ -114,6 +119,7 @@ func InitSession(mute *MuteCommand, unmute *UnmuteCommand) (DiscordHandler, erro
 	}()
 
 	sessionOpen.Wait()
+	go d.UpdateDiscordGuildUsers()
 	return d, nil
 }
 
@@ -260,4 +266,56 @@ func (d *DiscordHandler) sanitizeMessage(message string) string {
 
 func (d *DiscordHandler) AnswerDiscordMessage(msg string, originalMessage *discordgo.Message) (*discordgo.Message, error) {
 	return d.session.ChannelMessageSendReply(originalMessage.ChannelID, msg, originalMessage.Reference())
+}
+
+func (d *DiscordHandler) SearchDiscordUser(username string) (*discordgo.Member, error) {
+	go d.UpdateDiscordGuildUsers()
+	for _, user := range d.allUsers {
+		if user.User.Username == username {
+			slog.Info("found user", "user", user)
+			return user, nil
+		}
+
+		if user.Nick == username {
+			slog.Info("found user", "user", user)
+			return user, nil
+		}
+	}
+
+	return nil, errors.New("no user found")
+}
+
+func (d *DiscordHandler) UpdateDiscordGuildUsers() {
+	diff := time.Now().Sub(d.lastUserRefresh)
+	if diff.Minutes() < 10 {
+		slog.Debug("not refreshing users, last refresh was less than 10 minutes ago", "last_refresh", d.lastUserRefresh, "diff", diff)
+		return
+	}
+
+	after := ""
+	limit := 1000
+	tryCounter := 0
+	users := make([]*discordgo.Member, 0)
+
+	for {
+		els, err := d.session.GuildMembers(utils.DiscordGuildId(), after, limit)
+		if err != nil {
+			slog.Error("error when loading guild members", err)
+			return
+		}
+		users = append(users, els...)
+
+		if len(users) < limit {
+			break
+		}
+		if tryCounter > 20 {
+			break
+		}
+
+		lastUser := els[len(els)-1]
+		after = lastUser.User.ID
+		tryCounter++
+	}
+	slog.Info("reloaded all users", "count", len(users))
+	d.allUsers = users
 }

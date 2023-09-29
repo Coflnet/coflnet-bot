@@ -9,6 +9,7 @@ import (
 
 	"github.com/Coflnet/coflnet-bot/internal/coflnet"
 	"github.com/Coflnet/coflnet-bot/internal/db"
+	"github.com/Coflnet/coflnet-bot/internal/discord"
 	"github.com/Coflnet/coflnet-bot/internal/hypixel"
 	"github.com/Coflnet/coflnet-bot/internal/model"
 	"github.com/bwmarrin/discordgo"
@@ -18,21 +19,23 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func NewUserHandler(mc *coflnet.McConnectApi, p *coflnet.PaymentApi, userDb *db.UserRepo) *UserHandler {
+func NewUserHandler(mc *coflnet.McConnectApi, p *coflnet.PaymentApi, userDb *db.UserRepo, discordHandler *discord.DiscordHandler) *UserHandler {
 	u := &UserHandler{}
 	u.tracer = otel.Tracer("user-handler")
 	u.mcConnectApi = mc
 	u.paymentApi = p
 	u.userRepo = userDb
+	u.discordHandler = discordHandler
 
 	return u
 }
 
 type UserHandler struct {
-	tracer       trace.Tracer
-	mcConnectApi *coflnet.McConnectApi
-	paymentApi   *coflnet.PaymentApi
-	userRepo     *db.UserRepo
+	tracer         trace.Tracer
+	mcConnectApi   *coflnet.McConnectApi
+	paymentApi     *coflnet.PaymentApi
+	userRepo       *db.UserRepo
+	discordHandler *discord.DiscordHandler
 }
 
 func (u *UserHandler) RefreshUserByUUID(ctx context.Context, uuid string) error {
@@ -215,25 +218,47 @@ func (u *UserHandler) RefreshUser(ctx context.Context, user *model.User) error {
 
 	// load the hypixel information
 	slog.Warn("loading hypixel information..")
-	wg := &sync.WaitGroup{}
-	for _, uuid := range user.MinecraftUuids {
-		wg.Add(1)
-		go func(uuid string) {
-			defer wg.Done()
+	discord_members := make(chan *discordgo.Member)
 
-			hypixelData, err := hypixel.PlayerData(uuid)
-			if err != nil {
-				slog.Warn("failed to load hypixel data", "uuid", uuid, "error", err)
-				span.RecordError(err)
-				return
-			}
+	// load the discord names from the hypixel api
+	go func() {
+		wg := &sync.WaitGroup{}
+		for _, uuid := range user.MinecraftUuids {
+			wg.Add(1)
+			go func(uuid string) {
+				defer wg.Done()
 
-			slog.Info("loaded hypixel data", "uuid", uuid)
-			discordId := hypixelData.Player.SocialMedia.Links.Discord
-			slog.Info("loaded discord id for user", "discord_id", discordId, "uuid", uuid)
-		}(uuid)
+				hypixelData, err := hypixel.PlayerData(uuid)
+				if err != nil {
+					slog.Warn("failed to load hypixel data", "uuid", uuid, "error", err)
+					span.RecordError(err)
+					return
+				}
+
+				slog.Info("loaded hypixel data", "uuid", uuid)
+				discord_name := hypixelData.Player.SocialMedia.Links.Discord
+
+				// check if a user with that discord name exists
+				member, err := u.discordHandler.SearchDiscordUser(discord_name)
+				if err != nil {
+					slog.Error("failed to search discord user", "discord_name", discord_name, "error", err)
+					span.RecordError(err)
+					return
+				}
+
+				discord_members <- member
+			}(uuid)
+		}
+		wg.Wait()
+		close(discord_members)
+	}()
+
+	for member := range discord_members {
+		if member == nil {
+			continue
+		}
+		slog.Info("found discord member for user", "member_name", member.User.Username, "uuid", member.User.ID, "member_id", member.User.ID)
 	}
-	wg.Wait()
 
 	// load the roles the user should have
 	slog.Warn("loading roles is not implemented")
