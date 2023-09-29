@@ -305,7 +305,7 @@ func (d *DiscordHandler) UpdateDiscordGuildUsers() {
 		}
 		users = append(users, els...)
 
-		if len(users) < limit {
+		if len(els) < limit {
 			break
 		}
 		if tryCounter > 20 {
