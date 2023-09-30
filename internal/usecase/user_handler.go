@@ -16,6 +16,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/exp/slices"
 	"golang.org/x/exp/slog"
 )
 
@@ -164,7 +165,7 @@ func (u *UserHandler) createUserFromMinecraftUUID(ctx context.Context, uuid stri
 	}
 
 	if mcUser.Id == nil {
-		slog.Error("user has not id", "uuid", uuid)
+		slog.Error("mc user has no id", "uuid", uuid)
 		return nil, errors.New("user has not id")
 	}
 
@@ -257,8 +258,25 @@ func (u *UserHandler) RefreshUser(ctx context.Context, user *model.User) error {
 		if member == nil {
 			continue
 		}
-		slog.Info("found discord member for user", "member_name", member.User.Username, "uuid", member.User.ID, "member_id", member.User.ID)
+
+		slog.Info("found discord member for user", "member_name", member.User.Username, "uuid", user.UUID(), "member_id", member.User.ID)
+
+		// add the discord id to the existing user
+		if slices.Contains(user.DiscordIds, member.User.ID) {
+			slog.Debug("user already has that discord id", "discord_id", member.User.ID, "uuid", user.UUID())
+			continue
+		}
+
+		user.DiscordIds = append(user.DiscordIds, member.User.ID)
 	}
+
+	err = u.userRepo.SetDiscordIdForUser(ctx, user.UserId, user.DiscordIds)
+	if err != nil {
+		slog.Error(fmt.Sprintf("failed to set discord ids for user; traceId: %s", span.SpanContext().TraceID()), err)
+		span.RecordError(err)
+		return err
+	}
+	span.SetAttributes(attribute.Int("discord-ids-set", len(user.DiscordIds)))
 
 	// load the roles the user should have
 	slog.Warn("loading roles is not implemented")
