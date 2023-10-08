@@ -150,7 +150,7 @@ func (p *ChatProcessor) processDiscordMessage(ctx context.Context, msg *discordg
 			span.RecordError(err)
 
 			// send a error message to the user
-			_, err = p.discordHandler.AnswerDiscordMessage(fmt.Sprintf("an error occurred while sending the message to the chat api, create a bug report with the report id: %s", span.SpanContext().TraceID()), msg)
+			_, err = p.discordHandler.AnswerDiscordMessage(fmt.Sprintf("an error occurred while sending the message to the chat, create a bug report with the report id: %s, error msg: %s", span.SpanContext().TraceID(), err.Error()), msg)
 			if err != nil {
 				slog.Error("error sending error message to user", "err", err, "user", msg.Author.ID)
 				span.RecordError(err)
