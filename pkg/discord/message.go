@@ -14,26 +14,26 @@ import (
 
 type DiscordMessageToSend struct {
 	Message string
-	Channel string
+	Channel DiscordChannel
 	Webhook string
 }
 
 const (
-	WarningsChannel          = "warnings"
-	MutesChannel             = "mutes"
-	FlipperRoleChannel       = "flipper-role"
-	CiSuccessChannel         = "ci-success"
-	CiFailureChannel         = "ci-failure"
-	FeedbackChannel          = "feedback"
-	FlipChannel              = "flip"
-	SongvoterFeedbackChannel = "songvoter-feedback"
+	WarningsChannel          DiscordChannel = "warnings"
+	MutesChannel             DiscordChannel = "mutes"
+	FlipperRoleChannel       DiscordChannel = "flipper-role"
+	CiSuccessChannel         DiscordChannel = "ci-success"
+	CiFailureChannel         DiscordChannel = "ci-failure"
+	FeedbackChannel          DiscordChannel = "feedback"
+	FlipChannel              DiscordChannel = "flip"
+	SongvoterFeedbackChannel DiscordChannel = "songvoter-feedback"
 )
 
 type DiscordChannel string
 
 type Message struct {
 	Message         string          `json:"message"`
-	Channel         string          `json:"channel"`
+	Channel         DiscordChannel  `json:"channel"`
 	Webhook         string          `json:"webhook"`
 	AllowedMentions AllowedMentions `json:"allowed_mentions"`
 }
@@ -72,7 +72,7 @@ func SendMessageToSongvoterFeedbackChannel(msg string) error {
 	return sendMessageToChannel(msg, SongvoterFeedbackChannel)
 }
 
-func sendMessageToChannel(msg, channel string) error {
+func sendMessageToChannel(msg string, channel DiscordChannel) error {
 	payload, err := message(msg, channel)
 	if err != nil {
 		return err
@@ -88,7 +88,7 @@ func sendMessageToChannel(msg, channel string) error {
 	return err
 }
 
-func message(msg, channel string) ([]byte, error) {
+func message(msg string, channel DiscordChannel) ([]byte, error) {
 	v := DiscordMessageToSend{
 		Message: msg,
 		Channel: channel,
@@ -119,7 +119,7 @@ func getEnv(k string) (string, error) {
 	return v, nil
 }
 
-func SendMessageToChannel(content string, channel string) error {
+func SendMessageToChannel(content string, channel DiscordChannel) error {
 
 	// prepare a http post request
 	msg := Message{

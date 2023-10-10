@@ -193,7 +193,7 @@ func (d *DiscordHandler) messageReceived(_ *discordgo.Session, m *discordgo.Mess
 	d.messagesReceived <- *m.Message
 }
 
-func (d *DiscordHandler) webhookForChannel(channel string) (string, error) {
+func (d *DiscordHandler) webhookForChannel(channel discord.DiscordChannel) (string, error) {
 	switch channel {
 	case discord.WarningsChannel:
 		return utils.WarningsWebhook(), nil
