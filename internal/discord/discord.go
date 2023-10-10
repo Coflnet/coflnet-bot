@@ -209,6 +209,8 @@ func (d *DiscordHandler) webhookForChannel(channel string) (string, error) {
 		return utils.FeedbackWebhook(), nil
 	case discord.FlipChannel:
 		return utils.FlipWebhook(), nil
+	case discord.SongvoterFeedbackChannel:
+		return utils.SongvoterFeedbackWebhook(), nil
 	}
 
 	return "", errors.New("no webhook found for channel")

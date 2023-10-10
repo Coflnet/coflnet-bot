@@ -123,6 +123,10 @@ func FlipWebhook() string {
 	return getEnv("FLIP_WEBHOOK")
 }
 
+func SongvoterFeedbackWebhook() string {
+	return getEnv("SONGVOTER_FEEDBACK_WEBHOOK")
+}
+
 func optionalEnvVar(e string) (string, error) {
 	v := os.Getenv(e)
 	if v == "" {

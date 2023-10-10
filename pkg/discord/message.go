@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/Coflnet/coflnet-bot/internal/utils"
 	"log/slog"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/Coflnet/coflnet-bot/internal/utils"
 )
 
 type DiscordMessageToSend struct {
@@ -18,26 +19,29 @@ type DiscordMessageToSend struct {
 }
 
 const (
-	WarningsChannel    = "warnings"
-	MutesChannel       = "mutes"
-	FlipperRoleChannel = "flipper-role"
-	CiSuccessChannel   = "ci-success"
-	CiFailureChannel   = "ci-failure"
-	FeedbackChannel    = "feedback"
-	FlipChannel        = "flip"
+	WarningsChannel          = "warnings"
+	MutesChannel             = "mutes"
+	FlipperRoleChannel       = "flipper-role"
+	CiSuccessChannel         = "ci-success"
+	CiFailureChannel         = "ci-failure"
+	FeedbackChannel          = "feedback"
+	FlipChannel              = "flip"
+	SongvoterFeedbackChannel = "songvoter-feedback"
 )
 
+type DiscordChannel string
+
 type Message struct {
-	Message string `json:"message"`
-	Channel string `json:"channel"`
-	Webhook string `json:"webhook"`
-    AllowedMentions AllowedMentions `json:"allowed_mentions"`
+	Message         string          `json:"message"`
+	Channel         string          `json:"channel"`
+	Webhook         string          `json:"webhook"`
+	AllowedMentions AllowedMentions `json:"allowed_mentions"`
 }
 
 type AllowedMentions struct {
-    Parse []string `json:"parse"`
-    Users []string `json:"users"`
-    Roles []string `json:"roles"`
+	Parse []string `json:"parse"`
+	Users []string `json:"users"`
+	Roles []string `json:"roles"`
 }
 
 func SendMessageToFeedback(msg string) error {
@@ -62,6 +66,10 @@ func SendMessageToMutesChannel(msg string) error {
 
 func SendMessageToRoleChannel(msg string) error {
 	return sendMessageToChannel(msg, FlipperRoleChannel)
+}
+
+func SendMessageToSongvoterFeedbackChannel(msg string) error {
+	return sendMessageToChannel(msg, SongvoterFeedbackChannel)
 }
 
 func sendMessageToChannel(msg, channel string) error {
@@ -117,11 +125,11 @@ func SendMessageToChannel(content string, channel string) error {
 	msg := Message{
 		Channel: channel,
 		Message: content,
-        AllowedMentions: AllowedMentions{
-            Parse: []string{"users", "roles"},
-            Users: []string{},
-            Roles: []string{},
-        },
+		AllowedMentions: AllowedMentions{
+			Parse: []string{"users", "roles"},
+			Users: []string{},
+			Roles: []string{},
+		},
 	}
 
 	// send the message
