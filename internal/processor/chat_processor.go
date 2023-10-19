@@ -215,6 +215,20 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 		return err
 	}
 
+	if len(users) == 0 {
+		err := errors.New(fmt.Sprintf("no user found for discord account %s, can not forward the message, error: %s", msg.Author.Username, span.SpanContext().TraceID()))
+		go func() {
+			_, e := p.discordHandler.AnswerDiscordMessage(err.Error(), msg)
+			if e != nil {
+				slog.Error("error sending error message to user", "err", e, "user", msg.Author.ID)
+				span.RecordError(e)
+			}
+		}()
+		slog.Warn("error searching user for chat message", err)
+		span.RecordError(err)
+		return err
+	}
+
 	user := utils.FilterUsersForPreferredUsers(msg.Author.ID, users)
 
 	span.SetAttributes(attribute.String("uuid", user.UUID()))
