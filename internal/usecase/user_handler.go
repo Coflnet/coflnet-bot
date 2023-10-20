@@ -209,13 +209,13 @@ func (u *UserHandler) RefreshUser(ctx context.Context, user *model.User) error {
 	slog.Debug("loaded user from mc connect api: %v", mcConnectUser)
 
 	// load the payment information
-	ownedProducts, err := u.paymentApi.OwningTimesOfUser(ctx, user.UserId)
-	if err != nil {
-		slog.Error(fmt.Sprintf("failed to load user from payment api; traceId: %s", span.SpanContext().TraceID()), err)
-		span.RecordError(err)
-	}
-
-	slog.Info(fmt.Sprintf("user %d owns %d products", user.UserId, len(ownedProducts)))
+	// ownedProducts, err := u.paymentApi.OwningTimesOfUser(ctx, user.UserId)
+	// if err != nil {
+	// 	slog.Error(fmt.Sprintf("failed to load user from payment api; traceId: %s", span.SpanContext().TraceID()), err)
+	// 	span.RecordError(err)
+	// }
+	// slog.Info(fmt.Sprintf("user %d owns %d products", user.UserId, len(ownedProducts)))
+	slog.Warn("dont load payment information for now, this appeas to be broken")
 
 	// load the hypixel information
 	slog.Warn("loading hypixel information..")
