@@ -197,7 +197,11 @@ func (p *ChatProcessor) processRedisMessage(ctx context.Context, msg *redisgo.Me
 		defer cancel()
 		ctx, span := p.tracer.Start(ctx, "trigger-refresh-user")
 		defer span.End()
-		p.userHandler.RefreshUserByUUID(ctx, uuid)
+		err := p.userHandler.RefreshUserByUUID(ctx, uuid)
+		if err != nil {
+			slog.Error("error refreshing user", err)
+			span.RecordError(err)
+		}
 	}(message.UUID)
 
 	metrics.MessagesForwardedToCoflnetDiscordChatChannel.Inc()
@@ -235,7 +239,7 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 	span.SetAttributes(attribute.Int("user-id", user.UserId))
 
 	if len(users) == 0 {
-		err := errors.New(fmt.Sprintf("no user found for discord account %s, can not forward the message, error: %s", msg.Author.Username, span.SpanContext().TraceID()))
+		err := errors.New(fmt.Sprintf("no user found for discord account %s, can not forward the message\n To resolve this try the following:\n1. Make sure your hypixel account is connected to your discord account\n 2. Try to write a chat message within minecraft with the `/fc <msg>, this is necessary to connect your minecraft account with your discord account.\n3. If this does not work, please create a bug report with the id: %s", msg.Author.Username, span.SpanContext().TraceID()))
 		p.discordHandler.AnswerDiscordMessage(err.Error(), msg)
 		slog.Warn("error searching user for chat message", err)
 		span.RecordError(err)
