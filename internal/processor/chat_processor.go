@@ -247,7 +247,7 @@ func (p *ChatProcessor) sendDiscordMessageToChatAPI(ctx context.Context, msg *di
 	}
 
 	if user.UUID() == "" {
-		err := errors.New(fmt.Sprintf("user has no uuid, can not forward the message, error: %s", span.SpanContext().TraceID()))
+		err := errors.New(fmt.Sprintf("no user found for discord account %s, can not forward the message\n To resolve this try the following:\n1. Make sure your hypixel account is connected to your discord account\n 2. Try to write a chat message within minecraft with the `/fc <msg>, this is necessary to connect your minecraft account with your discord account.\n3. If this does not work, please create a bug report with the id: %s", msg.Author.Username, span.SpanContext().TraceID()))
 		slog.Warn(fmt.Sprintf("no uuid found for user"), err)
 		span.RecordError(err)
 		return err
