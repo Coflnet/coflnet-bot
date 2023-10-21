@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
 
@@ -164,16 +165,26 @@ func (u *UserHandler) createUserFromMinecraftUUID(ctx context.Context, uuid stri
 		return nil, errors.New("mc connect api returned nil user")
 	}
 
+	id := int(0)
+
 	if mcUser.Id == nil {
-		slog.Error("mc user has no id", "uuid", uuid)
-		return nil, errors.New("user has not id")
+		if mcUser.ExternalId == nil {
+			return nil, errors.New("mc connect api returned user with no id or external id")
+		}
+		id, err = strconv.Atoi(*mcUser.ExternalId)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		id = int(*mcUser.Id)
 	}
 
+	slog.Info("create a new user", "id", id, "uuid", uuid)
 	modelUser := &model.User{
 		MinecraftUuids: []string{uuid},
 		PreferredUUID:  uuid,
 		LastRefresh:    time.Now(),
-		UserId:         int(*mcUser.Id),
+		UserId:         id,
 	}
 
 	err = u.userRepo.InsertEmptyModelUser(ctx, modelUser)
