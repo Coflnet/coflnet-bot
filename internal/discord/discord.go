@@ -274,12 +274,12 @@ func (d *DiscordHandler) SearchDiscordUser(username string) (*discordgo.Member, 
 	go d.UpdateDiscordGuildUsers()
 	for _, user := range d.allUsers {
 		if user.User.Username == username {
-			slog.Info("found user", "user", user)
+			slog.Info("found user", "user", user, "search-username", username)
 			return user, nil
 		}
 
 		if user.Nick == username {
-			slog.Info("found user", "user", user)
+			slog.Info("found user", "user", user, "search-username", username)
 			return user, nil
 		}
 	}

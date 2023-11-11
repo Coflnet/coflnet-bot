@@ -247,8 +247,8 @@ func (u *UserHandler) RefreshUser(ctx context.Context, user *model.User) error {
 					return
 				}
 
-				slog.Info("loaded hypixel data", "uuid", uuid)
 				discord_name := hypixelData.Player.SocialMedia.Links.Discord
+				slog.Info("loaded hypixel data", "uuid", uuid, "discord_name", discord_name)
 
 				// check if a user with that discord name exists
 				member, err := u.discordHandler.SearchDiscordUser(discord_name)
