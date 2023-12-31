@@ -57,7 +57,7 @@ func main() {
 	// setup some base dependencies
 	discordMessageService := usecase.NewDiscordMessageService()
 	redisMessageService := usecase.NewRedisMessageService()
-	userService, err := usecase.NewUserService(chatUrl(), paymentUrl(), proxyUrl(), mcConnectUrl())
+	userService, err := usecase.NewUserService(paymentUrl(), proxyUrl(), mcConnectUrl())
 	if err != nil {
 		slog.Error("error setting up user service", "err", err)
 		panic(errors.New("cannot setup user service"))

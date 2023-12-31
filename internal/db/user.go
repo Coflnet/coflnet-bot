@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go.opentelemetry.io/otel/attribute"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"log/slog"
 	"time"
 )
@@ -16,41 +17,31 @@ type User struct {
 	// refers to the main user id, usually the external id
 	ExternalId string `gorm:"uniqueIndex"`
 
-	DiscordAccounts []DiscordAccount
-	HypixelAccounts []MinecraftAccount
-
-	// a user can have multiple minecraft accounts
-	// the preferred one is used for interactions
-	PreferredMinecraftAccountID uint
-	PreferredMinecraftAccount   *MinecraftAccount
-
-	// a user can have multiple discord accounts
-	// the preferred one is used for interactions
-	PreferredDiscordAccountID uint
-	PreferredDiscordAccount   *DiscordAccount
+	DiscordAccounts   []DiscordAccount
+	MinecraftAccounts []MinecraftAccount
 
 	// if the user has premium this timestamp is in the future
-	PremiumUntil time.Time
+	PremiumUntil *time.Time
 
 	// if the user has premium plus this timestamp is in the future
-	PremiumPlusUntil time.Time
+	PremiumPlusUntil *time.Time
 
 	// timestamp when the information of the user was last updated
-	LastUpdated time.Time
+	LastUpdated *time.Time
 }
 
 type DiscordAccount struct {
 	gorm.Model
-	DiscordID string
-
-	UserID uint `gorm:"uniqueIndex"`
+	DiscordID string `gorm:"uniqueIndex"`
+	UserID    uint   `gorm:"index"`
+	Preferred bool
 }
 
 type MinecraftAccount struct {
 	gorm.Model
 	MinecraftUUID string `gorm:"uniqueIndex"`
-
-	UserID uint
+	Preferred     bool
+	UserID        uint `gorm:"index"`
 }
 
 func (u *User) HasPremium() bool {
@@ -62,11 +53,31 @@ func (u *User) HasPremiumPlus() bool {
 }
 
 func (u *User) PreferredUUID() (string, error) {
-	if u.PreferredMinecraftAccount == nil {
-		return "", errors.New("no preferred minecraft account")
+	if len(u.MinecraftAccounts) == 0 {
+		return "", errors.New("no minecraft accounts")
 	}
 
-	return u.PreferredMinecraftAccount.MinecraftUUID, nil
+	for _, acc := range u.MinecraftAccounts {
+		if acc.Preferred {
+			return acc.MinecraftUUID, nil
+		}
+	}
+
+	return u.MinecraftAccounts[0].MinecraftUUID, nil
+}
+
+func (u *User) PreferredDiscordID() (string, error) {
+	if len(u.DiscordAccounts) == 0 {
+		return "", errors.New("no discord accounts")
+	}
+
+	for _, acc := range u.DiscordAccounts {
+		if acc.Preferred {
+			return acc.DiscordID, nil
+		}
+	}
+
+	return u.DiscordAccounts[0].DiscordID, nil
 }
 
 func UserByExternalId(ctx context.Context, externalId string) (*User, error) {
@@ -75,7 +86,10 @@ func UserByExternalId(ctx context.Context, externalId string) (*User, error) {
 	span.SetAttributes(attribute.String("externalId", externalId))
 
 	user := &User{}
-	result := db.Where(&User{ExternalId: externalId}).First(user)
+	result := db.
+		Preload(clause.Associations).
+		Where(&User{ExternalId: externalId}).
+		First(user)
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -97,6 +111,7 @@ func UserByExternalId(ctx context.Context, externalId string) (*User, error) {
 func SaveUser(ctx context.Context, user *User) error {
 	ctx, span := tracer.Start(ctx, "save-user")
 	defer span.End()
+	span.SetAttributes(attribute.String("externalId", user.ExternalId))
 
 	result := db.Session(&gorm.Session{FullSaveAssociations: true}).Save(user)
 	if result.Error != nil {
@@ -113,7 +128,13 @@ func UserByDiscordId(ctx context.Context, id string) (*User, error) {
 	span.SetAttributes(attribute.String("discordId", id))
 
 	user := &User{}
-	err := db.Model(&User{}).Where(DiscordAccount{DiscordID: id}).Association("DiscordAccounts").Find(user)
+	err := db.
+		Model(&User{}).
+		Preload(clause.Associations).
+		Where(DiscordAccount{DiscordID: id}).
+		Association("DiscordAccounts").
+		Find(user)
+
 	if err != nil {
 		return nil, err
 	}

@@ -25,7 +25,7 @@ type UserService struct {
 	mcConnectClient *mcconnectgen.ClientWithResponses
 }
 
-func NewUserService(chatUrl, paymentUrl, proxyUrl, mcConnectUrl string) (*UserService, error) {
+func NewUserService(paymentUrl, proxyUrl, mcConnectUrl string) (*UserService, error) {
 	paymentClient, err := paymentgen.NewClientWithResponses(paymentUrl, paymentgen.WithRequestEditorFn(addJsonAcceptHeaderFn))
 	if err != nil {
 		return nil, err
@@ -78,10 +78,16 @@ func (s *UserService) LoadUserByUUID(ctx context.Context, uuid string) (*db.User
 		slog.Info("user loaded from db is nil, create new user")
 	}
 
-	if user.LastUpdated.After(time.Now().Add(-1 * time.Minute)) {
-		slog.Info(fmt.Sprintf("user with id %s was refreshed less than an hour ago", dbUser.ExternalId))
-		return dbUser, nil
+	// merge the uuid in the object
+	s.mergeDBUserWithUUID(user, uuid)
+
+	// only refresh once a minute
+	if user.LastUpdated != nil && user.LastUpdated.After(time.Now().Add(-1*time.Minute)) {
+		slog.Info(fmt.Sprintf("user with id %s was refreshed less than an hour ago", user.ExternalId))
+		return user, nil
 	}
+
+	slog.Info(fmt.Sprintf("loaded the user: %v", user))
 
 	wg := sync.WaitGroup{}
 	wg.Add(2)
@@ -122,6 +128,33 @@ func (s *UserService) LoadUserByUUID(ctx context.Context, uuid string) (*db.User
 	return &db.User{
 		ExternalId: externalId,
 	}, nil
+}
+
+func (s *UserService) mergeDBUserWithUUID(user *db.User, uuid string) {
+	if user.MinecraftAccounts == nil {
+		user.MinecraftAccounts = make([]db.MinecraftAccount, 0)
+	}
+
+	if slices.ContainsFunc(user.MinecraftAccounts, func(acc db.MinecraftAccount) bool {
+		return acc.MinecraftUUID == uuid
+	}) {
+		slog.Debug(fmt.Sprintf("user with id %s already has minecraft account with uuid %s, skipping", user.ExternalId, uuid))
+	}
+
+	// set the new one as preferred
+	for _, acc := range user.MinecraftAccounts {
+		if acc.Preferred {
+			acc.Preferred = false
+			break
+		}
+	}
+
+	slog.Info(fmt.Sprintf("adding minecraft account %s to user %s", uuid, user.ExternalId))
+	user.MinecraftAccounts = append(user.MinecraftAccounts, db.MinecraftAccount{
+		MinecraftUUID: uuid,
+		UserID:        user.ID,
+		Preferred:     true,
+	})
 }
 
 // LoadExternalId LoadMcUser loads a user from the mcconnect service
@@ -188,14 +221,14 @@ func (s *UserService) LoadProductsOfUser(ctx context.Context, externalId string)
 	var premiumPlusUntil *time.Time
 
 	if until, ok := (*productMap)[premium]; ok {
-		slog.Debug("user has premium until %v", until)
+		slog.Debug("user has premium until %s", until.Format(time.RFC3339))
 		premiumUntil = &until
 	} else {
 		slog.Debug("user has no premium")
 	}
 
 	if until, ok := (*productMap)[premiumPlus]; ok {
-		slog.Debug("user has premium plus until %v", until)
+		slog.Debug("user has premium plus until %s", until.Format(time.RFC3339))
 		premiumPlusUntil = &until
 	} else {
 		slog.Debug("user has no premium plus")
@@ -216,11 +249,11 @@ func (s *UserService) UpdatePremiumStatusOfUser(ctx context.Context, user *db.Us
 	slog.Info("loaded products of user")
 	if premiumUntil != nil {
 		slog.Info("premium until: %v", premiumUntil)
-		user.PremiumUntil = *premiumUntil
+		user.PremiumUntil = premiumUntil
 	}
 	if premiumPlusUntil != nil {
 		slog.Info("premium plus until: %v", premiumPlusUntil)
-		user.PremiumPlusUntil = *premiumPlusUntil
+		user.PremiumPlusUntil = premiumPlusUntil
 	}
 
 	return nil
@@ -268,10 +301,20 @@ func (s *UserService) LoadHypixelInformationOfUUID(ctx context.Context, user *db
 	}) {
 		slog.Info("user already has discord account, skipping")
 	} else {
+
+		// set the new one as preferred
+		for _, acc := range user.DiscordAccounts {
+			if acc.Preferred {
+				acc.Preferred = false
+				break
+			}
+		}
+
 		slog.Info("adding discord account to user")
 		user.DiscordAccounts = append(user.DiscordAccounts, db.DiscordAccount{
 			DiscordID: discordMember.User.ID,
 			UserID:    user.ID,
+			Preferred: true,
 		})
 	}
 
@@ -285,7 +328,7 @@ type UserNotFoundError struct {
 func (e *UserNotFoundError) Error() string {
 	return fmt.Sprintf("user with search term %s not found", e.SearchTerm)
 }
-func addJsonAcceptHeaderFn(ctx context.Context, req *http.Request) error {
+func addJsonAcceptHeaderFn(_ context.Context, req *http.Request) error {
 	// header has to be set always, otherwise response parsing is not working
 	req.Header.Set("accept", "application/json")
 	return nil
