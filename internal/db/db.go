@@ -2,33 +2,78 @@ package db
 
 import (
 	"context"
-	"time"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
+	"gorm.io/gorm"
+	"log/slog"
+	"os"
 
-	"github.com/Coflnet/coflnet-bot/internal/utils"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"gorm.io/driver/postgres"
 )
 
-const (
-	dbName = "discord"
+var (
+	db     *gorm.DB
+	tracer trace.Tracer
 )
 
-func NewDB() *DB {
+func StartDB(ctx context.Context) error {
+	tracer = otel.Tracer("db")
+	ctx, span := tracer.Start(ctx, "start-db")
+	defer span.End()
 
 	var err error
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(utils.MongoHost()))
+	db, err = gorm.Open(postgres.Open(LoadDSN()), &gorm.Config{})
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	return &DB{
-		client: client,
+	err = migrations(ctx)
+	if err != nil {
+		slog.Error("Error running migrations", "err", err)
+		span.RecordError(err)
+		return err
 	}
+
+	slog.Info("Starting DB")
+	return nil
 }
 
-type DB struct {
-	client *mongo.Client
+func migrations(ctx context.Context) error {
+	ctx, span := tracer.Start(ctx, "migrations")
+	defer span.End()
+
+	slog.Info("Starting Migrations")
+
+	err := db.AutoMigrate(&Message{})
+	if err != nil {
+		return err
+	}
+
+	err = db.AutoMigrate(&User{})
+	if err != nil {
+		return err
+	}
+
+	err = db.AutoMigrate(&DiscordAccount{})
+	if err != nil {
+		return err
+	}
+
+	err = db.AutoMigrate(&MinecraftAccount{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func LoadDSN() string {
+	dsn, found := os.LookupEnv("DATABASE_URL")
+
+	if !found {
+		panic("DATABASE_URL not found")
+	}
+
+	slog.Info("DATABASE_URL found", "dsn", len(dsn))
+	return dsn
 }
