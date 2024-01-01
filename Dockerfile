@@ -1,17 +1,16 @@
-FROM golang:1.21-bullseye as builder
+FROM registry.suse.com/bci/golang:1.21 as builder
 
 WORKDIR /build
 
 COPY go.mod go.sum ./
-
 RUN go mod download
 
 COPY . .
+RUN make build
 
-RUN mkdir -p bin && go build -o ./bin ./...
+# FROM registry.suse.com/bci/bci-micro:15.5
+FROM registry.suse.com/bci/bci-base:15.5
 
-FROM gcr.io/distroless/base-debian11
-
-COPY --from=builder /build/bin/coflnet-bot /app
+COPY --from=builder /build/bin/app /app
 
 ENTRYPOINT ["/app"]

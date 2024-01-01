@@ -1,15 +1,13 @@
 package discord
 
 import (
-	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
 	"strings"
-
-	"github.com/Coflnet/coflnet-bot/internal/utils"
 )
 
 type DiscordMessageToSend struct {
@@ -73,19 +71,21 @@ func SendMessageToSongvoterFeedbackChannel(msg string) error {
 }
 
 func sendMessageToChannel(msg string, channel DiscordChannel) error {
-	payload, err := message(msg, channel)
-	if err != nil {
-		return err
-	}
+	// payload, err := message(msg, channel)
+	// if err != nil {
+	// 	return err
+	// }
 
 	// make http POST request
-	host, err := utils.CoflnetBotBaseUrl()
-	if err != nil {
-		return err
-	}
+	// host, err := utils.CoflnetBotBaseUrl()
+	// if err != nil {
+	// 	return err
+	// }
 
-	_, err = http.Post(fmt.Sprintf("%s/api/webhook/message", host), "application/json", bytes.NewBuffer(payload))
-	return err
+	// _, err = http.Post(fmt.Sprintf("%s/api/webhook/message", host), "application/json", bytes.NewBuffer(payload))
+	// return err
+
+	return errors.New("not implemented")
 }
 
 func message(msg string, channel DiscordChannel) ([]byte, error) {
