@@ -17,6 +17,7 @@ type Message struct {
 	IsBot           bool
 	ChannelId       string
 	GuildId         string
+	ThreadId        *string
 }
 
 func SaveMessage(ctx context.Context, message *Message) error {

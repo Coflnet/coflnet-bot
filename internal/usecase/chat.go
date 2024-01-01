@@ -225,7 +225,7 @@ func (c *Chat) sendMessageToIngameChat(ctx context.Context, msg *RedisMessage) e
 }
 
 func (c *Chat) convertDiscordMessageInChatMessage(msg *discordgo.Message) *db.Message {
-	return &db.Message{
+	res := &db.Message{
 		Content:         msg.Content,
 		Timestamp:       msg.Timestamp,
 		DiscordUserId:   msg.Author.ID,
@@ -234,6 +234,12 @@ func (c *Chat) convertDiscordMessageInChatMessage(msg *discordgo.Message) *db.Me
 		ChannelId:       msg.ChannelID,
 		GuildId:         msg.GuildID,
 	}
+
+	if msg.Thread != nil {
+		res.ThreadId = &msg.Thread.ID
+	}
+
+	return res
 }
 
 func (c *Chat) chatChannelID() string {
