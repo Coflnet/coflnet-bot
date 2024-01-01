@@ -279,10 +279,22 @@ func (s *UserService) LoadHypixelInformationOfUUID(ctx context.Context, user *db
 	hypixelResponse := gen.HypixelPlayerResponse{}
 	err = json.Unmarshal(response.Body, &hypixelResponse)
 	if err != nil {
-		span.SetAttributes(attribute.String("hypixel-response", string(response.Body)))
-		fmt.Println(string(response.Body))
-		span.RecordError(err)
-		return err
+
+		// try something
+		var str string
+		err = json.Unmarshal(response.Body, &str)
+		if err != nil {
+			span.RecordError(err)
+			return err
+		}
+
+		err = json.Unmarshal([]byte(str), &hypixelResponse)
+		if err != nil {
+			span.SetAttributes(attribute.String("hypixel-response", string(response.Body)))
+			fmt.Println(string(response.Body))
+			span.RecordError(err)
+			return err
+		}
 	}
 
 	// discordName is the username#discriminator
