@@ -15,6 +15,7 @@ import (
 	"log/slog"
 	"net/http"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 )
@@ -87,8 +88,6 @@ func (s *UserService) LoadUserByUUID(ctx context.Context, uuid string) (*db.User
 		slog.Info(fmt.Sprintf("user with id %s was refreshed less than an hour ago", user.ExternalId))
 		return user, nil
 	}
-
-	slog.Info(fmt.Sprintf("loaded the user: %v", user))
 
 	wg := sync.WaitGroup{}
 	wg.Add(2)
@@ -223,14 +222,14 @@ func (s *UserService) LoadProductsOfUser(ctx context.Context, externalId string)
 	var premiumPlusUntil *time.Time
 
 	if until, ok := (*productMap)[premium]; ok {
-		slog.Debug("user has premium until %s", until.Format(time.RFC3339))
+		slog.Debug(fmt.Sprintf("user has premium until %s", until.Format(time.RFC3339)))
 		premiumUntil = &until
 	} else {
 		slog.Debug("user has no premium")
 	}
 
 	if until, ok := (*productMap)[premiumPlus]; ok {
-		slog.Debug("user has premium plus until %s", until.Format(time.RFC3339))
+		slog.Debug(fmt.Sprintf("user has premium plus until %s", until.Format(time.RFC3339)))
 		premiumPlusUntil = &until
 	} else {
 		slog.Debug("user has no premium plus")
@@ -300,7 +299,9 @@ func (s *UserService) LoadHypixelInformationOfUUID(ctx context.Context, user *db
 	// discordName is the username#discriminator
 	discordName := hypixelResponse.Player.SocialMedia.Links.Discord
 	// remove the discriminator
-	discordName = discordName[:len(discordName)-5]
+	if strings.Contains(discordName, "#") {
+		discordName = discordName[:len(discordName)-5]
+	}
 
 	discordMember, err := SearchDiscordUser(ctx, discordName)
 	if err != nil {
@@ -308,7 +309,7 @@ func (s *UserService) LoadHypixelInformationOfUUID(ctx context.Context, user *db
 		return err
 	}
 
-	slog.Info("loaded discord user with name %s and id %s for uuid %s", discordMember.User.Username, discordMember.User.ID, uuid)
+	slog.Info(fmt.Sprintf("loaded discord user with name %s and id %s for uuid %s", discordMember.User.Username, discordMember.User.ID, uuid))
 
 	if user.DiscordAccounts == nil {
 		user.DiscordAccounts = make([]db.DiscordAccount, 0)
