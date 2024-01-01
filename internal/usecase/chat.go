@@ -96,18 +96,8 @@ func (c *Chat) processDiscordMessage(ctx context.Context, msg *discordgo.Message
 	// convert into chat message
 	chatMessage := c.convertDiscordMessageInChatMessage(msg)
 
-	// search the user by the discord id
-	user, err := db.UserByDiscordId(ctx, msg.Author.ID)
-	if err != nil {
-		span.RecordError(err)
-		slog.Error("unable to load user by discord id", "err", err)
-
-		// TODO tell the user that he is not registered
-		return
-	}
-
 	// save the message
-	err = db.SaveMessage(ctx, chatMessage)
+	err := db.SaveMessage(ctx, chatMessage)
 	if err != nil {
 		span.RecordError(err)
 		slog.Error("unable to save message", "err", err)
@@ -115,6 +105,16 @@ func (c *Chat) processDiscordMessage(ctx context.Context, msg *discordgo.Message
 
 	// send the message to the chat api
 	if c.shouldMessageBeForwardedToChatAPI(msg) {
+		// search the user by the discord id
+		user, err := db.UserByDiscordId(ctx, msg.Author.ID)
+		if err != nil {
+			span.RecordError(err)
+			slog.Error("unable to load user by discord id", "err", err)
+
+			// TODO tell the user that he is not registered
+			return
+		}
+
 		var uuid string
 		uuid, err = user.PreferredUUID()
 		if err != nil {
