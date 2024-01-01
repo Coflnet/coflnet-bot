@@ -41,7 +41,10 @@ func (s *MongoMigrationService) Migrate(ctx context.Context) error {
 	slog.Info("Starting Migrations")
 	coll := s.client.Database("discord").Collection("users")
 
-	cur, err := coll.Find(ctx, bson.M{})
+	opts := options.Find()
+	opts.SetSort(bson.D{{"_id", -1}})
+
+	cur, err := coll.Find(ctx, bson.M{}, opts)
 	if err != nil {
 		slog.Error("Error finding messages", "err", err)
 		span.RecordError(err)
@@ -89,7 +92,7 @@ func (s *MongoMigrationService) migrateDocument(ctx context.Context, doc bson.M)
 
 		slog.Info(fmt.Sprint("Migrated user with external id %s", user.ExternalId))
 	}
-	time.Sleep(1 * time.Second)
+	time.Sleep(10 * time.Second)
 
 	return nil
 }
