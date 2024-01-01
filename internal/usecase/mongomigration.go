@@ -42,7 +42,6 @@ func (s *MongoMigrationService) Migrate(ctx context.Context) error {
 	coll := s.client.Database("discord").Collection("users")
 
 	opts := options.Find()
-	opts.SetSort(bson.D{{"_id", -1}})
 
 	cur, err := coll.Find(ctx, bson.M{}, opts)
 	if err != nil {
@@ -90,10 +89,9 @@ func (s *MongoMigrationService) migrateDocument(ctx context.Context, doc bson.M)
 			return err
 		}
 
+		time.Sleep(time.Millisecond * 200)
 		slog.Info(fmt.Sprint("Migrated user with external id %s", user.ExternalId))
 	}
-	time.Sleep(10 * time.Second)
-
 	return nil
 }
 
