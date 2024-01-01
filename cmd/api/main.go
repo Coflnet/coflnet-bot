@@ -66,7 +66,12 @@ func main() {
 	}
 
 	// setup background services
-	chat := usecase.NewChat(discordMessageService, redisMessageService, chatClient, userService)
+	chat, err := usecase.NewChat(discordMessageService, redisMessageService, chatClient, userService)
+	if err != nil {
+		slog.Error("error setting up chat", "err", err)
+		panic(errors.New("cannot setup chat"))
+	}
+
 	go func() {
 		err := chat.StartChatService(ctx)
 		if err != nil {
@@ -150,6 +155,9 @@ func setupOTelSDK(ctx context.Context, serviceName, serviceVersion string) (shut
 		var err error
 		for _, fn := range shutdownFuncs {
 			err = errors.Join(err, fn(ctx))
+			if err != nil {
+				slog.Error("error during shutdown", "err", err)
+			}
 		}
 		shutdownFuncs = nil
 		return err
@@ -157,6 +165,7 @@ func setupOTelSDK(ctx context.Context, serviceName, serviceVersion string) (shut
 
 	// handleErr calls shutdown for cleanup and makes sure that all errors are returned.
 	handleErr := func(inErr error) {
+		slog.Error("error during setup", "err", inErr)
 		err = errors.Join(inErr, shutdown(ctx))
 	}
 
