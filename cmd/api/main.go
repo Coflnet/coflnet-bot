@@ -8,15 +8,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
+	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
 	"log/slog"
+	"net/http"
 	"os"
 )
 
@@ -186,6 +188,7 @@ func setupOTelSDK(ctx context.Context, serviceName, serviceVersion string) (shut
 	}
 	shutdownFuncs = append(shutdownFuncs, meterProvider.Shutdown)
 	otel.SetMeterProvider(meterProvider)
+	go serveMetrics()
 
 	return
 }
@@ -221,14 +224,25 @@ func newTraceProvider(ctx context.Context, res *resource.Resource) (*trace.Trace
 }
 
 func newMeterProvider(res *resource.Resource) (*metric.MeterProvider, error) {
-	metricExporter, err := stdoutmetric.New()
+	prometheusExporter, err := prometheus.New()
 	if err != nil {
 		return nil, err
 	}
 
 	meterProvider := metric.NewMeterProvider(
 		metric.WithResource(res),
-		metric.WithReader(metric.NewPeriodicReader(metricExporter)), // Default is 1m. Set to 3s for demonstrative purposes.
+		metric.WithReader(prometheusExporter),
 	)
 	return meterProvider, nil
+}
+
+func serveMetrics() {
+	slog.Info("serving metrics at localhost:2222/metrics")
+	http.Handle("/metrics", promhttp.Handler())
+
+	err := http.ListenAndServe(":2222", nil)
+	if err != nil {
+		slog.Error("error serving http", "err", err)
+		return
+	}
 }
