@@ -106,6 +106,20 @@ func SearchDiscordUser(ctx context.Context, name string) (*discordgo.Member, err
 	return members[0], nil
 }
 
+func AnswerDiscordMessage(ctx context.Context, msg *discordgo.Message, content string) error {
+	ctx, span := discordTracer.Start(ctx, "answer-discord-message")
+	defer span.End()
+
+	_, err := client.ChannelMessageSendReply(msg.ChannelID, content, msg.MessageReference)
+	if err != nil {
+		slog.Error("unable to answer discord message", err)
+		span.RecordError(err)
+		return err
+	}
+
+	return nil
+}
+
 func SendMessageToIngameChat(ctx context.Context, content, uuid, username string) error {
 	ctx, span := discordTracer.Start(ctx, "send-discord-message-to-ingame-chat")
 	defer span.End()

@@ -120,8 +120,11 @@ func (c *Chat) processDiscordMessage(ctx context.Context, msg *discordgo.Message
 	if err != nil {
 		span.RecordError(err)
 		slog.Error("unable to load user by discord id", "err", err)
-
-		// TODO tell the user that he is not registered
+		err = AnswerDiscordMessage(ctx, msg, "no username for your discord account found\nYou can try to write a message in minecraft with your connected minecraft account\nIt is important that your hypixel account has a link to your discord account\nIf this does not work ask in <@669976123714699284>")
+		if err != nil {
+			span.RecordError(err)
+			slog.Error("unable to answer discord message", "err", err)
+		}
 		return
 	}
 
@@ -130,7 +133,11 @@ func (c *Chat) processDiscordMessage(ctx context.Context, msg *discordgo.Message
 	if err != nil {
 		span.RecordError(err)
 		slog.Error("unable to get preferred uuid", "err", err)
-		// TODO tell the user that he is not registered
+		err = AnswerDiscordMessage(ctx, msg, "no username for your discord account found\nYou can try to write a message in minecraft with your connected minecraft account\nIt is important that your hypixel account has a link to your discord account\nIf this does not work ask in <@669976123714699284>")
+		if err != nil {
+			span.RecordError(err)
+			slog.Error("unable to answer discord message", "err", err)
+		}
 		return
 	}
 
@@ -138,8 +145,11 @@ func (c *Chat) processDiscordMessage(ctx context.Context, msg *discordgo.Message
 	if err != nil {
 		span.RecordError(err)
 		slog.Error("unable to send message to chat api", "err", err)
-
-		// TODO tell the user there was a problem
+		err = AnswerDiscordMessage(ctx, msg, "There was a internal issue when forwarding your request, if this continues to happen please open a issue in <@884002032392998942>")
+		if err != nil {
+			span.RecordError(err)
+			slog.Error("unable to answer discord message", "err", err)
+		}
 		return
 	}
 
