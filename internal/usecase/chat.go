@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"log/slog"
 	"os"
@@ -92,6 +93,9 @@ func (c *Chat) StartRedisMessageListener(ctx context.Context, reader <-chan *Red
 func (c *Chat) processDiscordMessage(ctx context.Context, msg *discordgo.Message) {
 	ctx, span := c.tracer.Start(ctx, "process-discord-message")
 	defer span.End()
+	span.SetAttributes(
+		attribute.String("discord-user-id", msg.Author.ID),
+	)
 
 	// convert into chat message
 	chatMessage := c.convertDiscordMessageInChatMessage(msg)
@@ -104,37 +108,43 @@ func (c *Chat) processDiscordMessage(ctx context.Context, msg *discordgo.Message
 	}
 
 	// send the message to the chat api
-	if c.shouldMessageBeForwardedToChatAPI(msg) {
-		// search the user by the discord id
-		user, err := db.UserByDiscordId(ctx, msg.Author.ID)
-		if err != nil {
-			span.RecordError(err)
-			slog.Error("unable to load user by discord id", "err", err)
-
-			// TODO tell the user that he is not registered
-			return
-		}
-
-		var uuid string
-		uuid, err = user.PreferredUUID()
-		if err != nil {
-			span.RecordError(err)
-			slog.Error("unable to get preferred uuid", "err", err)
-			// TODO tell the user that he is not registered
-			return
-		}
-
-		err = c.sendMessageToChatAPI(ctx, chatMessage, uuid)
-		if err != nil {
-			span.RecordError(err)
-			slog.Error("unable to send message to chat api", "err", err)
-
-			// TODO tell the user there was a problem
-			return
-		}
-
-		slog.Info("message forwarded to chat api")
+	if !c.shouldMessageBeForwardedToChatAPI(msg) {
+		span.SetAttributes(attribute.Bool("should-forward-to-chat-api", false))
+		return
 	}
+
+	span.SetAttributes(attribute.Bool("should-forward-to-chat-api", true))
+
+	// search the user by the discord id
+	user, err := db.UserByDiscordId(ctx, msg.Author.ID)
+	if err != nil {
+		span.RecordError(err)
+		slog.Error("unable to load user by discord id", "err", err)
+
+		// TODO tell the user that he is not registered
+		return
+	}
+
+	var uuid string
+	uuid, err = user.PreferredUUID()
+	if err != nil {
+		span.RecordError(err)
+		slog.Error("unable to get preferred uuid", "err", err)
+		// TODO tell the user that he is not registered
+		return
+	}
+
+	err = c.sendMessageToChatAPI(ctx, chatMessage, uuid)
+	if err != nil {
+		span.RecordError(err)
+		slog.Error("unable to send message to chat api", "err", err)
+
+		// TODO tell the user there was a problem
+		return
+	}
+
+	slog.Info("message forwarded to chat api")
+	return
 }
 
 func (c *Chat) sendMessageToChatAPI(ctx context.Context, message *db.Message, uuid string) error {

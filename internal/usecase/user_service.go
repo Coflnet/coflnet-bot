@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"log/slog"
 	"net/http"
@@ -278,6 +279,8 @@ func (s *UserService) LoadHypixelInformationOfUUID(ctx context.Context, user *db
 	hypixelResponse := gen.HypixelPlayerResponse{}
 	err = json.Unmarshal(response.Body, &hypixelResponse)
 	if err != nil {
+		span.SetAttributes(attribute.String("hypixel-response", string(response.Body)))
+		span.RecordError(err)
 		return err
 	}
 
@@ -288,6 +291,7 @@ func (s *UserService) LoadHypixelInformationOfUUID(ctx context.Context, user *db
 
 	discordMember, err := SearchDiscordUser(ctx, discordName)
 	if err != nil {
+		span.RecordError(err)
 		return err
 	}
 
