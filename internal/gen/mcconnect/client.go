@@ -907,9 +907,6 @@ func ParseGetConnectMinecraftMcUuidResponse(rsp *http.Response) (*GetConnectMine
 		HTTPResponse: rsp,
 	}
 
-	fmt.Println(strings.Join(rsp.Header.Values("content-type"), ","))
-	fmt.Println("t:")
-	fmt.Println(rsp.Header.Get("Test-Header"))
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest User
@@ -920,7 +917,6 @@ func ParseGetConnectMinecraftMcUuidResponse(rsp *http.Response) (*GetConnectMine
 
 	case rsp.StatusCode == 200:
 		// Content-type (text/plain) unsupported
-		fmt.Println("Content-type (text/plain) unsupported")
 	}
 
 	return response, nil

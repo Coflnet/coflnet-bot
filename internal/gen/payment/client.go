@@ -8462,8 +8462,6 @@ func ParseGetUserUserIdResponse(rsp *http.Response) (*GetUserUserIdResponse, err
 
 	case rsp.StatusCode == 200:
 		// Content-type (text/plain) unsupported
-		fmt.Println("unsupported thingy")
-		fmt.Println(rsp.Header.Get("Content-Type"))
 	}
 
 	return response, nil

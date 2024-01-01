@@ -109,7 +109,7 @@ func (s *UserService) LoadUserByUUID(ctx context.Context, uuid string) (*db.User
 		err = s.LoadHypixelInformationOfUUID(ctx, user, uuid)
 		if err != nil {
 			span.RecordError(err)
-			slog.Error("error loading hypixel information of user", "err", err)
+			slog.Warn(fmt.Sprintf("can not load hypixel information of user: %s", uuid), "err", err)
 		}
 		slog.Info("loaded hypixel information of user")
 	}()
@@ -290,7 +290,6 @@ func (s *UserService) LoadHypixelInformationOfUUID(ctx context.Context, user *db
 		err = json.Unmarshal([]byte(str), &hypixelResponse)
 		if err != nil {
 			span.SetAttributes(attribute.String("hypixel-response", string(response.Body)))
-			fmt.Println(string(response.Body))
 			span.RecordError(err)
 			return err
 		}
