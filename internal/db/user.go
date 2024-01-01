@@ -44,6 +44,24 @@ type MinecraftAccount struct {
 	UserID        uint `gorm:"index"`
 }
 
+type UserHasNoMinecraftAccountError struct {
+	UserId     uint
+	ExternalId string
+}
+
+func (e *UserHasNoMinecraftAccountError) Error() string {
+	return fmt.Sprintf("user with id %d and external id %s has no minecraft account", e.UserId, e.ExternalId)
+}
+
+type UserHasNoDiscordAccountError struct {
+	UserId     uint
+	ExternalId string
+}
+
+func (e *UserHasNoDiscordAccountError) Error() string {
+	return fmt.Sprintf("user with id %d and external id %s has no discord account", e.UserId, e.ExternalId)
+}
+
 func (u *User) HasPremium() bool {
 	return u.PremiumUntil.After(time.Now())
 }
@@ -128,15 +146,14 @@ func UserByDiscordId(ctx context.Context, id string) (*User, error) {
 	span.SetAttributes(attribute.String("discordId", id))
 
 	user := &User{}
-	err := db.
-		Model(&User{}).
+	result := db.
 		Preload(clause.Associations).
-		Where(DiscordAccount{DiscordID: id}).
-		Association("DiscordAccounts").
-		Find(user)
+		Joins("JOIN discord_accounts ON discord_accounts.user_id = users.id").
+		Where("discord_accounts.discord_id = ?", id).
+		First(user)
 
-	if err != nil {
-		return nil, err
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
 	return user, nil

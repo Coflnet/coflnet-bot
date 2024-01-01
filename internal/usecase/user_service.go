@@ -139,6 +139,7 @@ func (s *UserService) mergeDBUserWithUUID(user *db.User, uuid string) {
 		return acc.MinecraftUUID == uuid
 	}) {
 		slog.Debug(fmt.Sprintf("user with id %s already has minecraft account with uuid %s, skipping", user.ExternalId, uuid))
+		return
 	}
 
 	// set the new one as preferred

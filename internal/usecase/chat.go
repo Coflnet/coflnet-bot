@@ -94,12 +94,7 @@ func (c *Chat) processDiscordMessage(ctx context.Context, msg *discordgo.Message
 	defer span.End()
 
 	// convert into chat message
-	chatMessage, err := c.convertDiscordMessageInChatMessage(msg)
-	if err != nil {
-		span.RecordError(err)
-		slog.Error("unable to convert discord message in chat message", "err", err)
-		return
-	}
+	chatMessage := c.convertDiscordMessageInChatMessage(msg)
 
 	// search the user by the discord id
 	user, err := db.UserByDiscordId(ctx, msg.Author.ID)
@@ -125,7 +120,6 @@ func (c *Chat) processDiscordMessage(ctx context.Context, msg *discordgo.Message
 		if err != nil {
 			span.RecordError(err)
 			slog.Error("unable to get preferred uuid", "err", err)
-
 			// TODO tell the user that he is not registered
 			return
 		}
@@ -195,15 +189,41 @@ func (c *Chat) processRedisMessage(ctx context.Context, msg *RedisMessage) {
 		slog.Error("unable to load user", "err", err)
 		return
 	}
-
 	slog.Info(fmt.Sprintf("loaded user with uuid %s, external id %s", uuid, user.ExternalId))
+
+	// send the message to the discord channel
+	err = c.sendMessageToIngameChat(ctx, msg)
+	if err != nil {
+		span.RecordError(err)
+		slog.Error("unable to send message to ingame chat", "err", err)
+		return
+	}
 }
 
-func (c *Chat) convertDiscordMessageInChatMessage(msg *discordgo.Message) (*db.Message, error) {
+func (c *Chat) sendMessageToIngameChat(ctx context.Context, msg *RedisMessage) error {
+	ctx, span := c.tracer.Start(ctx, "send-message-to-ingame-chat")
+	defer span.End()
 
-	// TODO
+	err := SendMessageToIngameChat(ctx, msg.Message, msg.UUID, msg.Name)
+	if err != nil {
+		span.RecordError(err)
+		slog.Error("unable to send message to ingame chat", "err", err)
+		return err
+	}
 
-	return &db.Message{}, nil
+	return nil
+}
+
+func (c *Chat) convertDiscordMessageInChatMessage(msg *discordgo.Message) *db.Message {
+	return &db.Message{
+		Content:         msg.Content,
+		Timestamp:       msg.Timestamp,
+		DiscordUserId:   msg.Author.ID,
+		DiscordUsername: msg.Author.Username,
+		IsBot:           msg.Author.Bot,
+		ChannelId:       msg.ChannelID,
+		GuildId:         msg.GuildID,
+	}
 }
 
 func (c *Chat) chatChannelID() string {

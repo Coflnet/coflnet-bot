@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"gorm.io/gorm"
 	"log/slog"
 	"time"
@@ -9,30 +10,25 @@ import (
 
 type Message struct {
 	gorm.Model
-	UserID    uint `gorm:"index"`
-	Source    MessageSource
-	Content   string
-	Timestamp time.Time
+	Content         string
+	Timestamp       time.Time
+	DiscordUserId   string
+	DiscordUsername string
+	IsBot           bool
+	ChannelId       string
+	GuildId         string
 }
-
-type MessageSource string
-
-const (
-	MessageSourceDiscord MessageSource = "discord"
-	MessageSourceRedis   MessageSource = "redis"
-)
 
 func SaveMessage(ctx context.Context, message *Message) error {
 	ctx, span := tracer.Start(ctx, "save-message")
 	defer span.End()
 
-	slog.Debug("Saving message", "message", message)
-	result := db.Create(message)
-
+	result := db.Save(message)
 	if result.Error != nil {
+		span.RecordError(result.Error)
 		return result.Error
 	}
 
-	slog.Debug("Message saved")
+	slog.Info(fmt.Sprintf("saved message from %s", message.DiscordUsername))
 	return nil
 }

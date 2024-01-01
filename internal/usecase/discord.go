@@ -1,15 +1,19 @@
 package usecase
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
+	"regexp"
 	"syscall"
 )
 
@@ -100,6 +104,67 @@ func SearchDiscordUser(ctx context.Context, name string) (*discordgo.Member, err
 	}
 
 	return members[0], nil
+}
+
+func SendMessageToIngameChat(ctx context.Context, content, uuid, username string) error {
+	ctx, span := discordTracer.Start(ctx, "send-discord-message-to-ingame-chat")
+	defer span.End()
+
+	iconUrl := fmt.Sprintf("https://mc-heads.net/avatar/%s", uuid)
+	url := chatWebhook()
+	span.SetAttributes(attribute.String("iconUr", iconUrl))
+	span.SetAttributes(attribute.String("url", url))
+
+	data := &WebhookRequest{
+		Content:             sanitizeMessage(content),
+		Username:            username,
+		AvatarUrl:           iconUrl,
+		AllowedMentionsData: AllowedMentions{Parse: make([]string, 0)},
+	}
+
+	slog.Debug(fmt.Sprintf("send message to discord webhook with icon url %s", iconUrl))
+	body, err := json.Marshal(data)
+	if err != nil {
+		slog.Error("error when marshalling webhook request", err)
+		span.RecordError(err)
+		return err
+	}
+
+	response, err := http.DefaultClient.Post(url, "application/json", bytes.NewBuffer(body))
+	span.SetAttributes(attribute.Int("status", response.StatusCode))
+
+	if err != nil {
+		slog.Error("error when sending webhook request", err)
+		span.RecordError(err)
+		return err
+	}
+
+	return nil
+}
+
+type WebhookRequest struct {
+	Content             string          `json:"content"`
+	Username            string          `json:"username"`
+	AvatarUrl           string          `json:"avatar_url"`
+	AllowedMentionsData AllowedMentions `json:"allowed_mentions"`
+}
+
+type AllowedMentions struct {
+	Parse []string `json:"parse"`
+}
+
+func sanitizeMessage(message string) string {
+	reg := regexp.MustCompile("§.")
+	message = reg.ReplaceAllString(message, "")
+	return message
+}
+
+func chatWebhook() string {
+	val, found := os.LookupEnv("CHAT_WEBHOOK")
+	if !found {
+		panic("CHAT_WEBHOOK not found")
+	}
+	return val
 }
 
 type DiscordMemberNotFoundError struct {
