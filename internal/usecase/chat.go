@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	chatgen "coflnet-bot/gen/chat"
 	"coflnet-bot/internal/db"
+	chatgen "coflnet-bot/internal/gen/chat"
 	"context"
 	"errors"
 	"fmt"

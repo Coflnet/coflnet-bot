@@ -1,8 +1,8 @@
 package main
 
 import (
-	chatgen "coflnet-bot/gen/chat"
 	"coflnet-bot/internal/db"
+	chatgen "coflnet-bot/internal/gen/chat"
 	"coflnet-bot/internal/server"
 	"coflnet-bot/internal/usecase"
 	"context"

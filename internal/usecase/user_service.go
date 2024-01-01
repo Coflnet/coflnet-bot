@@ -1,11 +1,11 @@
 package usecase
 
 import (
-	"coflnet-bot/gen"
-	mcconnectgen "coflnet-bot/gen/mcconnect"
-	paymentgen "coflnet-bot/gen/payment"
-	proxygen "coflnet-bot/gen/proxy"
 	"coflnet-bot/internal/db"
+	"coflnet-bot/internal/gen"
+	mcconnectgen "coflnet-bot/internal/gen/mcconnect"
+	paymentgen "coflnet-bot/internal/gen/payment"
+	proxygen "coflnet-bot/internal/gen/proxy"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -280,6 +280,7 @@ func (s *UserService) LoadHypixelInformationOfUUID(ctx context.Context, user *db
 	err = json.Unmarshal(response.Body, &hypixelResponse)
 	if err != nil {
 		span.SetAttributes(attribute.String("hypixel-response", string(response.Body)))
+		fmt.Println(string(response.Body))
 		span.RecordError(err)
 		return err
 	}
