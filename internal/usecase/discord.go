@@ -110,7 +110,7 @@ func AnswerDiscordMessage(ctx context.Context, msg *discordgo.Message, content s
 	ctx, span := discordTracer.Start(ctx, "answer-discord-message")
 	defer span.End()
 
-	_, err := client.ChannelMessageSendReply(msg.ChannelID, content, msg.MessageReference)
+	_, err := client.ChannelMessageSendReply(msg.ChannelID, content, msg.Reference())
 	if err != nil {
 		slog.Error("unable to answer discord message", err)
 		span.RecordError(err)

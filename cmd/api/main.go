@@ -17,6 +17,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
+	othertrace "go.opentelemetry.io/otel/trace"
 	"log/slog"
 	"net/http"
 	"os"
@@ -134,12 +135,32 @@ func setupLogger() {
 		level = slog.LevelDebug
 	}
 
-	opts := slog.HandlerOptions{
-		Level: level,
-	}
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &opts))
+	var handler slog.Handler
+	handler = slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
+		AddSource: true,
+		Level:     level,
+	})
+	handler = TraceLogHandler{handler}
+	logger := slog.New(handler)
 	slog.SetDefault(logger)
 	slog.Info(fmt.Sprintf("using log level %s", level.String()))
+}
+
+type TraceLogHandler struct {
+	slog.Handler
+}
+
+func (h TraceLogHandler) Handle(ctx context.Context, r slog.Record) error {
+	span := othertrace.SpanFromContext(ctx)
+	if span == nil {
+		return h.Handler.Handle(ctx, r)
+	}
+	if !span.SpanContext().IsValid() {
+		return h.Handler.Handle(ctx, r)
+	}
+	traceId := span.SpanContext().TraceID().String()
+	r.Add("trace", slog.StringValue(traceId))
+	return h.Handler.Handle(ctx, r)
 }
 
 // OpenTelemetry initialization.
