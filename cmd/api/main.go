@@ -134,14 +134,11 @@ func setupLogger() {
 	if true {
 		level = slog.LevelDebug
 	}
+	opts := slog.HandlerOptions{
+		Level: level,
+	}
 
-	var handler slog.Handler
-	handler = slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
-		AddSource: true,
-		Level:     level,
-	})
-	handler = TraceLogHandler{handler}
-	logger := slog.New(handler)
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &opts))
 	slog.SetDefault(logger)
 	slog.Info(fmt.Sprintf("using log level %s", level.String()))
 }
@@ -150,17 +147,17 @@ type TraceLogHandler struct {
 	slog.Handler
 }
 
-func (h TraceLogHandler) Handle(ctx context.Context, r slog.Record) error {
+func (h *TraceLogHandler) Handle(ctx context.Context, r *slog.Record) error {
 	span := othertrace.SpanFromContext(ctx)
 	if span == nil {
-		return h.Handler.Handle(ctx, r)
+		return h.Handler.Handle(ctx, *r)
 	}
 	if !span.SpanContext().IsValid() {
-		return h.Handler.Handle(ctx, r)
+		return h.Handler.Handle(ctx, *r)
 	}
 	traceId := span.SpanContext().TraceID().String()
-	r.Add("trace", slog.StringValue(traceId))
-	return h.Handler.Handle(ctx, r)
+	r.Add("traceId", slog.StringValue(traceId))
+	return h.Handler.Handle(ctx, *r)
 }
 
 // OpenTelemetry initialization.
