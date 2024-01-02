@@ -247,12 +247,13 @@ func (s *UserService) UpdatePremiumStatusOfUser(ctx context.Context, user *db.Us
 		return err
 	}
 
-	slog.Debug(fmt.Sprintf("loaded premium until %s and premium plus until %s", premiumUntil.Format(time.RFC3339), premiumPlusUntil.Format(time.RFC3339)))
 	if premiumUntil != nil {
 		user.PremiumUntil = premiumUntil
+		slog.Debug(fmt.Sprintf("loaded premium until %s", premiumUntil.Format(time.RFC3339)))
 	}
 	if premiumPlusUntil != nil {
 		user.PremiumPlusUntil = premiumPlusUntil
+		slog.Debug(fmt.Sprintf("loaded premium plus until %s", premiumPlusUntil.Format(time.RFC3339)))
 	}
 
 	return nil
