@@ -92,11 +92,11 @@ func main() {
 		}()
 	}
 
-	startApi()
+	startApi(userService)
 }
 
-func startApi() {
-	apiServer := server.NewServer()
+func startApi(userService *usecase.UserService) {
+	apiServer := server.NewServer(userService)
 
 	err := apiServer.ListenAndServe()
 	if err != nil {

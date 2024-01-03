@@ -1,6 +1,7 @@
 package server
 
 import (
+	"coflnet-bot/internal/usecase"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,13 +12,15 @@ import (
 )
 
 type Server struct {
-	port int
+	port        int
+	userService *usecase.UserService
 }
 
-func NewServer() *http.Server {
+func NewServer(userService *usecase.UserService) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	NewServer := &Server{
-		port: port,
+		port:        port,
+		userService: userService,
 	}
 
 	// Declare Server config

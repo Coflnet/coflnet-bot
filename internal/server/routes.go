@@ -2,8 +2,10 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"go.opentelemetry.io/otel"
 	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -19,6 +21,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Use(middleware.Logger)
 
 	r.Get("/", s.HelloWorldHandler)
+	r.Post("/user/{uuid}", s.UpdateUserWithUUID)
 
 	return r
 }
@@ -36,4 +39,22 @@ func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, _ = w.Write(jsonResp)
+}
+
+func (s *Server) UpdateUserWithUUID(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "update-user-with-uuid")
+	defer span.End()
+
+	uuid := chi.URLParam(r, "uuid")
+
+	user, err := s.userService.LoadUserByUUID(ctx, uuid)
+	if err != nil {
+		span.RecordError(err)
+		slog.Error("unable to load user", "err", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	slog.Info(fmt.Sprintf("loaded user with external id %s", user.ExternalId))
+	w.WriteHeader(http.StatusOK)
 }
