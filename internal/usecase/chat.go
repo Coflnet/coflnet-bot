@@ -253,6 +253,11 @@ func (c *Chat) processRedisMessage(ctx context.Context, msg *RedisMessage) error
 	}
 	slog.Info(fmt.Sprintf("loaded user with uuid %s, external id %s", uuid, user.ExternalId))
 
+	if msg.Prefix == coflDiscordClientName {
+		slog.Info("message is already from discord, skip")
+		return nil
+	}
+
 	// send the message to the discord channel
 	err = c.sendMessageToIngameChat(ctx, msg)
 	if err != nil {
