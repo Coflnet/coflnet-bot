@@ -207,8 +207,7 @@ func (c *Chat) sendMessageToChatAPI(ctx context.Context, message *db.Message, uu
 	body := chatgen.PostApiChatSendJSONRequestBody{
 		ClientName: strPtr("cofl-discord"),
 		Message:    strPtr(message.Content),
-		Name:       strPtr(coflDiscordClientName),
-		Prefix:     strPtr(""),
+		Prefix:     strPtr(coflDiscordClientName),
 		Uuid:       strPtr(uuid),
 	}
 	headers := &chatgen.PostApiChatSendParams{
