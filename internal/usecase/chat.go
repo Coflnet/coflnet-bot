@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	coflDiscordClientName = "cofl-discord"
+	coflDiscordClientName = "§1dc§7:§f"
 )
 
 type Chat struct {
