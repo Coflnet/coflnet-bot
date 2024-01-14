@@ -97,7 +97,7 @@ func (c *ClearAlertChannels) clearMessagesInChannel(ctx context.Context, channel
 	bulkDeleteMessageIds := make([]string, 0)
 	singleDeleteMessageIds := make([]string, 0)
 	for _, message := range messages {
-		if message.Timestamp.Before(time.Now().Add(12 * 24 * time.Hour)) {
+		if message.Timestamp.After(time.Now().Add(-(12 * 24 * time.Hour))) {
 			bulkDeleteMessageIds = append(bulkDeleteMessageIds, message.ID)
 		} else {
 			singleDeleteMessageIds = append(singleDeleteMessageIds, message.ID)
