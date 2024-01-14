@@ -94,16 +94,34 @@ func (c *ClearAlertChannels) clearMessagesInChannel(ctx context.Context, channel
 		return err
 	}
 
-	messageIds := make([]string, len(messages))
-	for i, message := range messages {
-		messageIds[i] = message.ID
+	bulkDeleteMessageIds := make([]string, 0)
+	singleDeleteMessageIds := make([]string, 0)
+	for _, message := range messages {
+		if message.Timestamp.Before(time.Now().Add(12 * 24 * time.Hour)) {
+			bulkDeleteMessageIds = append(bulkDeleteMessageIds, message.ID)
+		} else {
+			singleDeleteMessageIds = append(singleDeleteMessageIds, message.ID)
+		}
 	}
 
-	err = c.session.ChannelMessagesBulkDelete(channel.ID, messageIds)
-	if err != nil {
-		slog.Error("Cannot delete messages in channel", "err", err)
-		span.RecordError(err)
-		return err
+	if len(bulkDeleteMessageIds) > 0 {
+		err = c.session.ChannelMessagesBulkDelete(channel.ID, bulkDeleteMessageIds)
+		if err != nil {
+			slog.Error("Cannot delete messages in channel", "err", err)
+			span.RecordError(err)
+			return err
+		}
+	}
+	if len(singleDeleteMessageIds) > 0 {
+		for _, id := range singleDeleteMessageIds {
+			err = c.session.ChannelMessageDelete(channel.ID, id)
+			if err != nil {
+				slog.Error("Cannot delete message in channel", "err", err)
+				span.RecordError(err)
+				return err
+			}
+			time.Sleep(1 * time.Second)
+		}
 	}
 	slog.Info(fmt.Sprintf("deleted %d messages in channel %s", len(messages), channel.Name))
 
