@@ -4,6 +4,7 @@ import (
 	"coflnet-bot/internal/db"
 	chatgen "coflnet-bot/internal/gen/chat"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
@@ -11,6 +12,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
+	"io"
 	"log/slog"
 	"os"
 	"sync"
@@ -19,6 +21,7 @@ import (
 
 const (
 	coflDiscordClientName = "§1dc§7:§f"
+	userMutedSlug         = "user_muted"
 )
 
 type Chat struct {
@@ -186,6 +189,17 @@ func (c *Chat) processDiscordMessage(ctx context.Context, msg *discordgo.Message
 
 	err = c.sendMessageToChatAPI(ctx, chatMessage, uuid)
 	if err != nil {
+		var userErr *UserVisibleError
+		if errors.As(err, &userErr) {
+			slog.Info("user visible error", "err", userErr)
+			innerErr := AnswerDiscordMessage(ctx, msg, userErr.Message)
+			if innerErr != nil {
+				span.RecordError(innerErr)
+				slog.Error("unable to answer discord message", "err", innerErr)
+			}
+			return err
+		}
+
 		span.RecordError(err)
 		slog.Error("unable to send message to chat api", "err", err)
 		innerErr := AnswerDiscordMessage(ctx, msg, "There was a internal issue when forwarding your request, if this continues to happen please open a issue in <@884002032392998942>")
@@ -217,6 +231,27 @@ func (c *Chat) sendMessageToChatAPI(ctx context.Context, message *db.Message, uu
 	response, err := c.chatClient.PostApiChatSend(ctx, headers, body)
 	if err != nil {
 		return err
+	}
+
+	if response.StatusCode == 400 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+
+		var failResponse ChatMessageFailResponse
+		err = json.Unmarshal(body, &failResponse)
+		if err != nil {
+			return err
+		}
+
+		if failResponse.Slug == userMutedSlug {
+			return &UserVisibleError{
+				Message: failResponse.Message,
+			}
+		}
+
+		return errors.New(fmt.Sprintf("unable to send message to chat api, status code is %d, body is %s", response.StatusCode, string(body)))
 	}
 
 	if response.StatusCode > 299 {
@@ -318,4 +353,17 @@ func mustEnv(key string) string {
 
 func strPtr(s string) *string {
 	return &s
+}
+
+type ChatMessageFailResponse struct {
+	Slug    string `json:"slug"`
+	Message string `json:"message"`
+}
+
+type UserVisibleError struct {
+	Message string `json:"message"`
+}
+
+func (e *UserVisibleError) Error() string {
+	return e.Message
 }
