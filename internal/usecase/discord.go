@@ -53,7 +53,17 @@ func StartSession(ctx context.Context) (*discordgo.Session, error) {
 	}
 	go startStopListener()
 
+	go registerCommands()
+
 	return client, nil
+}
+
+func registerCommands() {
+	cmds := NewDiscordCommands(client)
+	err := cmds.RegisterCommands()
+	if err != nil {
+		slog.Error("unable to register discord commands", err)
+	}
 }
 
 func startStopListener() {
