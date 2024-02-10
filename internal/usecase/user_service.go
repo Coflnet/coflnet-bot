@@ -84,7 +84,7 @@ func (s *UserService) LoadUserByUUID(ctx context.Context, uuid string) (*db.User
 	s.mergeDBUserWithUUID(user, uuid)
 
 	// only refresh once a minute
-	if user.LastUpdated != nil && user.LastUpdated.After(time.Now().Add(-1*time.Minute)) {
+	if user.LastUpdated != nil && user.LastUpdated.After(time.Now().Add(-1*time.Hour)) {
 		slog.Info(fmt.Sprintf("user with id %s was refreshed less than an hour ago", user.ExternalId))
 		return user, nil
 	}
