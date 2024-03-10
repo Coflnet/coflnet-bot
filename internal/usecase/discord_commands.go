@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	chatgen "coflnet-bot/internal/gen/chat"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"log/slog"
@@ -13,12 +14,14 @@ type DiscordCommands struct {
 	session         *discordgo.Session
 
 	clearAlertChannels *ClearAlertChannels
+	muteCommand        *MuteCommand
 }
 
-func NewDiscordCommands(session *discordgo.Session) *DiscordCommands {
+func NewDiscordCommands(session *discordgo.Session, userService *UserService, chatClient *chatgen.Client) *DiscordCommands {
 	return &DiscordCommands{
 		session:            session,
 		clearAlertChannels: NewClearAlertChannels(session),
+		muteCommand:        NewMuteCommand(session, userService, chatClient),
 	}
 }
 
@@ -43,10 +46,29 @@ func (d *DiscordCommands) defineCommands() {
 				},
 			},
 		},
+		{
+			Name:        "mute",
+			Description: "Mute a user",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "user",
+					Description: "User to mute",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "message",
+					Description: "message",
+					Required:    true,
+				},
+			},
+		},
 	}
 
 	d.commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"clear-alert-channel": d.clearAlertChannels.Execute,
+		"mute":                d.muteCommand.Execute,
 	}
 }
 

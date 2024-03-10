@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	chatgen "coflnet-bot/internal/gen/chat"
 	"context"
 	"github.com/bwmarrin/discordgo"
 	"log/slog"
@@ -16,8 +17,8 @@ func NewDiscordMessageService() *DiscordMessageService {
 	}
 }
 
-func (d *DiscordMessageService) Reader(ctx context.Context) (<-chan *discordgo.Message, error) {
-	session, err := DiscordSession(ctx)
+func (d *DiscordMessageService) Reader(ctx context.Context, userService *UserService, chatClient *chatgen.Client) (<-chan *discordgo.Message, error) {
+	session, err := DiscordSession(ctx, userService, chatClient)
 	if err != nil {
 		return nil, err
 	}

@@ -1004,7 +1004,6 @@ func NewGetProxyHypixelRequest(server string, params *GetProxyHypixelParams) (*h
 			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "path", runtime.ParamLocationQuery, *params.Path); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-
 				return nil, err
 			} else {
 				for k, v := range parsed {

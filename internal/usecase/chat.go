@@ -73,7 +73,7 @@ func NewChat(discordMessageService *DiscordMessageService, redisMessageService *
 func (c *Chat) StartChatService(ctx context.Context) error {
 	slog.Info("Starting chat service")
 
-	discordMessageReader, err := c.discordMessages.Reader(ctx)
+	discordMessageReader, err := c.discordMessages.Reader(ctx, c.userService, c.chatClient)
 	if err != nil {
 		return err
 	}
@@ -225,7 +225,7 @@ func (c *Chat) sendMessageToChatAPI(ctx context.Context, message *db.Message, uu
 		Uuid:       strPtr(uuid),
 	}
 	headers := &chatgen.PostApiChatSendParams{
-		Authorization: strPtr(c.authorization()),
+		Authorization: strPtr(authorization()),
 	}
 
 	response, err := c.chatClient.PostApiChatSend(ctx, headers, body)
@@ -339,7 +339,7 @@ func (c *Chat) chatChannelID() string {
 	return mustEnv("CHAT_CHANNEL_ID")
 }
 
-func (c *Chat) authorization() string {
+func authorization() string {
 	return mustEnv("CHAT_API_AUTHORIZATION")
 }
 

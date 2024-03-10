@@ -917,6 +917,7 @@ func ParseGetConnectMinecraftMcUuidResponse(rsp *http.Response) (*GetConnectMine
 
 	case rsp.StatusCode == 200:
 		// Content-type (text/plain) unsupported
+
 	}
 
 	return response, nil

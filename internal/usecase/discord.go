@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"bytes"
+	chatgen "coflnet-bot/internal/gen/chat"
 	"context"
 	"encoding/json"
 	"errors"
@@ -22,14 +23,14 @@ var (
 	discordTracer = otel.Tracer("discord")
 )
 
-func DiscordSession(ctx context.Context) (*discordgo.Session, error) {
+func DiscordSession(ctx context.Context, userService *UserService, chatClient *chatgen.Client) (*discordgo.Session, error) {
 	if client != nil {
 		return client, nil
 	}
-	return StartSession(ctx)
+	return StartSession(ctx, userService, chatClient)
 }
 
-func StartSession(ctx context.Context) (*discordgo.Session, error) {
+func StartSession(ctx context.Context, userService *UserService, chatClient *chatgen.Client) (*discordgo.Session, error) {
 	ctx, span := discordTracer.Start(ctx, "start-session")
 	defer span.End()
 	slog.Info("Starting a new discord session")
@@ -53,13 +54,13 @@ func StartSession(ctx context.Context) (*discordgo.Session, error) {
 	}
 	go startStopListener()
 
-	go registerCommands()
+	go registerCommands(userService, chatClient)
 
 	return client, nil
 }
 
-func registerCommands() {
-	cmds := NewDiscordCommands(client)
+func registerCommands(userService *UserService, chatClient *chatgen.Client) {
+	cmds := NewDiscordCommands(client, userService, chatClient)
 	err := cmds.RegisterCommands()
 	if err != nil {
 		slog.Error("unable to register discord commands", err)

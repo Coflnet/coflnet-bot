@@ -60,7 +60,7 @@ func main() {
 	// setup some base dependencies
 	discordMessageService := usecase.NewDiscordMessageService()
 	redisMessageService := usecase.NewRedisMessageService()
-	userService, err := usecase.NewUserService(paymentUrl(), proxyUrl(), mcConnectUrl())
+	userService, err := usecase.NewUserService(paymentUrl(), proxyUrl(), mcConnectUrl(), playernameUrl())
 	if err != nil {
 		slog.Error("error setting up user service", "err", err)
 		panic(errors.New("cannot setup user service"))
@@ -119,6 +119,10 @@ func paymentUrl() string {
 
 func mcConnectUrl() string {
 	return mustLoadEnv("MC_CONNECT_URL")
+}
+
+func playernameUrl() string {
+	return mustLoadEnv("PLAYERNAME_URL")
 }
 
 func mustLoadEnv(key string) string {

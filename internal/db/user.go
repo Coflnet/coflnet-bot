@@ -153,6 +153,7 @@ func UserByDiscordId(ctx context.Context, id string) (*User, error) {
 		First(user)
 
 	if result.Error != nil {
+		span.RecordError(result.Error)
 		return nil, result.Error
 	}
 

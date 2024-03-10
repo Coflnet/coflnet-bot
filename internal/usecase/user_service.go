@@ -5,6 +5,7 @@ import (
 	"coflnet-bot/internal/gen"
 	mcconnectgen "coflnet-bot/internal/gen/mcconnect"
 	paymentgen "coflnet-bot/internal/gen/payment"
+	playernamegen "coflnet-bot/internal/gen/playername"
 	proxygen "coflnet-bot/internal/gen/proxy"
 	"context"
 	"encoding/json"
@@ -21,13 +22,14 @@ import (
 )
 
 type UserService struct {
-	tracer          trace.Tracer
-	paymentClient   *paymentgen.ClientWithResponses
-	proxyClient     *proxygen.ClientWithResponses
-	mcConnectClient *mcconnectgen.ClientWithResponses
+	tracer           trace.Tracer
+	paymentClient    *paymentgen.ClientWithResponses
+	proxyClient      *proxygen.ClientWithResponses
+	mcConnectClient  *mcconnectgen.ClientWithResponses
+	playernameClient *playernamegen.ClientWithResponses
 }
 
-func NewUserService(paymentUrl, proxyUrl, mcConnectUrl string) (*UserService, error) {
+func NewUserService(paymentUrl, proxyUrl, mcConnectUrl, playernameUrl string) (*UserService, error) {
 	paymentClient, err := paymentgen.NewClientWithResponses(paymentUrl, paymentgen.WithRequestEditorFn(addJsonAcceptHeaderFn))
 	if err != nil {
 		return nil, err
@@ -40,12 +42,17 @@ func NewUserService(paymentUrl, proxyUrl, mcConnectUrl string) (*UserService, er
 	if err != nil {
 		return nil, err
 	}
+	playernameClient, err := playernamegen.NewClientWithResponses(playernameUrl, playernamegen.WithRequestEditorFn(addJsonAcceptHeaderFn))
+	if err != nil {
+		return nil, err
+	}
 
 	return &UserService{
-		tracer:          otel.Tracer("user-service"),
-		paymentClient:   paymentClient,
-		proxyClient:     proxyClient,
-		mcConnectClient: mcConnectClient,
+		tracer:           otel.Tracer("user-service"),
+		paymentClient:    paymentClient,
+		proxyClient:      proxyClient,
+		mcConnectClient:  mcConnectClient,
+		playernameClient: playernameClient,
 	}, nil
 }
 
@@ -257,6 +264,34 @@ func (s *UserService) UpdatePremiumStatusOfUser(ctx context.Context, user *db.Us
 	}
 
 	return nil
+}
+
+func (s *UserService) LoadUserUUIDByMinecraftName(ctx context.Context, name string) (string, error) {
+	ctx, span := s.tracer.Start(ctx, "load-user-by-minecraft-name")
+	defer span.End()
+
+	response, err := s.playernameClient.GetPlayerNameUuidNameWithResponse(ctx, name)
+	if err != nil {
+		span.RecordError(err)
+		return "", err
+	}
+
+	if response.StatusCode() > 399 {
+		err = fmt.Errorf("expected response code 200, got %d", response.StatusCode())
+		span.RecordError(err)
+		return "", err
+	}
+
+	uuid := response.JSON200
+
+	if uuid == nil {
+		err = fmt.Errorf("response of playername service is nil")
+		span.RecordError(err)
+		return "", err
+
+	}
+
+	return *uuid, nil
 }
 
 func (s *UserService) LoadHypixelInformationOfUUID(ctx context.Context, user *db.User, uuid string) error {
