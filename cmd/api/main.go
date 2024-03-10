@@ -26,7 +26,7 @@ import (
 func main() {
 	ctx := context.Background()
 	const service = "coflnet-bot"
-	const version = "0.0.1"
+	const version = "0.0.2"
 
 	// setup logging lib
 	setupLogger()
