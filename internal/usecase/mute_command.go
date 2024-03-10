@@ -76,6 +76,21 @@ func (m *MuteCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCrea
 
 	}
 
+	if !userAllowedToMute(i.Member) {
+		span.AddEvent("User not allowed to mute")
+		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "You are not allowed to mute",
+			},
+		})
+		if err != nil {
+			span.RecordError(err)
+			slog.Warn("Cannot respond to interaction", "err", err)
+		}
+		return
+	}
+
 	username := opt.StringValue()
 	span.SetAttributes(attribute.String("username", username))
 	message := messageOpt.StringValue()
@@ -139,4 +154,27 @@ func (m *MuteCommand) muteUser(ctx context.Context, uuid, message, muter string)
 	}
 
 	return nil
+}
+
+func userAllowedToMute(member *discordgo.Member) bool {
+	roles := member.Roles
+
+	for _, role := range roles {
+		if roleAllowedToMute(role) {
+			return true
+		}
+
+	}
+
+	return false
+}
+
+func roleAllowedToMute(role string) bool {
+	modRole := mustEnv("MOD_ROLE")
+
+	if role == modRole {
+		return true
+	}
+
+	return false
 }
