@@ -49,10 +49,10 @@ func migrations(ctx context.Context) error {
 		return err
 	}
 
-	err = db.AutoMigrate(&User{})
-	if err != nil {
-		return err
-	}
+	// err = db.AutoMigrate(&User{})
+	// if err != nil {
+	// 	return err
+	// }
 
 	err = db.AutoMigrate(&DiscordAccount{})
 	if err != nil {
