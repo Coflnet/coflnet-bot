@@ -27,12 +27,12 @@ func StartDB(ctx context.Context) error {
 		return err
 	}
 
-	err = migrations(ctx)
-	if err != nil {
-		slog.Error("Error running migrations", "err", err)
-		span.RecordError(err)
-		return err
-	}
+	// err = migrations(ctx)
+	// if err != nil {
+	// 	slog.Error("Error running migrations", "err", err)
+	// 	span.RecordError(err)
+	// 	return err
+	// }
 
 	slog.Info("Starting DB")
 	return nil
@@ -49,10 +49,10 @@ func migrations(ctx context.Context) error {
 		return err
 	}
 
-	// err = db.AutoMigrate(&User{})
-	// if err != nil {
-	// 	return err
-	// }
+	err = db.AutoMigrate(&User{})
+	if err != nil {
+		return err
+	}
 
 	err = db.AutoMigrate(&DiscordAccount{})
 	if err != nil {
