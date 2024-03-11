@@ -9,6 +9,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"log/slog"
+	"strings"
 	"time"
 )
 
@@ -44,7 +45,7 @@ func (m *MuteCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCrea
 	for _, opt := range options {
 		optionMap[opt.Name] = opt
 	}
-	opt, ok := optionMap["user"]
+	opt, ok := optionMap["username"]
 	if !ok {
 		span.AddEvent("User is required")
 		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -170,10 +171,14 @@ func userAllowedToMute(member *discordgo.Member) bool {
 }
 
 func roleAllowedToMute(role string) bool {
-	modRole := mustEnv("MOD_ROLE")
+	modRole := mustEnv("MOD_ROLES")
 
-	if role == modRole {
-		return true
+	roles := strings.Split(modRole, ",")
+
+	for _, r := range roles {
+		if strings.TrimSpace(r) == role {
+			return true
+		}
 	}
 
 	return false

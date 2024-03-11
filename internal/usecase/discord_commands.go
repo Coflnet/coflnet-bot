@@ -52,7 +52,7 @@ func (d *DiscordCommands) defineCommands() {
 			Options: []*discordgo.ApplicationCommandOption{
 				{
 					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "user",
+					Name:        "username",
 					Description: "User to mute",
 					Required:    true,
 				},
