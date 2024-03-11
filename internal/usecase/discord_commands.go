@@ -74,7 +74,7 @@ func (d *DiscordCommands) defineCommands() {
 		{
 			Name:                     "unmute",
 			Description:              "Unmute a user",
-			DefaultMemberPermissions: &defaultMemberPermissions,
+			DefaultMemberPermissions: &banPermissions,
 			Options: []*discordgo.ApplicationCommandOption{
 				{
 					Type:        discordgo.ApplicationCommandOptionString,
