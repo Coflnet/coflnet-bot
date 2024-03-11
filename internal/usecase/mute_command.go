@@ -8,6 +8,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"io"
 	"log/slog"
 	"strings"
 	"time"
@@ -74,7 +75,21 @@ func (m *MuteCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCrea
 			slog.Warn("Cannot respond to interaction", "err", err)
 		}
 		return
-
+	}
+	reasonOpt, ok := optionMap["reason"]
+	if !ok {
+		span.AddEvent("Reason is required")
+		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Reason is required",
+			},
+		})
+		if err != nil {
+			span.RecordError(err)
+			slog.Warn("Cannot respond to interaction", "err", err)
+		}
+		return
 	}
 
 	if !userAllowedToMute(i.Member) {
@@ -98,6 +113,23 @@ func (m *MuteCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCrea
 	span.SetAttributes(attribute.String("username", username))
 	message := messageOpt.StringValue()
 	span.SetAttributes(attribute.String("message", message))
+	reason := reasonOpt.StringValue()
+	span.SetAttributes(attribute.String("reason", reason))
+
+	if reason != "rule 1" && reason != "rule 2" {
+		span.AddEvent("Invalid reason")
+		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Invalid reason",
+			},
+		})
+		if err != nil {
+			span.RecordError(err)
+			slog.Warn("Cannot respond to interaction", "err", err)
+		}
+		return
+	}
 
 	uuid, err := m.userService.LoadUserUUIDByMinecraftName(ctx, username)
 	if err != nil {
@@ -119,7 +151,7 @@ func (m *MuteCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCrea
 	span.SetAttributes(attribute.String("muter", muter))
 
 	// Mute user
-	err = m.muteUser(ctx, uuid, message, muter)
+	err = m.muteUser(ctx, uuid, message, reason, muter)
 	if err != nil {
 		span.RecordError(err)
 		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -149,7 +181,7 @@ func (m *MuteCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCrea
 	span.AddEvent("User muted")
 }
 
-func (m *MuteCommand) muteUser(ctx context.Context, uuid, message, muter string) error {
+func (m *MuteCommand) muteUser(ctx context.Context, uuid, message, reason, muter string) error {
 	ctx, span := m.tracer.Start(ctx, "mute-user")
 	defer span.End()
 
@@ -160,7 +192,7 @@ func (m *MuteCommand) muteUser(ctx context.Context, uuid, message, muter string)
 	body := chatgen.PostApiChatMuteJSONRequestBody{
 		Message: strPtr(message),
 		Muter:   strPtr(muter),
-		Reason:  strPtr(message),
+		Reason:  strPtr(reason),
 		Uuid:    strPtr(uuid),
 	}
 	params := chatgen.PostApiChatMuteParams{
@@ -179,8 +211,15 @@ func (m *MuteCommand) muteUser(ctx context.Context, uuid, message, muter string)
 	if response.StatusCode >= 200 && response.StatusCode < 300 {
 		span.AddEvent("User muted")
 		return nil
-
 	}
+
+	content, err := io.ReadAll(response.Body)
+	if err != nil {
+		span.RecordError(err)
+		return err
+	}
+
+	span.SetAttributes(attribute.String("response_body", string(content)))
 
 	span.AddEvent("Cannot mute user")
 	return fmt.Errorf("cannot mute user, status code: %d", response.StatusCode)

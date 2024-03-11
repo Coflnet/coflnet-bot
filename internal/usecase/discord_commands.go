@@ -66,7 +66,13 @@ func (d *DiscordCommands) defineCommands() {
 				{
 					Type:        discordgo.ApplicationCommandOptionString,
 					Name:        "message",
-					Description: "message",
+					Description: "the message the user sent (why he got banned)",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "reason",
+					Description: "either 'rule 1' or 'rule 2'",
 					Required:    true,
 				},
 			},
