@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"log/slog"
-	"os"
 )
 
 type DiscordCommands struct {
-	commands        []*discordgo.ApplicationCommand
-	commandHandlers map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)
-	session         *discordgo.Session
+	notificationChannelCommands []*discordgo.ApplicationCommand
+	coflnetChannelCommands      []*discordgo.ApplicationCommand
+	commandHandlers             map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)
+	session                     *discordgo.Session
 
 	clearAlertChannels *ClearAlertChannels
 	muteCommand        *MuteCommand
@@ -29,8 +29,9 @@ func NewDiscordCommands(session *discordgo.Session, userService *UserService, ch
 
 func (d *DiscordCommands) defineCommands() {
 	var defaultMemberPermissions int64 = discordgo.PermissionManageServer
+	var banPermissions int64 = discordgo.PermissionBanMembers
 
-	d.commands = []*discordgo.ApplicationCommand{
+	d.notificationChannelCommands = []*discordgo.ApplicationCommand{
 		{
 			Name:                     "clear-alert-channel",
 			Description:              "Clears a specific alert channel",
@@ -48,9 +49,13 @@ func (d *DiscordCommands) defineCommands() {
 				},
 			},
 		},
+	}
+
+	d.coflnetChannelCommands = []*discordgo.ApplicationCommand{
 		{
-			Name:        "mute",
-			Description: "Mute a user",
+			Name:                     "mute",
+			Description:              "Mute a user",
+			DefaultMemberPermissions: &banPermissions,
 			Options: []*discordgo.ApplicationCommandOption{
 				{
 					Type:        discordgo.ApplicationCommandOptionString,
@@ -67,8 +72,9 @@ func (d *DiscordCommands) defineCommands() {
 			},
 		},
 		{
-			Name:        "unmute",
-			Description: "Unmute a user",
+			Name:                     "unmute",
+			Description:              "Unmute a user",
+			DefaultMemberPermissions: &defaultMemberPermissions,
 			Options: []*discordgo.ApplicationCommandOption{
 				{
 					Type:        discordgo.ApplicationCommandOptionString,
@@ -103,8 +109,18 @@ func (d *DiscordCommands) RegisterCommands() error {
 	})
 
 	slog.Info("Adding commands...")
-	for _, v := range d.commands {
+	for _, v := range d.notificationChannelCommands {
 		cmd, err := d.session.ApplicationCommandCreate(d.session.State.User.ID, notificationServerGuildId(), v)
+		if err != nil {
+			slog.Error(fmt.Sprintf("Cannot create '%v' command: %v", v.Name, err))
+			return err
+		}
+
+		slog.Info(fmt.Sprintf("Command '%s' added", cmd.Name))
+	}
+
+	for _, v := range d.coflnetChannelCommands {
+		cmd, err := d.session.ApplicationCommandCreate(d.session.State.User.ID, coflnetServerGuildId(), v)
 		if err != nil {
 			slog.Error(fmt.Sprintf("Cannot create '%v' command: %v", v.Name, err))
 			return err
@@ -117,11 +133,9 @@ func (d *DiscordCommands) RegisterCommands() error {
 }
 
 func notificationServerGuildId() string {
-	id, found := os.LookupEnv("NOTIFICATION_SERVER_GUILD_ID")
-	if !found {
-		panic("NOTIFICATION_SERVER_GUILD_ID not found")
-	}
+	return mustEnv("NOTIFICATION_SERVER_GUILD_ID")
+}
 
-	slog.Debug("NOTIFICATION_SERVER_GUILD_ID found, returning")
-	return id
+func coflnetServerGuildId() string {
+	return mustEnv("GUILD_ID")
 }
