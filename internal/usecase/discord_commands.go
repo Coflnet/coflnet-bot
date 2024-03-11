@@ -15,6 +15,7 @@ type DiscordCommands struct {
 
 	clearAlertChannels *ClearAlertChannels
 	muteCommand        *MuteCommand
+	unmuteCommand      *UnmuteCommand
 }
 
 func NewDiscordCommands(session *discordgo.Session, userService *UserService, chatClient *chatgen.Client) *DiscordCommands {
@@ -22,6 +23,7 @@ func NewDiscordCommands(session *discordgo.Session, userService *UserService, ch
 		session:            session,
 		clearAlertChannels: NewClearAlertChannels(session),
 		muteCommand:        NewMuteCommand(session, userService, chatClient),
+		unmuteCommand:      NewUnmuteCommand(session, userService, chatClient),
 	}
 }
 
@@ -64,11 +66,30 @@ func (d *DiscordCommands) defineCommands() {
 				},
 			},
 		},
+		{
+			Name:        "unmute",
+			Description: "Unmute a user",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "username",
+					Description: "User to unmute",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "reason",
+					Description: "reason",
+					Required:    true,
+				},
+			},
+		},
 	}
 
 	d.commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"clear-alert-channel": d.clearAlertChannels.Execute,
 		"mute":                d.muteCommand.Execute,
+		"unmute":              d.unmuteCommand.Execute,
 	}
 }
 
