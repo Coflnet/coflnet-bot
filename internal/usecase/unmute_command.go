@@ -29,7 +29,7 @@ func NewUnmuteCommand(session *discordgo.Session, userService *UserService, chat
 }
 
 func (u *UnmuteCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	ctx, span := u.tracer.Start(ctx, "unmute-command")
 	defer span.End()

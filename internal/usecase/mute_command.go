@@ -30,7 +30,7 @@ func NewMuteCommand(session *discordgo.Session, userService *UserService, chatCl
 }
 
 func (m *MuteCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	ctx, span := m.tracer.Start(ctx, "mute-command")
 	defer span.End()
