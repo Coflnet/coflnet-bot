@@ -207,12 +207,6 @@ func (m *MuteCommand) muteUser(ctx context.Context, uuid, message, reason, muter
 	}
 
 	span.SetAttributes(attribute.Int("status_code", response.StatusCode))
-
-	if response.StatusCode >= 200 && response.StatusCode < 300 {
-		span.AddEvent("User muted")
-		return nil
-	}
-
 	content, err := io.ReadAll(response.Body)
 	if err != nil {
 		span.RecordError(err)
@@ -220,6 +214,10 @@ func (m *MuteCommand) muteUser(ctx context.Context, uuid, message, reason, muter
 	}
 
 	span.SetAttributes(attribute.String("response_body", string(content)))
+	if response.StatusCode >= 200 && response.StatusCode < 300 {
+		span.AddEvent("User muted")
+		return nil
+	}
 
 	span.AddEvent("Cannot mute user")
 	return fmt.Errorf("cannot mute user, status code: %d", response.StatusCode)
