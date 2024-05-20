@@ -128,7 +128,7 @@ func (c *ClearAlertChannels) clearMessagesInChannel(ctx context.Context, channel
 	if len(messages) == msgLimit {
 		slog.Info(fmt.Sprintf("More than %d messages in channel %s, calling clearMessagesInChannel again", msgLimit, channel.Name))
 
-		time.Sleep(1 * time.Minute)
+		time.Sleep(10 * time.Second)
 		err = c.clearMessagesInChannel(ctx, channel)
 		if err != nil {
 			slog.Error("Cannot clear messages in channel", "err", err)
