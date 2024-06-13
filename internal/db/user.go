@@ -39,7 +39,7 @@ type DiscordAccount struct {
 
 type MinecraftAccount struct {
 	gorm.Model
-	MinecraftUUID string `gorm:"uniqueIndex"`
+	MinecraftUUID string `gorm:"index"`
 	Preferred     bool
 	UserID        uint `gorm:"index"`
 }
