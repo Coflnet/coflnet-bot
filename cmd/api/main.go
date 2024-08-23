@@ -67,18 +67,20 @@ func main() {
 	}
 
 	// setup background services
-	chat, err := usecase.NewChat(discordMessageService, redisMessageService, chatClient, userService)
+	_, err = usecase.NewChat(discordMessageService, redisMessageService, chatClient, userService)
 	if err != nil {
 		slog.Error("error setting up chat", "err", err)
 		panic(errors.New("cannot setup chat"))
 	}
 
 	go func() {
-		err := chat.StartChatService(ctx)
-		if err != nil {
-			slog.Error("failed to start chat service", "err", err)
-			panic(err)
-		}
+		// err := chat.StartChatService(ctx)
+		// if err != nil {
+		// 	slog.Error("failed to start chat service", "err", err)
+		// 	panic(err)
+		// }
+
+		slog.Warn("chat service is disabled")
 	}()
 
 	// start mongo migration
